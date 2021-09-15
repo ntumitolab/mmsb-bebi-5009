@@ -17,9 +17,11 @@ jobs:
       with:
         path: |
           __pypackages__
-        key: ${{ runner.os }}-pdm-${{ hashFiles('**/pdm.lock') }}
+          docs/_build
+        key: ${{ runner.os }}-pdm-${{ hashFiles('**/pdm.lock', '**/*.md', '**/*.ipynb') }}
         restore-keys: |
-          ${{ runner.os }}-pdm-
+          ${{ runner.os }}-pdm-${{ hashFiles('**/pdm.lock') }}
+          ${{ runner.os }}-pdm
           ${{ runner.os }}
     - name: Install dependencies
       run: pdm install
