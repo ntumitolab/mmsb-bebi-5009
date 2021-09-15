@@ -1,0 +1,43 @@
+# Reference: https://gitlab.com/coherentminds/pdm-gitlab-example/-/blob/main/.gitlab-ci.yml
+
+image: python:3.8
+
+stages:
+  - test
+  - deploy
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+before_script:
+  - apt update -qq && apt install brotli -y
+  - pip install pdm
+  - pdm install
+  - pdm run jb build docs
+
+cache:
+  - key:
+      files:
+        - pdm.lock
+    paths:
+      - __pypackages__/
+      - .cache/pip
+
+test:
+  stage: test
+  except:
+  - main
+  script:
+  - echo "Nothing to do"
+
+pages:
+  stage: deploy
+  only:
+  - main
+  script:
+  - cp -r docs/_build/html public
+  - find public -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\|svg\|xml\)$' -exec gzip   -f -k {} \; || echo 'Gzip failed. Skipping...'
+  - find public -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\|svg\|xml\)$' -exec brotli -f -k {} \; || echo 'Brotli failed. Skipping...'
+  artifacts:
+    paths:
+    - public

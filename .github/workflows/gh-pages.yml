@@ -1,0 +1,33 @@
+name: Build pages
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout master
+      uses: actions/checkout@v2
+    - name: Set up PDM
+      uses: pdm-project/setup-pdm@main
+      with:
+        python-version: 3.8
+    - name: Cache dependencies
+      uses: actions/cache@v2
+      with:
+        path: |
+          __pypackages__
+        key: ${{ runner.os }}-pdm-${{ hashFiles('**/pdm.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-pdm-
+          ${{ runner.os }}
+    - name: Install dependencies
+      run: pdm install
+    - name: Build website
+      run: pdm run jb build docs
+    - name: Deploy
+      uses: peaceiris/actions-gh-pages@v3.8.0
+      if: github.ref == 'refs/heads/main'
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: docs/_build/html
