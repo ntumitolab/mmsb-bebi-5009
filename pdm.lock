@@ -487,6 +487,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "myst-parser"
+version = "0.13.7"
+extras = ["linkify"]
+requires_python = ">=3.6"
+summary = "An extended commonmark compliant parser, with bridges to docutils & sphinx."
+dependencies = [
+    "docutils<0.18,>=0.15",
+    "jinja2",
+    "linkify-it-py~=1.0",
+    "markdown-it-py~=0.6.2",
+    "mdit-py-plugins~=0.2.5",
+    "myst-parser==0.13.7",
+    "pyyaml",
+    "sphinx<4,>=2.1",
+]
+
+[[package]]
 name = "nbclient"
 version = "0.5.4"
 requires_python = ">=3.6.1"
@@ -1053,7 +1070,7 @@ summary = "Backport of pathlib-compatible object wrapper for zip files"
 
 [metadata]
 lock_version = "3.1"
-content_hash = "sha256:7ff220e88d22ced8c0f5dbd064bdc524b3d9d3d767f102c02cd7154dcfa3320a"
+content_hash = "sha256:e80bf7aabfd80de3b50e8b9d0b7d324506bc5a5821812710536055fa128be522"
 
 [metadata.files]
 "alabaster 0.7.12" = [
