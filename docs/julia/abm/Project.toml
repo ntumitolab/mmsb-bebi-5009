@@ -1,0 +1,7 @@
+[deps]
+Agents = "46ada45e-f475-11e8-01d0-f70cc89e6671"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
+GraphRecipes = "bd48cda9-67a9-57be-86fa-5b3c104eda73"
+LightGraphs = "093fc24a-ae57-5d10-9952-331d41423f4d"
+Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
