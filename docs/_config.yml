@@ -1,10 +1,10 @@
 # Book settings
 # Learn more at https://jupyterbook.org/customize/config.html
 
-title: My sample book
+title: Mathematical Modeling in Systems Biology
 author: Wen-Wei Tseng
 copyright: "2021"     # Copyright year to be placed in the footer
-logo: logo.png
+logo: ""
 
 # See https://jupyterbook.org/content/execute.html
 execute:
@@ -25,11 +25,11 @@ parse:
     - colon_fence
     - deflist
     - dollarmath
-    - html_admonition
-    - html_image
+    # - html_admonition
+    # - html_image
     - linkify
     - replacements
-    - smartquotes
+    # - smartquotes
     - substitution
   myst_url_schemes       : [mailto, http, https]  # URI schemes that will be recognised as external URLs in Markdown links
 
@@ -57,7 +57,7 @@ launch_buttons:
 
 # Information about where the book exists on the web
 repository:
-  url: https://github.com/sosiristseng/template-jupyterbook  # Online location of your book
+  url: https://github.com/NTUMitoLab/mmsb-bebi-5009  # Online location of your book
   path_to_book: docs  # Optional path to your book, relative to the repository root
   branch: main        # Which branch of the repository should be used when creating links (optional)
 
@@ -78,3 +78,6 @@ html:
     hypothesis              : false
     utterances              : false
 
+sphinx:
+  extra_extensions:
+  - sphinx_jupyterbook_latex
