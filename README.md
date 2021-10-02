@@ -2,32 +2,35 @@
 
 ![GitHub repo size](https://img.shields.io/github/repo-size/NTUMitoLab/mmsb-bebi-5009) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/NTUMitoLab/mmsb-bebi-5009)
 
-## Course information
+## Commands
 
-👩‍🏫 Instructor: An-Chi Wei @ MD 521
+### Install Julia dependencies without updating
 
-🦜 Teaching assistant: Wen-Wei Tseng @ MD 705
+Requires `julia` to be installed.
 
-📝 Announcements & homeworks: [NTU Cool](https://cool.ntu.edu.tw/)
+```bash
+julia --project=docs/abm/ --color=yes -e 'using Pkg; Pkg.instantiate()'
+julia --project=docs/intro/ --color=yes -e 'using Pkg; Pkg.instantiate()'
+julia --project=docs/mmsb/ --color=yes -e 'using Pkg; Pkg.instantiate()'
+```
 
-📗 Textbook: Mathematical Modeling in Systems Biology(2013), by Brian P. Ingalls ([pdf](https://www.math.uwaterloo.ca/~bingalls/MMSB/MMSB_w_solutions.pdf), [MATLAB code](https://www.math.uwaterloo.ca/~bingalls/MMSB/MMSB_code.xhtml))
+### Update Julia dependencies
 
-📚 Additional materials
-- An Introduction to Stochastic Processes with Applications to Biology ([pdf](http://sistemas.fciencias.unam.mx/~silo/Cursos/coronavirus/Allen.pdf))
+Requires `julia` to be installed.
 
-## Course content
+```bash
+julia --project=docs/abm/ --color=yes -e 'using Pkg; Pkg.update()'
+julia --project=docs/intro/ --color=yes -e 'using Pkg; Pkg.update()'
+julia --project=docs/mmsb/ --color=yes -e 'using Pkg; Pkg.update()'
+```
 
-Chapter 1-4 describes mathematical modelling in molecular systems biology.
+### Run all the notebooks locally
 
-- Basic notions of mathematical modelling.
-- Dynamic mathematical models of chemical reaction networks. (ODE models)
-- Biochemical kinetics of enzyme-catalysed reactions and cooperative binding. 
-- Model reductions.
-- Analyzing differential equation models: phase plane, stability, bifurcations, sensitivity analysis.
+Requires
+- Julia dependencies installed
+- Jupyter `nbconvert`
+- GNU `parallel`
 
-Chapter 5 and beyond are applications in specific biological domain(s).
-
-- Stoichiometric modelling for large-scale metabolic networks. e.g. [COBRA](https://opencobra.github.io/cobrapy/)
-- Signal transduction pathways.
-- Gene regulatory networks.
-- Electrophysiology and action potentials in exitable cells.
+```bash
+find . -type f -name '*.ipynb' -print0 | parallel -0 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --execute --inplace {}
+```
