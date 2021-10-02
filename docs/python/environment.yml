@@ -1,7 +1,0 @@
-name: mmsb
-channels:
-  - conda-forge
-dependencies:
-  - numpy
-  - matplotlib
-  - scipy

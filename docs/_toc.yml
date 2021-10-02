@@ -6,37 +6,23 @@ root: index
 parts:
 - caption: Julia notebooks
   chapters:
-  - file: julia/intro/01-intro-to-julia
-  - file: julia/intro/02-modeling-and-visualization
-  - file: julia/abm/abm-01
+  - file: intro/01-intro-to-julia
+  - file: intro/02-modeling-and-visualization
+  - file: abm/abm-01
     sections:
-    - file: julia/abm/abm-02
-  - file: julia/mmsb/fig-01-07
+    - file: abm/abm-02
+  - file: mmsb/fig-01-07
     sections:
-    - file: julia/mmsb/fig-01-09
-    - file: julia/mmsb/fig-02-04
-    - file: julia/mmsb/fig-02-09
-    - file: julia/mmsb/fig-02-11
-    - file: julia/mmsb/fig-03-03
-    - file: julia/mmsb/fig-04-01
-    - file: julia/mmsb/fig-04-07
-    - file: julia/mmsb/fig-04-11
-    - file: julia/mmsb/fig-04-15
-    - file: julia/mmsb/fig-04-18
-    - file: julia/mmsb/fig-04-22
-    - file: julia/mmsb/prob-246
-    - file: julia/mmsb/prob-375
-
-- caption: Python notebooks
-  chapters:
-  - file: python/tutorial
-  - file: python/numpy
-  - file: python/plot
-  - file: python/ode
-  - file: python/random-walk
-  - file: python/ssa
-  - file: python/pandas
-  - file: python/textbook
-  - file: python/metanet/cobra_2020_part1
-    sections:
-    - file: python/metanet/cobra_2020_part2
+    - file: mmsb/fig-01-09
+    - file: mmsb/fig-02-04
+    - file: mmsb/fig-02-09
+    - file: mmsb/fig-02-11
+    - file: mmsb/fig-03-03
+    - file: mmsb/fig-04-01
+    - file: mmsb/fig-04-07
+    - file: mmsb/fig-04-11
+    - file: mmsb/fig-04-15
+    - file: mmsb/fig-04-18
+    - file: mmsb/fig-04-22
+    - file: mmsb/prob-246
+    - file: mmsb/prob-375
