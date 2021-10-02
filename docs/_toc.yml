@@ -6,8 +6,8 @@ root: index
 parts:
 - caption: Julia notebooks
   chapters:
-  - file: julia/01-intro-to-julia
-  - file: julia/02-modeling-and-visualization
+  - file: julia/intro/01-intro-to-julia
+  - file: julia/intro/02-modeling-and-visualization
   - file: julia/abm/abm-01
     sections:
     - file: julia/abm/abm-02
