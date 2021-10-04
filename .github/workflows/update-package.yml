@@ -1,0 +1,28 @@
+name: Auto update and rerun notebooks
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * 2"  # Every Tuesday
+
+jobs:
+  pkgupd:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: julia-actions/setup-julia@v1
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -qq && sudo apt-get install parallel
+          pip install jupyter nbconvert
+          julia --color=yes -e 'using Pkg; Pkg.add("IJulia")'
+          julia --project=docs/abm/ --color=yes -e 'using Pkg; Pkg.update()'
+          julia --project=docs/intro/ --color=yes -e 'using Pkg; Pkg.update()'
+          julia --project=docs/mmsb/ --color=yes -e 'using Pkg; Pkg.update()'
+      - name: run notebooks
+        run: 'find . -type f -name "*.ipynb" -print0 | parallel -0 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --execute --inplace {}'
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
