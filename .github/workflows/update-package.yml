@@ -16,7 +16,6 @@ jobs:
           python-version: '3.x'
       - name: Install dependencies
         run: |
-          sudo apt-get update -qq && sudo apt-get install parallel
           pip install jupyter nbconvert
           julia --color=yes -e 'using Pkg; Pkg.add("IJulia")'
           julia --project=docs/abm/ --color=yes -e 'using Pkg; Pkg.update()'
