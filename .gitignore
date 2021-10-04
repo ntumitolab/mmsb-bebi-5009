@@ -128,3 +128,6 @@ dmypy.json
 
 # Local VSCode settings
 .vscode/
+
+# Generate video clip
+*.mp4
