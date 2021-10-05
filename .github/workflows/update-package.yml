@@ -22,14 +22,14 @@ jobs:
       - name: Cache Julia
         uses: actions/cache@v2
         with:
-          path: ~/.julia
-          key: ${{ runner.os }}-${{ hashFiles('**/Manifest.toml') }}
+          path: ~/.julia/artifacts
+          key: ${{ runner.os }}-julia-${{ hashFiles('**/Manifest.toml') }}
           restore-keys: |
-            ${{ runner.os }}-
+            ${{ runner.os }}-julia-
       - name: Install dependencies
         run: |
           pip install jupyter nbconvert
-          julia --color=yes -e 'using Pkg; Pkg.add("IJulia")'
+          julia --color=yes -e 'using Pkg; Pkg.add("IJulia"); Pkg.build("IJulia");'
           julia --project=docs/abm/ --color=yes -e 'using Pkg; Pkg.update()'
           julia --project=docs/intro/ --color=yes -e 'using Pkg; Pkg.update()'
           julia --project=docs/mmsb/ --color=yes -e 'using Pkg; Pkg.update()'
