@@ -5,28 +5,22 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash -l {0}
     steps:
     - uses: actions/checkout@v2
-    - name: Cache conda
+    - name: Cache python
       uses: actions/cache@v2
-      env:
-        # Increase this value to reset cache
-        CACHE_NUMBER: 0
       with:
-        path: ~/conda_pkgs_dir
-        key: ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}
-    - name: Set up Mamba
-      uses: conda-incubator/setup-miniconda@v2
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    - name: Set up Python
+      uses: actions/setup-python@v2
       with:
-        miniforge-variant: Mambaforge
-        miniforge-version: latest
-        use-mamba: true
-        use-only-tar-bz2: true
-    - name: Install dependencies
-      run: mamba install jupyter-book
+        python-version: 3.9
+    - name: Install Python Dependencies
+      run: |
+        pip install -r requirements.txt
     - name: Build website
       run: jb build docs
     - name: Deploy
