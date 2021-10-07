@@ -1,4 +1,4 @@
-name: Auto update and rerun notebooks
+name: Auto update notebooks
 
 on:
   workflow_dispatch:
