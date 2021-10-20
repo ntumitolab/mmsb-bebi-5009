@@ -9,7 +9,6 @@
 Requires `julia` to be installed.
 
 ```bash
-julia --project=docs/abm/ --color=yes -e 'using Pkg; Pkg.instantiate()'
 julia --project=docs/intro/ --color=yes -e 'using Pkg; Pkg.instantiate()'
 julia --project=docs/mmsb/ --color=yes -e 'using Pkg; Pkg.instantiate()'
 ```
@@ -19,7 +18,6 @@ julia --project=docs/mmsb/ --color=yes -e 'using Pkg; Pkg.instantiate()'
 Requires `julia` to be installed.
 
 ```bash
-julia --project=docs/abm/ --color=yes -e 'using Pkg; Pkg.update()'
 julia --project=docs/intro/ --color=yes -e 'using Pkg; Pkg.update()'
 julia --project=docs/mmsb/ --color=yes -e 'using Pkg; Pkg.update()'
 ```
@@ -32,5 +30,5 @@ Requires
 - GNU `parallel`
 
 ```bash
-find . -type f -name '*.ipynb' -print0 | parallel -0 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --execute --inplace {}
+find . -type f -name '*.ipynb' -print0 | parallel -0 -j$(nproc) jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --execute --inplace {}
 ```
