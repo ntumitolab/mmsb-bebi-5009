@@ -11,6 +11,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: julia-actions/setup-julia@v1
+        with:
+          version: '1.6'
       - uses: actions/setup-python@v2
         with:
           python-version: '3.x'
@@ -34,6 +36,6 @@ jobs:
           julia --project=docs/intro/ --color=yes -e 'using Pkg; Pkg.update()'
           julia --project=docs/mmsb/ --color=yes -e 'using Pkg; Pkg.update()'
       - name: run notebooks
-        run: 'find . -type f -name "*.ipynb" -print0 | parallel -0 -j2 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --execute --inplace {}'
+        run: 'find . -type f -name "*.ipynb" -print0 | parallel -0 -j$(nproc) jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --execute --inplace {}'
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
