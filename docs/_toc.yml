@@ -8,9 +8,6 @@ parts:
   chapters:
   - file: intro/01-intro-to-julia
   - file: intro/02-modeling-and-visualization
-  - file: abm/abm-01
-    sections:
-    - file: abm/abm-02
   - file: mmsb/fig-01-07
     sections:
     - file: mmsb/fig-01-09
