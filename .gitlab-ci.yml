@@ -4,12 +4,9 @@ stages:
   - test
   - deploy
 
-variables:
-  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-
-cache:
-  paths:
-    - .cache/pip
+tags:
+  - ubuntu
+  - md705
 
 before_script:
   - python -m pip install jupyter-book
