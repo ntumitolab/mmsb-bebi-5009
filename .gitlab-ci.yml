@@ -4,15 +4,14 @@ stages:
   - test
   - deploy
 
-tags:
-  - ubuntu
-  - md705
-
 before_script:
   - python -m pip install jupyter-book
   - jupyter-book build docs
 
 test:
+  tags:
+  - ubuntu
+  - md705
   stage: test
   except:
   - main
@@ -20,6 +19,9 @@ test:
   - echo "Nothing to do"
 
 pages:
+  tags:
+  - ubuntu
+  - md705
   stage: deploy
   only:
   - main
