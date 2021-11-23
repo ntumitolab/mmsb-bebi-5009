@@ -27,8 +27,8 @@ jobs:
         run: |
           pip install jupyter nbconvert
           julia --color=yes -e 'using Pkg; Pkg.add("IJulia"); Pkg.build("IJulia");'
-          julia --project=docs/intro/ --color=yes -e 'using Pkg; Pkg.update()'
-          julia --project=docs/mmsb/ --color=yes -e 'using Pkg; Pkg.update()'
+          julia --project=intro/ --color=yes -e 'using Pkg; Pkg.update()'
+          julia --project=mmsb/ --color=yes -e 'using Pkg; Pkg.update()'
       - name: run notebooks
         run: 'find . -type f -name "*.ipynb" -print0 | parallel -0 -j$(nproc) jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --execute --inplace {}'
       - name: Create Pull Request
