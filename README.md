@@ -9,8 +9,7 @@
 Requires `julia` to be installed.
 
 ```bash
-julia --project=docs/intro/ --color=yes -e 'using Pkg; Pkg.instantiate()'
-julia --project=docs/mmsb/ --color=yes -e 'using Pkg; Pkg.instantiate()'
+julia --project=. --color=yes -e 'using Pkg; Pkg.instantiate()'
 ```
 
 ### Update Julia dependencies
@@ -18,8 +17,7 @@ julia --project=docs/mmsb/ --color=yes -e 'using Pkg; Pkg.instantiate()'
 Requires `julia` to be installed.
 
 ```bash
-julia --project=docs/intro/ --color=yes -e 'using Pkg; Pkg.update()'
-julia --project=docs/mmsb/ --color=yes -e 'using Pkg; Pkg.update()'
+julia --project=. --color=yes -e 'using Pkg; Pkg.update()'
 ```
 
 ### Run all the notebooks locally
