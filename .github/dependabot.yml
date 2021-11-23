@@ -7,3 +7,15 @@ updates:
       interval: 'weekly'
     labels:
       - "automerge"
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "automerge"
+  - package-ecosystem: "pip"
+    directory: "/jupyter-book"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "automerge"

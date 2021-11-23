@@ -7,13 +7,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - name: Cache Python dependencies
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-jb-${{ hashFiles('jupyter-book/requirements.txt') }}
+        restore-keys: |
+            ${{ runner.os }}-jb-
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
         python-version: 3.9
     - name: Install Python Dependencies
-      run: |
-        pip install jupyter-book
+      run: python -m pip install -r jupyter-book/requirements.txt
     - name: Build website
       run: jb build .
     - name: Deploy
