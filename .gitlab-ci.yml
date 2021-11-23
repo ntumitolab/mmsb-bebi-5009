@@ -6,7 +6,7 @@ stages:
 
 before_script:
   - python -m pip install jupyter-book
-  - jupyter-book build docs
+  - jupyter-book build .
 
 test:
   tags:
@@ -26,7 +26,7 @@ pages:
   only:
   - main
   script:
-  - mv docs/_build/html public
+  - mv _build/html public
   - apt-get update -qq && apt-get install brotli -y
   - find public -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\|svg\|xml\)$' -exec gzip   -f -k {} \; || echo 'Gzip failed. Skipping...'
   - find public -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\|svg\|xml\)$' -exec brotli -f -k {} \; || echo 'Brotli failed. Skipping...'
