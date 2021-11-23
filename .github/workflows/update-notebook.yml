@@ -6,7 +6,7 @@ on:
     - cron: "0 0 * * 2"  # Every Tuesday
 
 jobs:
-  pkgupd:
+  update:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -16,15 +16,10 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: '3.x'
-      - name: Cache python
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-
       - name: Cache Julia
         uses: actions/cache@v2
         with:
-          path: ~/.julia/artifacts
+          path: ~/.julia
           key: ${{ runner.os }}-julia-${{ hashFiles('**/Manifest.toml') }}
           restore-keys: |
             ${{ runner.os }}-julia-

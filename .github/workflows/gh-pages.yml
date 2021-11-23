@@ -7,11 +7,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Cache python
-      uses: actions/cache@v2
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-jb-
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
@@ -20,11 +15,11 @@ jobs:
       run: |
         pip install jupyter-book
     - name: Build website
-      run: jupyter-book build docs
+      run: jb build .
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v3.8.0
       if: github.ref == 'refs/heads/main'
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: docs/_build/html
+        publish_dir: _build/html
         force_orphan: true
