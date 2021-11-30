@@ -9,9 +9,6 @@ before_script:
   - jupyter-book build .
 
 test:
-  tags:
-  - ubuntu
-  - md705
   stage: test
   except:
   - main
@@ -19,15 +16,12 @@ test:
   - echo "Nothing to do"
 
 pages:
-  tags:
-  - ubuntu
-  - md705
   stage: deploy
   only:
   - main
   script:
   - mv _build/html public
-  - apt-get update -qq && apt-get install brotli -y
+  - apt-get update -qq && apt-get install gzip brotli -y
   - find public -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\|svg\|xml\)$' -exec gzip   -f -k {} \; || echo 'Gzip failed. Skipping...'
   - find public -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\|svg\|xml\)$' -exec brotli -f -k {} \; || echo 'Brotli failed. Skipping...'
   artifacts:

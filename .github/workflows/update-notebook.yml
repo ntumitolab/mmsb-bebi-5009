@@ -6,31 +6,44 @@ on:
     - cron: "0 0 * * 2"  # Every Tuesday
 
 jobs:
-  update:
+  update-notebook:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: julia-actions/setup-julia@v1
+      - name: Setup Julia
+        uses: julia-actions/setup-julia@v1
         with:
           version: '1.6'
-      - uses: actions/setup-python@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
         with:
-          python-version: '3.x'
-      - name: Cache Julia
+          python-version: '3.9'
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Cache Julia artifacts
         uses: actions/cache@v2
+        env:
+          cache-name: cache-all
         with:
           path: ~/.julia
-          key: ${{ runner.os }}-julia-${{ hashFiles('**/Manifest.toml') }}
+          key: ${{ runner.os }}-julia-${{ env.cache-name }}-${{ hashFiles('**/Manifest.toml') }}
           restore-keys: |
+            ${{ runner.os }}-julia-${{ env.cache-name }}-
             ${{ runner.os }}-julia-
-      - name: Install dependencies
+      - name: Update Julia dependencies
         env:
-          PYTHON : ""
+          PYTHON : python
+        shell: julia --color=yes --project=. {0}
         run: |
-          pip install nbconvert
-          julia --color=yes -e 'using Pkg; Pkg.add("IJulia"); Pkg.build("IJulia");'
-          julia --project=. --color=yes -e 'using Pkg; Pkg.update()'
-      - name: run notebooks
-        run: 'find . -type f -name "*.ipynb" -print0 | parallel -0 -j$(nproc) jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --execute --inplace {}'
+          using Pkg
+          Pkg.update()
+          Pkg.add("IJulia")
+          Pkg.build("IJulia")
+      - name: Execute notebooks
+        run: |
+          find . -type f -name "*.ipynb" -print0 | parallel -0 -j2 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --execute --inplace {}
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
