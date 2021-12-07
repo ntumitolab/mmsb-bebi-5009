@@ -13,4 +13,7 @@ StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 
 [compat]
 Parameters = "0.12"
+DifferentialEquations = "6"
+IJulia = "1"
+PyPlot = "2"
 julia = "1.7"
