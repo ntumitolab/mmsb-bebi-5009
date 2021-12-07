@@ -14,7 +14,7 @@ updates:
     labels:
       - "automerge"
   - package-ecosystem: "pip"
-    directory: "/jupyter-book"
+    directory: "/_jb"
     schedule:
       interval: "weekly"
     labels:

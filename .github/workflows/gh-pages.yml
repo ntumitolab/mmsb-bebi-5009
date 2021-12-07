@@ -7,12 +7,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python
+    - name: Setup Python
       uses: actions/setup-python@v2
       with:
-        python-version: 3.9
+        python-version: '3.9'
     - name: Install Jupyter book Dependencies
-      run: python -m pip install -r jupyter-book/requirements.txt
+      run: pip install -r _jb/requirements.txt
     - name: Build website
       run: jb build .
     - name: Deploy
