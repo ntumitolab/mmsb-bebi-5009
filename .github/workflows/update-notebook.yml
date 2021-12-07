@@ -13,7 +13,7 @@ jobs:
       - name: Setup Julia
         uses: julia-actions/setup-julia@v1
         with:
-          version: '1.6'
+          version: '1.7'
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
@@ -35,7 +35,7 @@ jobs:
       - name: Install IJulia
         env:
           PYTHON : python
-        shell: julia --color=yes {0}
+        shell: julia --color=yes --threads=auto {0}
         run: |
           import Pkg
           Pkg.add("IJulia")
@@ -43,7 +43,7 @@ jobs:
       - name: Update Julia dependencies
         env:
           PYTHON : python
-        shell: julia --color=yes --project=. {0}
+        shell: julia --color=yes --project=. --threads=auto {0}
         run: |
           import Pkg
           Pkg.update()
