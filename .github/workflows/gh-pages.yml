@@ -7,10 +7,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Setup Python
-      uses: actions/setup-python@v2
+    - uses: actions/setup-python@v2
       with:
         python-version: '3.9'
+        cache: 'pip'
+        cache-dependency-path: '_jb/requirements.txt'
     - name: Install Jupyter book Dependencies
       run: pip install -r _jb/requirements.txt
     - name: Build website
