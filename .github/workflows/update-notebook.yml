@@ -14,6 +14,7 @@ jobs:
         uses: julia-actions/setup-julia@v1
         with:
           version: '1.7'
+      - uses: julia-actions/cache-artifacts@v1
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
@@ -22,17 +23,6 @@ jobs:
           cache-dependency-path: 'requirements.txt'
       - name: Install Python dependencies
         run: pip install -r requirements.txt
-      - name: Cache Julia
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-all
-        with:
-          path: ~/.julia
-          key: ${{ runner.os }}-julia-${{ env.cache-name }}-${{ hashFiles('**/Manifest.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-julia-${{ env.cache-name }}-
-            ${{ runner.os }}-julia-
-
       - name: Install IJulia
         env:
           PYTHON : python
