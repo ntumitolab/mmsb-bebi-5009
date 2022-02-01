@@ -1,29 +1,98 @@
-image: python:3.9-slim
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  JULIA_DEPOT_PATH: "$CI_PROJECT_DIR/.julia"
 
 stages:
+  - build
   - test
   - deploy
 
-before_script:
-  - python -m pip install jupyter-book
-  - jupyter-book build .
-
-test:
+# GitLab CI: Auto dependency updates https://thacoon.com/posts/gitlab-ci-auto-dependency-update/
+# You need a personal access token as GIT_PUSH_TOKEN, with api and write repository rights
+update-julia-notebooks:
   stage: test
-  except:
-  - main
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+  image: julia:1.7
+  variables:
+    PYTHON: python
+  cache:
+    - key:
+        files:
+          - requirements.txt
+      paths:
+        - venv/
+        - .cache/pip
+    - key:
+        files:
+          - Project.toml
+          - Manifest.toml
+      paths:
+        - .julia/artifacts
+        - .julia/compiled
+        - .julia/packages
   script:
-  - echo "Nothing to do"
+    - apt-get -qq update && apt-get -qq install parallel python3 python3-pip python3-venv git curl > /dev/null
+    - python3 -m venv --upgrade-deps venv/
+    - source venv/bin/activate
+    - python3 -m pip install -r requirements.txt
+    - julia --color=yes --threads=auto -e 'import Pkg; Pkg.add(["IJulia", "PyPlot"]); Pkg.build(["IJulia", "PyPlot"]); import PyPlot'
+    - julia --color=yes --threads=auto --project=@. -e 'import Pkg; Pkg.update()'
+    - find docs -type f -name "*.ipynb" -print0 | parallel -0 -j1 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --ExecutePreprocessor.kernel_name=julia-1.7 --execute --inplace {}
+    - |
+      lines=$(git status -s | wc -l)
+      if [ $lines -gt 0 ];then
+        echo "committing"
+        git checkout -b auto-update-$(date '+%Y-%m-%d')
+        git config --global user.name "${GITLAB_USER_NAME}"
+        git config --global user.email "${GITLAB_USER_EMAIL}"
+        git add .
+        git commit -m "auto-update-$(date '+%Y-%m-%d')"
+        git push "https://${GITLAB_USER_NAME}:${GIT_PUSH_TOKEN}@${CI_REPOSITORY_URL#*@}"
+        BODY="{\"id\": \"${CI_PROJECT_ID}\", \"source_branch\": \"auto-update-$(date '+%Y-%m-%d')\", \"target_branch\": \"main\", \"remove_source_branch\": true, \"title\": \"Auto Update $(date '+%Y-%m-%d')\"}"
+        curl -X POST "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/merge_requests" \
+                --header "PRIVATE-TOKEN:${GIT_PUSH_TOKEN}" \
+                --header "Content-Type: application/json" \
+                --data "${BODY}";
+        echo "Opened a new merge request: \"Auto Update $(date '+%Y-%m-%d')\" and assigned to you";
+        exit;
+      else
+        echo "no change, nothing to commit"
+      fi
+
+build-notebooks:
+  stage: build
+  image: debian:11-slim
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
+  cache:
+    - key:
+        files:
+          - .jb/requirements.txt
+      paths:
+        - jbenv/
+        - .cache/pip
+  script:
+    - apt-get -qq update && apt-get -qq install python3 python3-pip python3-venv > /dev/null
+    - python3 -m venv --upgrade-deps jbenv/
+    - source jbenv/bin/activate
+    - python3 -m pip install -r .jb/requirements.txt
+    - jupyter-book build docs
+  artifacts:
+    paths:
+      - docs/_build/
 
 pages:
   stage: deploy
-  only:
-  - main
+  image: alpine:3.15
+  needs: ["build-notebooks"]
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "push"
   script:
-  - mv _build/html public
-  - apt-get update -qq && apt-get install gzip brotli -y
-  - find public -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\|svg\|xml\)$' -exec gzip   -f -k {} \; || echo 'Gzip failed. Skipping...'
-  - find public -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\|svg\|xml\)$' -exec brotli -f -k {} \; || echo 'Brotli failed. Skipping...'
+    - mv docs/_build/html public
+    - apk add --no-cache brotli gzip
+    - find public -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\|svg\|xml\)$' -exec gzip   -f -k {} \; || echo 'Gzip failed. Skipping...'
+    - find public -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\|svg\|xml\)$' -exec brotli -f -k {} \; || echo 'Brotli failed. Skipping...'
   artifacts:
     paths:
-    - public
+      - public

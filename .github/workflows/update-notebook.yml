@@ -1,45 +1,43 @@
 name: Auto update notebooks
 
+env:
+  JULIA_VERSION: "1.7"
+  PYTHON_VERSION: "3.9"
+
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 0 * * 2"  # Every Tuesday
+    - cron: "0 0 * * 2" # Every Tuesday
 
 jobs:
   update-notebook:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: julia-actions/cache@v1
       - name: Setup Julia
         uses: julia-actions/setup-julia@v1
         with:
-          version: '1.7'
+          version: ${{ env.JULIA_VERSION }}
       - uses: julia-actions/cache-artifacts@v1
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.9'
-          cache: 'pip'
-          cache-dependency-path: 'requirements.txt'
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: "pip"
+          cache-dependency-path: "requirements.txt"
       - name: Install Python dependencies
         run: pip install -r requirements.txt
       - name: Install IJulia
         env:
-          PYTHON : python
-        shell: julia --color=yes --threads=auto {0}
-        run: |
-          import Pkg
-          Pkg.add("IJulia")
-          Pkg.build("IJulia")
+          PYTHON: python
+        run: julia --color=yes --threads=auto -e 'import Pkg; Pkg.add(["IJulia", "PyPlot"]); Pkg.build(["IJulia", "PyPlot"]); import PyPlot'
       - name: Update Julia dependencies
         env:
-          PYTHON : python
-        shell: julia --color=yes --project=. --threads=auto {0}
-        run: |
-          import Pkg
-          Pkg.update()
+          PYTHON: python
+        run: julia --color=yes --threads=auto --project=@. -e 'import Pkg; Pkg.update()'
       - name: Execute notebooks
         run: |
-          find . -type f -name "*.ipynb" -print0 | parallel -0 -j2 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --execute --inplace {}
+          find docs -type f -name "*.ipynb" -print0 | parallel -0 -j2 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --execute --inplace {}
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3

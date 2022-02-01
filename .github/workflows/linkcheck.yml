@@ -12,10 +12,10 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
-          python-version: '3.9'
-          cache: 'pip'
-          cache-dependency-path: '_jb/requirements.txt'
+          python-version: "3.9"
+          cache: "pip"
+          cache-dependency-path: "_jb/requirements.txt"
       - name: Install Jupyter book Dependencies
-        run: pip install -r _jb/requirements.txt
+        run: pip install -r .jb/requirements.txt
       - name: Check links
-        run: jb build . --builder linkcheck
+        run: jb build docs --builder linkcheck
