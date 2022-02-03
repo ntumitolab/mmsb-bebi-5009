@@ -14,6 +14,8 @@ update-julia-notebooks:
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
   image: julia:1.7
+  tags:
+    - "md705"
   variables:
     PYTHON: python
   cache:
