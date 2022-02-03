@@ -47,6 +47,7 @@ update-julia-notebooks:
         echo "committing"
         git config --global user.name "${GITLAB_USER_NAME}"
         git config --global user.email "${GITLAB_USER_EMAIL}"
+        git checkout -b $CI_DEFAULT_BRANCH
         git add .
         git commit -m "auto-update-$(date '+%Y-%m-%d')"
         git push "https://${GITLAB_USER_NAME}:${GIT_PUSH_TOKEN}@${CI_REPOSITORY_URL#*@}"
