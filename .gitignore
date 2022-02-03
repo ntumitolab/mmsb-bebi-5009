@@ -131,3 +131,7 @@ dmypy.json
 
 # Generate video clip
 *.mp4
+
+# Julia DEPOT
+
+.julia/
