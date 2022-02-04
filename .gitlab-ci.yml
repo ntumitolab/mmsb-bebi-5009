@@ -59,8 +59,6 @@ update-julia-notebooks:
 build-notebooks:
   stage: build
   image: debian:11-slim
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "push"
   cache:
     - key:
         files:
