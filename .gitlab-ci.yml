@@ -1,6 +1,10 @@
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
   JULIA_DEPOT_PATH: "$CI_PROJECT_DIR/.julia"
+  JL_MAJOR: "1.7"
+  JL_MINOR: "1"
+  JL_ARCH: "x64"
+  JULIA_PATH: "/usr/local/bin"
 
 stages:
   - build
@@ -13,11 +17,11 @@ update-julia-notebooks:
   stage: build
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
-  image: julia:1.7
+  image: python:3.10-slim
   tags:
     - "md705"
-  variables:
-    PYTHON: python
+  # variables:
+  #   PYTHON: python
   cache:
     - key:
         files:
@@ -34,13 +38,14 @@ update-julia-notebooks:
         - .julia/compiled
         - .julia/packages
   script:
-    - apt-get -qq update && apt-get -qq install parallel python3 python3-pip python3-venv git curl > /dev/null
-    - python3 -m venv --upgrade-deps venv/
+    - apt-get -qq update && apt-get -qq install parallel git curl > /dev/null
+    - curl -fL "https://julialang-s3.julialang.org/bin/linux/${JL_ARCH}/${JL_MAJOR}/julia-${JL_MAJOR}.${JL_MINOR}-linux-x86_64.tar.gz" | tar -xzvf - -C "${JULIA_PATH}" --strip-components 1
+    - python -m venv --upgrade-deps venv/
     - source venv/bin/activate
-    - python3 -m pip install -r requirements.txt
+    - python -m pip install -r requirements.txt
     - julia --color=yes --threads=auto -e 'import Pkg; Pkg.add(["IJulia", "PyPlot"]); Pkg.build(["IJulia", "PyPlot"]); import PyPlot'
     - julia --color=yes --threads=auto --project=@. -e 'import Pkg; Pkg.update()'
-    - find docs -type f -name "*.ipynb" -print0 | parallel -0 -j8 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --ExecutePreprocessor.kernel_name=julia-1.7 --execute --inplace {}
+    - find docs -type f -name "*.ipynb" -print0 | parallel -0 -j8 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --ExecutePreprocessor.kernel_name=julia-${JL_MAJOR} --execute --inplace {}
     - |
       lines=$(git status -s | wc -l)
       if [ $lines -gt 0 ];then
