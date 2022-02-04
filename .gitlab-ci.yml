@@ -10,7 +10,7 @@ stages:
 # GitLab CI: Auto dependency updates https://thacoon.com/posts/gitlab-ci-auto-dependency-update/
 # You need a personal access token as GIT_PUSH_TOKEN, with api and write repository rights
 update-julia-notebooks:
-  stage: test
+  stage: build
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
   image: julia:1.7
