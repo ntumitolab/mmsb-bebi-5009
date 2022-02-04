@@ -50,18 +50,19 @@ update-julia-notebooks:
       lines=$(git status -s | wc -l)
       if [ $lines -gt 0 ];then
         echo "committing"
-        git checkout -b auto-update-$(date '+%Y-%m-%d')
+        NEW_BR=auto-update-$(date '+%Y-%m-%d-%H-%M-%S')
+        git checkout -b ${NEW_BR}
         git config --global user.name "${GITLAB_USER_NAME}"
         git config --global user.email "${GITLAB_USER_EMAIL}"
         git add .
-        git commit -m "auto-update-$(date '+%Y-%m-%d')"
+        git commit -m "${NEW_BR}"
         git push "https://${GITLAB_USER_NAME}:${GIT_PUSH_TOKEN}@${CI_REPOSITORY_URL#*@}"
-        BODY="{\"id\": \"${CI_PROJECT_ID}\", \"source_branch\": \"auto-update-$(date '+%Y-%m-%d')\", \"target_branch\": \"main\", \"remove_source_branch\": true, \"title\": \"Auto Update $(date '+%Y-%m-%d')\"}"
+        BODY="{\"id\": \"${CI_PROJECT_ID}\", \"source_branch\": \"${NEW_BR}\", \"target_branch\": \"main\", \"remove_source_branch\": true, \"title\": \"${NEW_BR}\"}"
         curl -X POST "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/merge_requests" \
                 --header "PRIVATE-TOKEN:${GIT_PUSH_TOKEN}" \
                 --header "Content-Type: application/json" \
                 --data "${BODY}";
-        echo "Opened a new merge request: \"Auto Update $(date '+%Y-%m-%d')\" and assigned to you";
+        echo "Opened a new merge request: \" ${NEW_BR} \" and assigned to you";
         exit;
       else
         echo "no change, nothing to commit"
