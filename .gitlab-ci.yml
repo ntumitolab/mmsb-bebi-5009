@@ -39,7 +39,8 @@ update-julia-notebooks:
         - .julia/packages
   script:
     - apt-get -qq update && apt-get -qq install parallel git curl > /dev/null
-    - curl -fL "https://julialang-s3.julialang.org/bin/linux/${JL_ARCH}/${JL_MAJOR}/julia-${JL_MAJOR}.${JL_MINOR}-linux-x86_64.tar.gz" | tar -xzvf - -C "${JULIA_PATH}" --strip-components 1
+    - curl -fL "https://julialang-s3.julialang.org/bin/linux/${JL_ARCH}/${JL_MAJOR}/julia-${JL_MAJOR}.${JL_MINOR}-linux-x86_64.tar.gz" | tar -xzf - -C "${JULIA_PATH}" --strip-components 1
+    - julia --version
     - python -m venv --upgrade-deps venv/
     - source venv/bin/activate
     - python -m pip install -r requirements.txt
