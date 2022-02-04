@@ -4,7 +4,7 @@ variables:
   JL_MAJOR: "1.7"
   JL_MINOR: "1"
   JL_ARCH: "x64"
-  JULIA_PATH: "/usr/local/bin"
+  JULIA_PATH: "/usr/local"
 
 stages:
   - build
