@@ -8,19 +8,15 @@ stages:
 
 # GitLab CI: Auto dependency updates https://thacoon.com/posts/gitlab-ci-auto-dependency-update/
 # You need a personal access token as GIT_PUSH_TOKEN, with api and write repository rights
-update-julia-notebooks:
+update-julia:
   stage: build
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
-  image: python:3.10-slim
+  image: registry.gitlab.com/sosiristseng/docker-python-julia:latest
   tags:
     - "md705"
   variables:
     JULIA_DEPOT_PATH: "$CI_PROJECT_DIR/.julia"
-    JL_MAJOR: "1.7"
-    JL_MINOR: "2"
-    JL_ARCH: "x64"
-    JULIA_PATH: "/usr/local"
     N_CORES: 8
   cache:
     - key:
@@ -29,21 +25,17 @@ update-julia-notebooks:
       paths:
         - venv/
         - .cache/pip
-    - key: julia-$JL_MAJOR
+    - key: julia
       paths:
         - .julia/artifacts
         - .julia/compiled
         - .julia/packages
 
   before_script:
-    - pip install -U pip wheel virtualenv
     - virtualenv venv
     - source venv/bin/activate
     - pip install -r requirements.txt
   script:
-    - apt-get -qq update && apt-get -qq install parallel git curl > /dev/null
-    - curl -fL "https://julialang-s3.julialang.org/bin/linux/${JL_ARCH}/${JL_MAJOR}/julia-${JL_MAJOR}.${JL_MINOR}-linux-x86_64.tar.gz" | tar -xzf - -C "${JULIA_PATH}" --strip-components 1
-    - julia --version
     - julia --color=yes --threads=auto -e 'import Pkg; Pkg.add(["IJulia", "PyPlot"]); Pkg.build(["IJulia", "PyPlot"]); import PyPlot'
     - julia --color=yes --threads=auto --project=@. -e 'import Pkg; Pkg.update()'
     - find docs -type f -name "*.ipynb" -print0 | parallel -0 -j${N_CORES} jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --ExecutePreprocessor.kernel_name=julia-${JL_MAJOR} --execute --inplace {}
@@ -69,7 +61,7 @@ update-julia-notebooks:
         echo "no change, nothing to commit"
       fi
 
-build-notebooks:
+build-website:
   stage: build
   image: python:3.10-slim
   rules:
@@ -96,7 +88,7 @@ build-notebooks:
 pages:
   stage: deploy
   image: alpine:3.15
-  needs: ["build-notebooks"]
+  needs: ["build-website"]
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "push"
   script:
