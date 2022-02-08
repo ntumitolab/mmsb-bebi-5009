@@ -1,10 +1,5 @@
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-  JULIA_DEPOT_PATH: "$CI_PROJECT_DIR/.julia"
-  JL_MAJOR: "1.7"
-  JL_MINOR: "1"
-  JL_ARCH: "x64"
-  JULIA_PATH: "/usr/local"
 
 stages:
   - build
@@ -20,8 +15,13 @@ update-julia-notebooks:
   image: python:3.10-slim
   tags:
     - "md705"
-  # variables:
-  #   PYTHON: python
+  variables:
+    JULIA_DEPOT_PATH: "$CI_PROJECT_DIR/.julia"
+    JL_MAJOR: "1.7"
+    JL_MINOR: "1"
+    JL_ARCH: "x64"
+    JULIA_PATH: "/usr/local"
+    N_CORES: 8
   cache:
     - key:
         files:
@@ -29,41 +29,41 @@ update-julia-notebooks:
       paths:
         - venv/
         - .cache/pip
-    - key:
-        files:
-          - Project.toml
-          - Manifest.toml
+    - key: julia-$JL_MAJOR
       paths:
         - .julia/artifacts
         - .julia/compiled
         - .julia/packages
+
+  before_script:
+    - pip install -U pip wheel virtualenv
+    - virtualenv venv
+    - source venv/bin/activate
+    - pip install -r requirements.txt
   script:
     - apt-get -qq update && apt-get -qq install parallel git curl > /dev/null
     - curl -fL "https://julialang-s3.julialang.org/bin/linux/${JL_ARCH}/${JL_MAJOR}/julia-${JL_MAJOR}.${JL_MINOR}-linux-x86_64.tar.gz" | tar -xzf - -C "${JULIA_PATH}" --strip-components 1
     - julia --version
-    - python -m venv --upgrade-deps venv/
-    - source venv/bin/activate
-    - python -m pip install -r requirements.txt
     - julia --color=yes --threads=auto -e 'import Pkg; Pkg.add(["IJulia", "PyPlot"]); Pkg.build(["IJulia", "PyPlot"]); import PyPlot'
     - julia --color=yes --threads=auto --project=@. -e 'import Pkg; Pkg.update()'
-    - find docs -type f -name "*.ipynb" -print0 | parallel -0 -j8 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --ExecutePreprocessor.kernel_name=julia-${JL_MAJOR} --execute --inplace {}
+    - find docs -type f -name "*.ipynb" -print0 | parallel -0 -j${N_CORES} jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --ExecutePreprocessor.kernel_name=julia-${JL_MAJOR} --execute --inplace {}
     - |
-      lines=$(git status -s | wc -l)
-      if [ $lines -gt 0 ];then
-        echo "committing"
+      if [[ -n $(git status --porcelain) ]]; then
+        echo "Commiting updates"
         NEW_BR=auto-update-$(date '+%Y-%m-%d-%H-%M-%S')
-        git checkout -b ${NEW_BR}
         git config --global user.name "${GITLAB_USER_NAME}"
         git config --global user.email "${GITLAB_USER_EMAIL}"
+        git checkout -b ${NEW_BR}
         git add .
         git commit -m "${NEW_BR}"
-        git push "https://${GITLAB_USER_NAME}:${GIT_PUSH_TOKEN}@${CI_REPOSITORY_URL#*@}"
-        BODY="{\"id\": \"${CI_PROJECT_ID}\", \"source_branch\": \"${NEW_BR}\", \"target_branch\": \"main\", \"remove_source_branch\": true, \"title\": \"${NEW_BR}\"}"
-        curl -X POST "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/merge_requests" \
-                --header "PRIVATE-TOKEN:${GIT_PUSH_TOKEN}" \
-                --header "Content-Type: application/json" \
-                --data "${BODY}";
-        echo "Opened a new merge request: \" ${NEW_BR} \" and assigned to you";
+        git push "https://${GITLAB_USER_NAME}:${GIT_PUSH_TOKEN}@${CI_REPOSITORY_URL#*@}" \
+            -o merge_request.create \
+            -o merge_request.target="${CI_DEFAULT_BRANCH}" \
+            -o merge_request.merge_when_pipeline_succeeds \
+            -o merge_request.remove_source_branch \
+            -o merge_request.title="${NEW_BR}" \
+            -o merge_request.label="automated update" \
+            -o merge_request.assign="${GITLAB_USER_NAME}"
         exit;
       else
         echo "no change, nothing to commit"
@@ -79,12 +79,14 @@ build-notebooks:
         files:
           - .jb/requirements.txt
       paths:
-        - jbenv/
+        - venv/
         - .cache/pip
+  before_script:
+    - pip install -U pip wheel virtualenv
+    - virtualenv venv
+    - source venv/bin/activate
+    - pip install -r .jb/requirements.txt
   script:
-    - python -m venv --upgrade-deps jbenv/
-    - source jbenv/bin/activate
-    - python -m pip install -r .jb/requirements.txt
     - jupyter-book build docs
   artifacts:
     paths:
