@@ -91,6 +91,7 @@ build-notebooks:
   artifacts:
     paths:
       - docs/_build/
+    expire_in: 1 week
 
 pages:
   stage: deploy
