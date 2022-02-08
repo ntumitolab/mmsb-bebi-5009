@@ -18,7 +18,7 @@ update-julia-notebooks:
   variables:
     JULIA_DEPOT_PATH: "$CI_PROJECT_DIR/.julia"
     JL_MAJOR: "1.7"
-    JL_MINOR: "1"
+    JL_MINOR: "2"
     JL_ARCH: "x64"
     JULIA_PATH: "/usr/local"
     N_CORES: 8
