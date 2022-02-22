@@ -7,24 +7,25 @@ stages:
   - deploy
 
 # GitLab CI: Auto dependency updates https://thacoon.com/posts/gitlab-ci-auto-dependency-update/
-# You need a personal access token as GIT_PUSH_TOKEN, with api and write repository rights
-update-julia:
+# `GIT_PUSH_TOKEN` CI/CD variable = personal access token (PAT) with write access
+auto-update:
   stage: build
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
   image: registry.gitlab.com/sosiristseng/docker-python-julia:latest
-  tags:
-    - "md705"
   variables:
-    JULIA_DEPOT_PATH: "$CI_PROJECT_DIR/.julia"
-    N_CORES: 8
+    JULIA_DEPOT_PATH: "${CI_PROJECT_DIR}/.julia"
+    N_CORES: 1
+  # tags:
+  #   - "your-runner"
   cache:
     - key:
         files:
           - requirements.txt
+          - .jb/requirements.txt
       paths:
         - venv/
-        - .cache/pip
+        - .cache/pip/
     - key: julia
       paths:
         - .julia/artifacts
@@ -35,6 +36,7 @@ update-julia:
     - virtualenv venv
     - source venv/bin/activate
     - pip install -r requirements.txt
+    - pip install -r .jb/requirements.txt
   script:
     - julia --color=yes --threads=auto -e 'import Pkg; Pkg.add(["IJulia", "PyPlot"]); Pkg.build(["IJulia", "PyPlot"]); import PyPlot'
     - julia --color=yes --threads=auto --project=@. -e 'import Pkg; Pkg.update()'
@@ -63,7 +65,7 @@ update-julia:
 
 build-website:
   stage: build
-  image: python:3.10-slim
+  image: python:3.9-slim
   rules:
     - if: $CI_PIPELINE_SOURCE == "push"
   cache:
@@ -71,12 +73,13 @@ build-website:
         files:
           - .jb/requirements.txt
       paths:
-        - venv/
-        - .cache/pip
+        - jbenv/
+        - .cache/pip/
+
   before_script:
     - pip install -U pip wheel virtualenv
-    - virtualenv venv
-    - source venv/bin/activate
+    - virtualenv jbenv
+    - source jbenv/bin/activate
     - pip install -r .jb/requirements.txt
   script:
     - jupyter-book build docs
@@ -89,6 +92,8 @@ pages:
   stage: deploy
   image: alpine:3.15
   needs: ["build-website"]
+  variables:
+    GIT_STRATEGY: none
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "push"
   script:

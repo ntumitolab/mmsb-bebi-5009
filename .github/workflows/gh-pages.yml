@@ -1,6 +1,15 @@
 name: Build pages
 
-on: [push, pull_request]
+env:
+  PYTHON_VERSION: "3.9"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
@@ -9,10 +18,10 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
-          python-version: "3.9"
+          python-version: ${{ env.PYTHON_VERSION }}
           cache: "pip"
           cache-dependency-path: ".jb/requirements.txt"
-      - name: Install Jupyter book Dependencies
+      - name: Install Jupyter Book dependencies
         run: pip install -r .jb/requirements.txt
       - name: Build website
         run: jupyter-book build docs
@@ -21,5 +30,6 @@ jobs:
         if: github.ref == 'refs/heads/main'
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: docs/_build/html
           force_orphan: true
+          publish_dir: docs/_build/html
+          full_commit_message: ${{ github.event.head_commit.message }}

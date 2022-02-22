@@ -7,37 +7,50 @@ env:
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 0 * * 2" # Every Tuesday
+    - cron: "0 0 * * 1" # Every Monday
 
 jobs:
   update-notebook:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: julia-actions/cache@v1
-      - name: Setup Julia
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Cache Julia
+        uses: julia-actions/cache@v1
+      - name: cache Python
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Setup Julia ${{ env.JULIA_VERSION }}
         uses: julia-actions/setup-julia@v1
         with:
           version: ${{ env.JULIA_VERSION }}
-      - uses: julia-actions/cache-artifacts@v1
-      - name: Setup Python
+      - name: Setup Python ${{ env.PYTHON_VERSION }}
         uses: actions/setup-python@v2
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-          cache: "pip"
-          cache-dependency-path: "requirements.txt"
       - name: Install Python dependencies
-        run: pip install -r requirements.txt
+        run: |
+          pip install -r requirements.txt
+          pip install -r .jb/requirements.txt
       - name: Install IJulia
         env:
           PYTHON: python
-        run: julia --color=yes --threads=auto -e 'import Pkg; Pkg.add(["IJulia", "PyPlot"]); Pkg.build(["IJulia", "PyPlot"]); import PyPlot'
+        shell: julia --color=yes --threads=auto {0}
+        run: |
+          import Pkg
+          Pkg.add(["IJulia", "PyPlot"])
+          Pkg.build(["IJulia", "PyPlot"])
+          import PyPlot
       - name: Update Julia dependencies
         env:
           PYTHON: python
         run: julia --color=yes --threads=auto --project=@. -e 'import Pkg; Pkg.update()'
       - name: Execute notebooks
         run: |
-          find docs -type f -name "*.ipynb" -print0 | parallel -0 -j2 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --execute --inplace {}
+          find docs -type f -name "*.ipynb" -print0 | parallel -0 -j2 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --ExecutePreprocessor.kernel_name=julia-${JULIA_VERSION} --execute --inplace {}
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3

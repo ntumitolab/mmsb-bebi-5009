@@ -1,12 +1,6 @@
-# Docs: https://docs.github.com/en/github/administering-a-repository/configuration-options-for-dependency-updates
 version: 2
 updates:
-  - package-ecosystem: "github-actions"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-    labels:
-      - "automerge"
+  # Python
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
@@ -15,6 +9,13 @@ updates:
       - "automerge"
   - package-ecosystem: "pip"
     directory: "/.jb"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "automerge"
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
     schedule:
       interval: "weekly"
     labels:
