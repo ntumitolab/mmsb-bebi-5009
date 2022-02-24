@@ -4,7 +4,7 @@
 format: jb-book
 root: index
 parts:
-  - caption: Julia notebooks
+  - caption: Julia
     chapters:
       - file: intro/01-intro-to-julia
       - file: intro/02-modeling-and-visualization

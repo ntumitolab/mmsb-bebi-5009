@@ -1,4 +1,4 @@
-# Mathematical Modeling in Systems Biology Textbook
+# MMSB Textbook
 
 Mathematical Modeling in Systems Biology(2013), by Brian P. Ingalls
 
