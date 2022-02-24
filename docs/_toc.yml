@@ -4,13 +4,13 @@
 format: jb-book
 root: index
 parts:
-- caption: Julia notebooks
-  chapters:
-  - file: intro/01-intro-to-julia
-  - file: intro/02-modeling-and-visualization
-  - file: mmsb/ch01
-    sections:
-    - file: mmsb/ch02
-    - file: mmsb/ch03
-    - file: mmsb/ch04
-
+  - caption: Julia notebooks
+    chapters:
+      - file: intro/01-intro-to-julia
+      - file: intro/02-modeling-and-visualization
+      - file: mmsb/index
+        sections:
+          - file: mmsb/ch01
+          - file: mmsb/ch02
+          - file: mmsb/ch03
+          - file: mmsb/ch04
