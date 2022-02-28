@@ -29,7 +29,7 @@ jobs:
         with:
           version: ${{ env.JULIA_VERSION }}
       - name: Setup Python ${{ env.PYTHON_VERSION }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: ${{ env.PYTHON_VERSION }}
       - name: Install Python dependencies
