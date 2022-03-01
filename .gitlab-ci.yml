@@ -1,5 +1,8 @@
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  JULIA_DEPOT_PATH: "${CI_PROJECT_DIR}/.julia"
+  JULIA_NUM_THREADS: 8
+  N_JOBS: 4
 
 stages:
   - update
@@ -9,14 +12,12 @@ stages:
 # GitLab CI: Auto dependency updates https://thacoon.com/posts/gitlab-ci-auto-dependency-update/
 # `GIT_PUSH_TOKEN` CI/CD variable = personal access token (PAT) with write access
 auto-update:
+  image: registry.gitlab.com/sosiristseng/docker-python-julia:latest
+  tags:
+    - md705
   stage: update
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
-  image: registry.gitlab.com/sosiristseng/docker-python-julia:latest
-  variables:
-    JULIA_DEPOT_PATH: "${CI_PROJECT_DIR}/.julia"
-  tags:
-    - md705
   cache:
     - key: julia
       paths:
@@ -48,43 +49,27 @@ auto-update:
       fi
 
 build-website:
+  image: registry.gitlab.com/sosiristseng/docker-python-julia:latest
+  tags:
+    - md705
   stage: build
   rules:
     - if: $CI_PIPELINE_SOURCE != "schedule"
-  image: registry.gitlab.com/sosiristseng/docker-python-julia:latest
-  variables:
-    JULIA_DEPOT_PATH: "${CI_PROJECT_DIR}/.julia"
-    JULIA_NUM_THREADS: 8
-    N_CORES: 8
-  tags:
-    - md705
   cache:
-    - key:
-        files:
-          - .jb/requirements.txt
-          - requirements.txt
-      paths:
-        - venv/
-        - .cache/pip/
     - key: julia
       paths:
         - .julia/artifacts
         - .julia/compiled
         - .julia/packages
-
   script:
-    - virtualenv venv
-    - source venv/bin/activate
-    - pip install -r .jb/requirements.txt
-    - pip install -r requirements.txt
     - julia --color=yes -e 'import Pkg; Pkg.add(["IJulia", "PyPlot"]); Pkg.build(["IJulia", "PyPlot"]); import PyPlot'
     - julia --color=yes --project=@. -e 'import Pkg; Pkg.instantiate()'
-    - find docs -type f -name "*.ipynb" -print0 | parallel -0 -j${N_CORES} jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --ExecutePreprocessor.kernel_name=julia-${JL_MAJOR} --execute --inplace {}
+    - find docs -type f -name "*.ipynb" -print0 | parallel -0 -j${N_JOBS} jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --ExecutePreprocessor.kernel_name=julia-${JL_MAJOR} --execute --inplace {}
     - jupyter-book build docs
   artifacts:
     paths:
       - docs/_build/
-    expire_in: 1 week
+    expire_in: 1 day
 
 pages:
   stage: deploy

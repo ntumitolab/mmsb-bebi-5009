@@ -37,7 +37,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           pip install -r requirements.txt
-          pip install -r .jb/requirements.txt
+          pip install -r .github/requirements.txt
       - name: Install IJulia
         env:
           PYTHON: python
