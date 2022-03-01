@@ -1,0 +1,16 @@
+# Table of contents
+# Learn more at https://jupyterbook.org/customize/toc.html
+
+format: jb-book
+root: index
+parts:
+  - caption: Julia
+    chapters:
+      - file: intro/01-intro-to-julia
+      - file: intro/02-modeling-and-visualization
+      - file: mmsb/index
+        sections:
+          - file: mmsb/ch01
+          - file: mmsb/ch02
+          - file: mmsb/ch03
+          - file: mmsb/ch04

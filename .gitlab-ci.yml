@@ -1,0 +1,104 @@
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+stages:
+  - update
+  - build
+  - deploy
+
+# GitLab CI: Auto dependency updates https://thacoon.com/posts/gitlab-ci-auto-dependency-update/
+# `GIT_PUSH_TOKEN` CI/CD variable = personal access token (PAT) with write access
+auto-update:
+  stage: update
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+  image: registry.gitlab.com/sosiristseng/docker-python-julia:latest
+  variables:
+    JULIA_DEPOT_PATH: "${CI_PROJECT_DIR}/.julia"
+  tags:
+    - md705
+  cache:
+    - key: julia
+      paths:
+        - .julia/artifacts
+        - .julia/compiled
+        - .julia/packages
+  script:
+    - julia --color=yes --threads=auto --project=@. -e 'import Pkg; Pkg.update()'
+    - |
+      if [[ -n $(git status --porcelain) ]]; then
+        echo "Commiting updates"
+        NEW_BR=auto-update-$(date '+%Y-%m-%d-%H-%M-%S')
+        git config --global user.name "${GITLAB_USER_NAME}"
+        git config --global user.email "${GITLAB_USER_EMAIL}"
+        git checkout -b ${NEW_BR}
+        git add .
+        git commit -m "${NEW_BR}"
+        git push "https://${GITLAB_USER_NAME}:${GIT_PUSH_TOKEN}@${CI_REPOSITORY_URL#*@}" \
+            -o merge_request.create \
+            -o merge_request.target="${CI_DEFAULT_BRANCH}" \
+            -o merge_request.merge_when_pipeline_succeeds \
+            -o merge_request.remove_source_branch \
+            -o merge_request.title="${NEW_BR}" \
+            -o merge_request.label="automated update" \
+            -o merge_request.assign="${GITLAB_USER_NAME}"
+        exit;
+      else
+        echo "no change, nothing to commit"
+      fi
+
+build-website:
+  stage: build
+  rules:
+    - if: $CI_PIPELINE_SOURCE != "schedule"
+  image: registry.gitlab.com/sosiristseng/docker-python-julia:latest
+  variables:
+    JULIA_DEPOT_PATH: "${CI_PROJECT_DIR}/.julia"
+    JULIA_NUM_THREADS: 8
+    N_CORES: 8
+  tags:
+    - md705
+  cache:
+    - key:
+        files:
+          - .jb/requirements.txt
+          - requirements.txt
+      paths:
+        - venv/
+        - .cache/pip/
+    - key: julia
+      paths:
+        - .julia/artifacts
+        - .julia/compiled
+        - .julia/packages
+
+  script:
+    - virtualenv venv
+    - source venv/bin/activate
+    - pip install -r .jb/requirements.txt
+    - pip install -r requirements.txt
+    - julia --color=yes -e 'import Pkg; Pkg.add(["IJulia", "PyPlot"]); Pkg.build(["IJulia", "PyPlot"]); import PyPlot'
+    - julia --color=yes --project=@. -e 'import Pkg; Pkg.instantiate()'
+    - find docs -type f -name "*.ipynb" -print0 | parallel -0 -j${N_CORES} jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --ExecutePreprocessor.kernel_name=julia-${JL_MAJOR} --execute --inplace {}
+    - jupyter-book build docs
+  artifacts:
+    paths:
+      - docs/_build/
+    expire_in: 1 week
+
+pages:
+  stage: deploy
+  image: alpine:3.15
+  needs: ["build-website"]
+  variables:
+    GIT_STRATEGY: none
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "push"
+  script:
+    - mv docs/_build/html public
+    - apk add --no-cache brotli gzip
+    - find public -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\|svg\|xml\)$' -exec gzip   -f -k {} \; || echo 'Gzip failed. Skipping...'
+    - find public -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\|svg\|xml\)$' -exec brotli -f -k {} \; || echo 'Brotli failed. Skipping...'
+  artifacts:
+    paths:
+      - public

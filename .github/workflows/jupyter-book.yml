@@ -1,0 +1,63 @@
+name: Build pages
+
+env:
+  JULIA_VERSION: "1.7"
+  PYTHON_VERSION: "3.9"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cache Julia
+        uses: julia-actions/cache@v1
+      - name: Cache Python
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Setup Julia ${{ env.JULIA_VERSION }}
+        uses: julia-actions/setup-julia@v1
+        with:
+          version: ${{ env.JULIA_VERSION }}
+      - name: Setup Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Install Python dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install -r .jb/requirements.txt
+      - name: Install IJulia
+        env:
+          PYTHON: python
+        shell: julia --color=yes --threads=auto {0}
+        run: |
+          import Pkg
+          Pkg.add(["IJulia", "PyPlot"])
+          Pkg.build(["IJulia", "PyPlot"])
+          import PyPlot
+      - name: Execute notebooks
+        run: |
+          julia --color=yes --threads=auto --project=@. -e 'import Pkg; Pkg.instantiate()'
+          find docs -type f -name "*.ipynb" -print0 | parallel -0 -j2 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --ExecutePreprocessor.kernel_name=julia-${JULIA_VERSION} --execute --inplace {}
+      - name: Build website
+        run: jupyter-book build docs
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3.8.0
+        if: github.ref == 'refs/heads/main'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          force_orphan: true
+          publish_dir: docs/_build/html
+          full_commit_message: ${{ github.event.head_commit.message }}

@@ -1,0 +1,22 @@
+version: 2
+updates:
+  # Python
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "automerge"
+  - package-ecosystem: "pip"
+    directory: "/.jb"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "automerge"
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "automerge"
