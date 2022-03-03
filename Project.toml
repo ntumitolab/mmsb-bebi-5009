@@ -1,3 +1,6 @@
+[compat]
+julia = "1.7"
+
 [deps]
 Catalyst = "479239e8-5488-4da2-87a7-35f2df7eef83"
 DifferentialEquations = "0c46a032-eb83-5123-abaf-570d42b7fbaa"
@@ -10,5 +13,5 @@ PyPlot = "d330b81b-6aea-500a-939a-2ce795aea3ee"
 Setfield = "efcf1570-3423-57d1-acb7-fd33fddbac46"
 StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 
-[compat]
-julia = "1.7"
+[extras]
+CPUSummary = "2a0fbf3d-bb9c-48f3-b0a9-814d99fd7ab9"
