@@ -9,7 +9,7 @@ parts:
       - file: intro/01-first-steps.ipynb
       - file: intro/02-plotting
       - file: intro/03-diffeq
-      - file: intro/04-stochastic
+      - file: intro/04-gillespie
   - caption: Textbook figures
     chapters:
       - file: mmsb/ch01
