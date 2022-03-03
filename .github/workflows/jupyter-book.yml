@@ -55,12 +55,12 @@ jobs:
           Pkg.add(["IJulia", "PyPlot"])
           Pkg.build(["IJulia", "PyPlot"])
           import PyPlot
-      - name: Execute notebooks
+      - name: Install Julia dependencies
         env:
           PYTHON: python
-        run: |
-          julia --color=yes --threads=auto --project=@. -e 'import Pkg; Pkg.instantiate()'
-          find docs -type f -name "*.ipynb" -print0 | parallel -0 -j2 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --ExecutePreprocessor.kernel_name=julia-${JULIA_VERSION} --execute --inplace {}
+        run: julia --color=yes --threads=auto --project=@. -e 'import Pkg; Pkg.instantiate()'
+      - name: Execute notebooks
+        run: find docs -type f -name "*.ipynb" -print0 | parallel -0 -j2 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --ExecutePreprocessor.kernel_name=julia-${JULIA_VERSION} --execute --inplace {}
       - name: Build website
         run: jupyter-book build docs
       - name: Deploy
