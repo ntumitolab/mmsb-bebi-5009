@@ -18,7 +18,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Cache Julia
-        uses: julia-actions/cache@v1
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.julia/artifacts
+            ~/.julia/compiled
+            ~/.julia/packages
+          key: ${{ runner.os }}-julia01-${{ hashFiles('Manifest.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-julia01-
       - name: Cache Python
         uses: actions/cache@v2
         with:
@@ -48,6 +56,8 @@ jobs:
           Pkg.build(["IJulia", "PyPlot"])
           import PyPlot
       - name: Execute notebooks
+        env:
+          PYTHON: python
         run: |
           julia --color=yes --threads=auto --project=@. -e 'import Pkg; Pkg.instantiate()'
           find docs -type f -name "*.ipynb" -print0 | parallel -0 -j2 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --ExecutePreprocessor.kernel_name=julia-${JULIA_VERSION} --execute --inplace {}
