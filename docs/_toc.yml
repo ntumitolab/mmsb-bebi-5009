@@ -16,3 +16,6 @@ parts:
       - file: mmsb/ch02
       - file: mmsb/ch03
       - file: mmsb/ch04
+  - caption: Homework
+    chapters:
+      - file: hw/hw-01
