@@ -1,5 +1,9 @@
 # Mathematical Modeling in Systems Biology
 
+GitLab main: <https://gitlab.com/NTUMito/mmsb-bebi-5009>
+
+GitHub mirror: <https://github.com/NTUMitoLab/mmsb-bebi-5009>
+
 ## Commands
 
 ### Install Julia dependencies without updating
