@@ -20,8 +20,8 @@ jobs:
             ~/.julia/packages
           key: ${{ runner.os }}-julia-${{ hashFiles('Project.toml') }}-${{ hashFiles('Manifest.toml') }}
           restore-keys: |
-            ${{ runner.os }}-julia-${{ hashFiles('Project.toml') }}
-            ${{ runner.os }}-julia
+            ${{ runner.os }}-julia-${{ hashFiles('Project.toml') }}-
+            ${{ runner.os }}-julia-
       - name: Cache Python
         uses: actions/cache@v2
         with:
