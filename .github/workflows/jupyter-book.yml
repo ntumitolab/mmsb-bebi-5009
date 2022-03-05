@@ -24,9 +24,7 @@ jobs:
             ~/.julia/artifacts
             ~/.julia/compiled
             ~/.julia/packages
-          key: ${{ runner.os }}-julia01-${{ hashFiles('Manifest.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-julia01-
+          key: ${{ runner.os }}-julia-${{ hashFiles('Project.toml') }}
       - name: Cache Python
         uses: actions/cache@v2
         with:
@@ -34,6 +32,11 @@ jobs:
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
+      - name: Cache Jupyter book outputs
+        uses: actions/cache@v2
+        with:
+          path: ./docs/_build/.jupyter_cache/
+          key: ${{ runner.os }}-jb-${{ hashFiles('Manifest.toml', 'requirements.txt') }}
       - name: Setup Julia ${{ env.JULIA_VERSION }}
         uses: julia-actions/setup-julia@v1
         with:
@@ -46,21 +49,13 @@ jobs:
         run: |
           pip install -r requirements.txt
           pip install -r .github/requirements.txt
-      - name: Install IJulia
-        env:
-          PYTHON: python
-        shell: julia --color=yes --threads=auto {0}
-        run: |
-          import Pkg
-          Pkg.add(["IJulia", "PyPlot"])
-          Pkg.build(["IJulia", "PyPlot"])
-          import PyPlot
       - name: Install Julia dependencies
         env:
           PYTHON: python
-        run: julia --color=yes --threads=auto --project=@. -e 'import Pkg; Pkg.instantiate()'
-      - name: Execute notebooks
-        run: find docs -type f -name "*.ipynb" -print0 | parallel -0 -j2 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --ExecutePreprocessor.kernel_name=julia-${JULIA_VERSION} --execute --inplace {}
+        run: julia --color=yes --project=@. -e 'import Pkg; Pkg.instantiate(); Pkg.build("IJulia")'
+      # - name: Execute notebooks in parallel
+      #   run: |
+      #    find docs -type f -name "*.ipynb" -print0 | parallel -0 -j2 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --ExecutePreprocessor.kernel_name=julia-${JULIA_VERSION} --execute --inplace {}
       - name: Build website
         run: jupyter-book build docs
       - name: Deploy
