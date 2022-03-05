@@ -18,7 +18,10 @@ jobs:
             ~/.julia/artifacts
             ~/.julia/compiled
             ~/.julia/packages
-          key: ${{ runner.os }}-julia-${{ hashFiles('Project.toml') }}
+          key: ${{ runner.os }}-julia-${{ hashFiles('Project.toml') }}-${{ hashFiles('Manifest.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-julia-${{ hashFiles('Project.toml') }}
+            ${{ runner.os }}-julia
       - name: Cache Python
         uses: actions/cache@v2
         with:
@@ -28,9 +31,13 @@ jobs:
             ${{ runner.os }}-pip-
       - name: Cache Jupyter book outputs
         uses: actions/cache@v2
+        env:
+          cache-name: "jb-01"
         with:
           path: ./docs/_build/.jupyter_cache/
-          key: ${{ runner.os }}-jb-${{ hashFiles('Manifest.toml', 'requirements.txt') }}
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('Manifest.toml', 'requirements.txt') }}-${{ hashFiles('**/*.ipynb') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('Manifest.toml', 'requirements.txt') }}
       - name: Setup Julia ${{ env.JULIA_VERSION }}
         uses: julia-actions/setup-julia@v1
         with:

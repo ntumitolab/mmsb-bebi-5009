@@ -23,7 +23,10 @@ jobs:
             ~/.julia/artifacts
             ~/.julia/compiled
             ~/.julia/packages
-          key: ${{ runner.os }}-julia-${{ hashFiles('Project.toml') }}
+          key: ${{ runner.os }}-julia-${{ hashFiles('Project.toml', 'Manifest.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-julia-${{ hashFiles('Project.toml') }}
+            ${{ runner.os }}-julia
       - name: Setup Julia ${{ env.JULIA_VERSION }}
         uses: julia-actions/setup-julia@v1
         with:
