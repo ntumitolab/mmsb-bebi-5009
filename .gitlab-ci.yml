@@ -67,9 +67,9 @@ build-website:
       paths:
       - docs/_build/.jupyter_cache
   script:
-   - julia --color=yes --threads=auto --project=@. -e 'import Pkg; Pkg.instantiate()'
-    # Enable for parallel builds
-    # - find docs -type f -name "*.ipynb" -print0 | parallel -0 -j${N_JOBS} jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --ExecutePreprocessor.kernel_name=julia-${JL_MAJOR} --execute --inplace {}
+   - julia --color=yes --threads=auto --project=@. -e 'import Pkg; Pkg.instantiate(); Pkg.build("IJulia")'
+   # Enable parallel builds
+   - find docs -type f -name "*.ipynb" -print0 | parallel -0 -j${N_JOBS} jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --ExecutePreprocessor.kernel_name=julia-${JL_MAJOR} --execute --inplace {}
    - jupyter-book build docs
   artifacts:
     paths:
