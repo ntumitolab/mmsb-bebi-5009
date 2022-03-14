@@ -12,7 +12,3 @@
   PyPlot                = "d330b81b-6aea-500a-939a-2ce795aea3ee"
   Setfield              = "efcf1570-3423-57d1-acb7-fd33fddbac46"
   StatsBase             = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
-  IJulia                = "7073ff75-c697-5162-941a-fcdaad2a7d2a"
-
-[extras]
-  CPUSummary = "2a0fbf3d-bb9c-48f3-b0a9-814d99fd7ab9"

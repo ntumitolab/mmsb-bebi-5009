@@ -22,32 +22,25 @@ jobs:
         uses: syphar/restore-pip-download-cache@v1
         if: steps.cache-virtualenv.outputs.cache-hit != 'true'
       - name: Install Python dependencies if cache miss
-        run: |
-          pip install -r requirements.txt
-          pip install -r .github/requirements.txt
+        run: pip install -r requirements.txt -r .github/requirements.txt
         if: steps.cache-virtualenv.outputs.cache-hit != 'true'
       - name: Setup Julia ${{ env.JULIA_VERSION }}
         uses: julia-actions/setup-julia@v1
         with:
           version: ${{ env.JULIA_VERSION }}
-      - name: Cache Julia
+      - name: Cache Julia deps
+        env:
+          cache-name: "1"
         uses: actions/cache@v2
         with:
           path: |
             ~/.julia/artifacts
             ~/.julia/compiled
             ~/.julia/packages
-          key: ${{ runner.os }}-julia-${{ hashFiles('Project.toml') }}-${{ hashFiles('Manifest.toml') }}
+          key: ${{ runner.os }}-julia-${{ env.cache-name }}-${{ hashFiles('Project.toml') }}-${{ hashFiles('Manifest.toml') }}
           restore-keys: |
-            ${{ runner.os }}-julia-${{ hashFiles('Project.toml') }}-
-            ${{ runner.os }}-julia-
-      - name: Install Julia dependencies
-        env:
-          PYTHON: python
-        run: julia --color=yes --project=@. -e 'import Pkg; Pkg.instantiate(); Pkg.build("IJulia")'
-      # - name: Execute notebooks in parallel
-      #   run: |
-      #    find docs -type f -name "*.ipynb" -print0 | parallel -0 -j2 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --ExecutePreprocessor.kernel_name=julia-${JULIA_VERSION} --execute --inplace {}
+            ${{ runner.os }}-julia-${{ env.cache-name }}-${{ hashFiles('Project.toml') }}-
+            ${{ runner.os }}-julia-${{ env.cache-name }}-
       - name: Cache Jupyter book outputs
         uses: actions/cache@v2
         env:
@@ -57,6 +50,17 @@ jobs:
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('Manifest.toml', 'requirements.txt') }}-${{ hashFiles('**/*.ipynb') }}
           restore-keys: |
             ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('Manifest.toml', 'requirements.txt') }}
+      - name: Install IJulia
+        env:
+          PYTHON: python
+        run: JULIA_PROJECT="" julia --color=yes --threads=auto -e 'import Pkg; Pkg.add("IJulia"); Pkg.build("IJulia")'
+      - name: Install Julia deps
+        env:
+          PYTHON: python
+        run: julia --color=yes --threads=auto --project=@. -e 'import Pkg; Pkg.instantiate()'
+      # - name: Execute notebooks in parallel
+      #   run: |
+      #    find docs -type f -name "*.ipynb" -print0 | parallel -0 -j2 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --ExecutePreprocessor.kernel_name=julia-${JULIA_VERSION} --execute --inplace {}
       - name: Build website
         run: jupyter-book build docs
       - name: Deploy
