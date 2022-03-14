@@ -76,6 +76,8 @@ build-website:
 pages:
   stage: deploy
   image: ${JL_IMAGE}
+  tags:
+    - md705
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "push"
   script:
