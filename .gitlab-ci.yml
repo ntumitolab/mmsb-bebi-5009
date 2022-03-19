@@ -1,38 +1,29 @@
-variables:
-  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-  JULIA_DEPOT_PATH: "${CI_PROJECT_DIR}/.julia"
-  N_JOBS: 4
-  JL_IMAGE: "registry.gitlab.com/sosiristseng/docker-juliabook:latest"
+# Using "merge_request into main" workflow
+workflow:
+  rules:
+    - if: $CI_MERGE_REQUEST_IID
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
 stages:
-  - update
-  - build
+  - update:julia
+  - build:docker
+  - push:docker
+  - build:notebooks
   - deploy
-
-cache:
-  - key: julia-1.7
-    paths:
-      - .julia/artifacts
-      - .julia/compiled
-      - .julia/packages
-  - key:
-      files:
-        - Manifest.toml
-        # - requirements.txt
-    paths:
-      - docs/_build/.jupyter_cache
 
 # GitLab CI: Auto dependency updates https://thacoon.com/posts/gitlab-ci-auto-dependency-update/
 # `GIT_PUSH_TOKEN` CI/CD variable = personal access token (PAT) with write access
-auto-update:
-  stage: update
-  image: ${JL_IMAGE}
-  tags:
-    - md705
+update-julia:
+  image: julia:1.7
+  # tags:
+  #   - your_runner
+  stage: update:julia
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
   script:
     - julia --color=yes --threads=auto --project=@. -e 'import Pkg; Pkg.update()'
+    # Open a MR when there is a update, requires GIT_PUSH_TOKEN` CI/CD variable = personal access token (PAT) with write access
     - |
       if [[ -n $(git status --porcelain) ]]; then
         echo "Commiting updates"
@@ -55,38 +46,109 @@ auto-update:
         echo "no change, nothing to commit"
       fi
 
-build-website:
-  stage: build
-  image: ${JL_IMAGE}
-  tags:
-    - md705
+# Taken from https://blog.callr.tech/building-docker-images-with-gitlab-ci-best-practices/
+build-docker:
+  image: docker:latest
+  variables:
+    IMG: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+  # tags:
+  #   - your_runner
+  services:
+    - docker:dind
+  stage: build:docker
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
+    - if: $CI_COMMIT_TAG
+      when: never
+    - changes:
+      - docker/Dockerfile
+      - requirements.txt
+      - Project.toml
+      - Manifest.toml
+      - .gitlab-ci.yml
+    
   script:
-    - JULIA_PROJECT="" julia --color=yes --threads=auto -e 'import Pkg; Pkg.add("IJulia"); Pkg.build("IJulia")'
-    - julia --color=yes --threads=auto --project=@. -e 'import Pkg; Pkg.instantiate()'
-    # Enable parallel builds
-    # - find docs -type f -name "*.ipynb" -print0 | parallel -0 -j${N_JOBS} jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --ExecutePreprocessor.kernel_name=julia-${JL_MAJOR} --execute --inplace {}
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE:latest || true
+    - >
+      docker build
+      --pull
+      --cache-from $CI_REGISTRY_IMAGE:latest
+      --label "org.opencontainers.image.title=$CI_PROJECT_TITLE"
+      --label "org.opencontainers.image.url=$CI_PROJECT_URL"
+      --label "org.opencontainers.image.created=$CI_JOB_STARTED_AT"
+      --label "org.opencontainers.image.revision=$CI_COMMIT_SHA"
+      --label "org.opencontainers.image.version=$CI_COMMIT_REF_NAME"
+      --tag $IMG
+      -f docker/Dockerfile
+      .
+    # main -> latest; others -> branch name
+    - |
+      if [[ $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH ]]; then
+        echo "Latest tag for the default branch"
+        docker tag $IMG $CI_REGISTRY_IMAGE:latest
+      else
+        echo "Branch tag for the others"
+        docker tag $IMG $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+      fi
+    - docker push --all-tags $CI_REGISTRY_IMAGE
+
+# Seperate git tags docker job so that the same image is not built twice.
+push-tags-docker:
+  image: docker:latest
+  services:
+    - docker:dind
+  stage: push:docker
+  variables:
+    GIT_STRATEGY: none
+    IMG: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+  rules:
+    - if: $CI_COMMIT_TAG
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - docker pull $IMG
+    - docker tag $IMG $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
+
+.build-notebooks:
+  image: $CI_REGISTRY_IMAGE:latest
+  # tags:
+  #   - your_runner
+  stage: build:notebooks
+  cache:
+    - key:
+        files:
+          - Manifest.toml
+          - requirements.txt
+        prefix: jb
+      paths:
+        - docs/_build/.jupyter_cache
+  script:
+    # Uncomment if you want parallel notebook execution
+    # - find docs -type f -name "*.ipynb" -print0 | parallel -0 -j2 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --ExecutePreprocessor.kernel_name=julia-${JL_MAJOR} --execute --inplace {}
     - jupyter-book build docs
   artifacts:
     paths:
       - docs/_build/
     expire_in: 1 day
 
+mr-notebooks:
+  extends: .build-notebooks
+  rules:
+    - if: $CI_MERGE_REQUEST_IID
+  image: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+
 pages:
-  stage: deploy
-  image: ${JL_IMAGE}
-  tags:
-    - md705
+  extends: .build-notebooks
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "push"
   script:
-    - JULIA_PROJECT="" julia --color=yes --threads=auto -e 'import Pkg; Pkg.add("IJulia"); Pkg.build("IJulia")'
-    - julia --color=yes --threads=auto --project=@. -e 'import Pkg; Pkg.instantiate()'
+    # Uncomment if you want parallel notebook execution
+    # - find docs -type f -name "*.ipynb" -print0 | parallel -0 -j2 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --ExecutePreprocessor.kernel_name=julia-${JL_MAJOR} --execute --inplace {}
     - jupyter-book build docs
     - mv docs/_build/html public
-    - find public -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\|svg\|xml\)$' -exec gzip   -f -k {} \; || echo 'Gzip failed. Skipping...'
-    - find public -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\|svg\|xml\)$' -exec brotli -f -k {} \; || echo 'Brotli failed. Skipping...'
+    - find public -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\|svg\|xml\)$' -exec gzip -f -k {} \; -exec brotli -f -k {} \; || echo 'Compression failed. Skipping...'
   artifacts:
     paths:
       - public
