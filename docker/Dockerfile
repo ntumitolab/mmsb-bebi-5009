@@ -4,7 +4,7 @@ WORKDIR /usr/src/app
 
 # Install apt packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    git openssh-client curl parallel brotli \
+    git curl gzip brotli \
     # build-essential \
     && rm -rf /var/lib/apt/lists/*
 
