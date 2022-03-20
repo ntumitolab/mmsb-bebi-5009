@@ -7,12 +7,17 @@ updates:
       interval: "daily"
     labels:
       - "automerge"
-    open-pull-requests-limit: 0
   # Python
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
     labels:
       - "automerge"
-    open-pull-requests-limit: 0
+  # Docker
+  - package-ecosystem: "docker"
+    directory: "/docker"
+    schedule:
+      interval: "daily"
+    labels:
+      - "automerge"
