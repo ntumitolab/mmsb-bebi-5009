@@ -24,4 +24,5 @@ parts:
           - file: mmsb/ch04
   - caption: Homework
     chapters:
+      - file: hw/hw-00
       - file: hw/hw-01
