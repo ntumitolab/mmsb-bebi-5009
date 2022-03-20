@@ -4,6 +4,6 @@ version = 1
 [merge]
   method = "squash"
 
-[merge.message]
-title = "pull_request_title"
-body = "pull_request_body"
+  [merge.message]
+    title = "pull_request_title"
+    body  = "pull_request_body"
