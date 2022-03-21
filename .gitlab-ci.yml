@@ -21,7 +21,10 @@ update-julia:
   stage: update:julia
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
+  variables:
+    JULIA_PKG_PRECOMPILE_AUTO: 0
   script:
+    - apt-get update && apt-get install -y --no-install-recommends git
     - julia --color=yes --threads=auto --project=@. -e 'import Pkg; Pkg.update()'
     # Open a MR when there is a update, requires GIT_PUSH_TOKEN` CI/CD variable = personal access token (PAT) with write access
     - |
@@ -62,12 +65,12 @@ build-docker:
     - if: $CI_COMMIT_TAG
       when: never
     - changes:
-      - docker/Dockerfile
-      - requirements.txt
-      - Project.toml
-      - Manifest.toml
-      - .gitlab-ci.yml
-    
+        - docker/Dockerfile
+        - requirements.txt
+        - Project.toml
+        - Manifest.toml
+        - .gitlab-ci.yml
+
   script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
     - docker pull $CI_REGISTRY_IMAGE:latest || true
@@ -83,19 +86,12 @@ build-docker:
       --tag $IMG
       -f docker/Dockerfile
       .
-    # main -> latest; others -> branch name
-    - |
-      if [[ $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH ]]; then
-        echo "Latest tag for the default branch"
-        docker tag $IMG $CI_REGISTRY_IMAGE:latest
-      else
-        echo "Branch tag for the others"
-        docker tag $IMG $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
-      fi
+    # main -> latest
+    - $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && docker tag $IMG $CI_REGISTRY_IMAGE:latest
+    - docker tag $IMG $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
     - docker push --all-tags $CI_REGISTRY_IMAGE
 
-# Seperate git tags docker job so that the same image is not built twice.
-push-tags-docker:
+.push-docker:
   image: docker:latest
   services:
     - docker:dind
@@ -103,19 +99,28 @@ push-tags-docker:
   variables:
     GIT_STRATEGY: none
     IMG: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-  rules:
-    - if: $CI_COMMIT_TAG
+    TAG: ""
   script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
     - docker pull $IMG
-    - docker tag $IMG $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
-    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
+    - docker tag $IMG $CI_REGISTRY_IMAGE:$TAG
+    - docker push $CI_REGISTRY_IMAGE:$TAG
 
-.build-notebooks:
-  image: $CI_REGISTRY_IMAGE:latest
+push-tag-docker:
+  extends: .push-docker
+  rules:
+    - if: $CI_COMMIT_TAG
+  variables:
+    TAG: $CI_COMMIT_TAG
+
+build-notebooks:
+  image: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
   # tags:
   #   - your_runner
   stage: build:notebooks
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
   cache:
     - key:
         files:
@@ -133,22 +138,18 @@ push-tags-docker:
       - docs/_build/
     expire_in: 1 day
 
-mr-notebooks:
-  extends: .build-notebooks
-  rules:
-    - if: $CI_MERGE_REQUEST_IID
-  image: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
-
 pages:
-  extends: .build-notebooks
+  image: alpine:latest
+  stage: deploy
+  cache: []
+  variables:
+    GIT_STRATEGY: none
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "push"
   script:
-    # Uncomment if you want parallel notebook execution
-    # - find docs -type f -name "*.ipynb" -print0 | parallel -0 -j2 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --ExecutePreprocessor.kernel_name=julia-${JL_MAJOR} --execute --inplace {}
-    - jupyter-book build docs
+    - apk add --no-cache gzip brotli
     - mv docs/_build/html public
-    - find public -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\|svg\|xml\)$' -exec gzip -f -k {} \; -exec brotli -f -k {} \; || echo 'Compression failed. Skipping...'
+    - find public -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\|svg\|xml\)$' -exec gzip -f -k {} \; -exec  -f -k {} \; || echo 'Compression failed. Skipping...'
   artifacts:
     paths:
       - public
