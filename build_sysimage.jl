@@ -8,5 +8,5 @@ PackageCompiler.create_sysimage(
 using IJulia
 IJulia.installkernel("Julia", "--sysimage=sysimage.so")
 
-Pkg.remove("PackageCompiler")
+Pkg.rm("PackageCompiler")
 Pkg.gc()
