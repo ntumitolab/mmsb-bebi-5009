@@ -17,13 +17,13 @@ RUN julia --threads=auto --color=yes -e 'import Pkg; Pkg.add("IJulia")' \
     && julia --threads=auto --color=yes --project=@. -e 'import Pkg; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()'
 
 # Julia sysimage (optional)
-# RUN julia --threads=auto --color=yes -e 'import Pkg; Pkg.add("PackageCompiler"); \
-#     create_sysimage(["Example"]; project= ".", sysimage_path="sysimage.so"); \
-#     using IJulia; installkernel("Julia", "-J sysimage.so"); \
-#     Pkg.remove("PackageCompiler"); Pkg.gc()'
+RUN julia --threads=auto --color=yes -e 'import Pkg; Pkg.add("PackageCompiler"); \
+    create_sysimage(["Plots", "DifferentialEquations", "ModelingToolkit", "Catalyst"]; project= ".", sysimage_path="sysimage.so"); \
+    using IJulia; installkernel("Julia", "--sysimage=sysimage.so"); \
+    Pkg.remove("PackageCompiler"); Pkg.gc()'
 
 # Julia command
-CMD ["julia"]
+# CMD ["julia"]
 
 # If using sysimage
-# CMD ["julia", "-J", "sysimage.so"]
+CMD ["julia", "-J", "sysimage.so"]
