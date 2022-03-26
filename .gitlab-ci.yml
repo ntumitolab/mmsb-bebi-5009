@@ -101,7 +101,7 @@ build-notebooks:
     - md705
   stage: test
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_PIPELINE_SOURCE != "schedule"
   cache:
     - key:
         files:
@@ -119,13 +119,18 @@ build-notebooks:
       - docs/_build/
 
 pages:
-  extends: build-notebooks
+  image: alpine:latest
+  stage: deploy
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "push"
+  dependencies:
+    - "build-jupyter"
+  variables:
+    GIT_STRATEGY: none
   script:
-    - jupyter-book build docs
+    - apk add --no-cache gzip brotli
     - mv docs/_build/html public
-    # - find public -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\|svg\|xml\)$' -exec gzip -f -k {} \; -exec  -f -k {} \; || echo 'Compression failed. Skipping...'
+    - find public -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\|svg\|xml\)$' -exec gzip -f -k {} \; -exec brotli -f -k {} \; || echo 'Compression failed. Skipping...'
   artifacts:
     paths:
       - public
