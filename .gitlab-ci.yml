@@ -16,8 +16,8 @@ variables:
 # GitLab CI: Auto dependency updates https://thacoon.com/posts/gitlab-ci-auto-dependency-update/
 # `GIT_PUSH_TOKEN` CI/CD variable = personal access token (PAT) with write access
 update-julia:
-  tags:
-    - md705
+  # tags:
+  #   - md705
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
   variables:
