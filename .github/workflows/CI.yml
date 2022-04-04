@@ -1,4 +1,4 @@
-name: Build Jupyter Book Website
+name: Build Docker Image and Jupyter Book Website
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -7,81 +7,81 @@ concurrency:
 on:
   push:
     branches: [main]
+    # Publish semver tags as releases.
+    tags: ["*.*"]
   pull_request:
     branches: [main]
 
 env:
-  JULIA_VERSION: "1.7"
-  PYTHON_VERSION: "3.9"
-  JULIA_NUM_THREADS: 2
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   ci:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Python
-      - name: Setup Python ${{ env.PYTHON_VERSION }}
-        uses: actions/setup-python@v3
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-      - name: Restore Python virtualenv
-        uses: syphar/restore-virtualenv@v1
-        id: cache-virtualenv
-      - name: Download Pip cache
-        uses: syphar/restore-pip-download-cache@v1
-        if: steps.cache-virtualenv.outputs.cache-hit != 'true'
-      - name: Install Python dependencies if cache miss
-        run: pip install -r requirements.txt
-        if: steps.cache-virtualenv.outputs.cache-hit != 'true'
+      # Workaround for icorrect digest: https://github.com/docker/build-push-action/issues/461
+      - name: Setup Docker buildx
+        uses: docker/setup-buildx-action@v1.6.0
 
-      # Julia
-      - name: Setup Julia ${{ env.JULIA_VERSION }}
-        uses: julia-actions/setup-julia@v1
+      - name: Login to the Container registry ${{ env.REGISTRY }}
+        uses: docker/login-action@v1
         with:
-          version: ${{ env.JULIA_VERSION }}
-      - name: Cache Julia Depot
-        uses: actions/cache@v3
-        env:
-          cache-name: "Julia"
-        with:
-          path: ~/.julia/
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ env.JULIA_VERSION }}-${{ hashFiles('Manifest.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ env.cache-name }}-${{ env.JULIA_VERSION }}-
-            ${{ runner.os }}-${{ env.cache-name }}-
-      - name: Install Julia dependencies
-        shell: julia --color=yes --threads=auto --project=@. {0}
-        env:
-          PYTHON: python
-        run: |
-          using Pkg
-          Pkg.instantiate()
-          Pkg.resolve()
-          Pkg.precompile()
-      - name: Install IJulia
-        shell: julia --color=yes --threads=auto {0}
-        env:
-          PYTHON: python
-        run: |
-          using Pkg
-          Pkg.add("IJulia")
-          Pkg.build("IJulia")
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Jupyer book
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v3
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,priority=600, event=pr
+            type=ref,priority=600, event=tag
+            type=raw,value=latest,priority=600, enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
+            type=sha,enable=true,priority=100,prefix=,suffix=,format=long
+          flavor: |
+            latest=false
+
+      - name: Build Docker Image
+        # if: github.event_name != 'pull_request'
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./docker/Dockerfile
+          load: true
+          tags: ${{ env.IMAGE_NAME }}:test
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+
+      - name: Push Docker Image
+        # Do not push on PR's
+        if: github.event_name != 'pull_request'
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./docker/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-to: type=inline
+
       - name: Cache Jupyter book outputs
         uses: actions/cache@v3
         env:
-          cache-name: "jb-03"
+          cache-name: "jb"
         with:
-          path: docs/_build/.jupyter_cache
+          path: docs/_build/
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('Manifest.toml', 'requirements.txt') }}-${{ hashFiles('docs/**/*.md', 'docs/**/*.ipynb') }}
           restore-keys: |
-            ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('Manifest.toml', 'requirements.txt') }}-
+            ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('Manifest.toml', 'requirements.txt') }}
+
       - name: Build Jupyter Books
-        run: jb build docs --warningiserror --keep-going
+        run: docker run -v ${{ github.workspace }}:/work ${{ env.IMAGE_NAME }}:test jb build /work/docs --warningiserror --keep-going -v
 
       - name: Deploy Website
         uses: peaceiris/actions-gh-pages@v3.8.0
