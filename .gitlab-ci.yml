@@ -41,75 +41,40 @@ update-julia:
         echo "no change, nothing to commit"
       fi
 
-# Taken from https://blog.callr.tech/building-docker-images-with-gitlab-ci-best-practices/
-# Build docker images and tag it by git SHA
-build-docker:
-  image: docker:20.10
-  services:
-    - docker:20.10-dind
-  stage: build
-  rules:
-    - if: $CI_PIPELINE_SOURCE != "schedule"
-  script:
-    - echo -n $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER $CI_REGISTRY --password-stdin
-    - docker pull $CI_REGISTRY_IMAGE:latest || true
-    - >
-      docker build
-      --pull
-      --cache-from $CI_REGISTRY_IMAGE:latest
-      --label "org.opencontainers.image.title=$CI_PROJECT_TITLE"
-      --label "org.opencontainers.image.url=$CI_PROJECT_URL"
-      --label "org.opencontainers.image.created=$CI_JOB_STARTED_AT"
-      --label "org.opencontainers.image.revision=$CI_COMMIT_SHA"
-      --label "org.opencontainers.image.version=$CI_COMMIT_REF_NAME"
-      --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-      -f docker/Dockerfile
-      .
-    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-
-# Default: main = latest
-push-docker:
-  image: docker:20.10
-  services:
-    - docker:20.10-dind
-  stage: test
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "push"
-  variables:
-    GIT_STRATEGY: none
-    TAG: "latest"
-  script:
-    - echo -n $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER $CI_REGISTRY --password-stdin
-    - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:$TAG
-    - docker push $CI_REGISTRY_IMAGE:$TAG
-
-push-tag-docker:
-  extends: push-docker
-  rules:
-    - if: $CI_COMMIT_TAG
-  variables:
-    TAG: $CI_COMMIT_TAG
-
 build-notebooks:
-  image: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+  image: registry.gitlab.com/sosiristseng/docker-juliabook:latest
   # tags:
   #   - your_runner
   stage: test
   rules:
     - if: $CI_PIPELINE_SOURCE != "schedule"
+  variables:
+    JULIA_DEPOT_PATH: "$CI_PROJECT_PATH/.julia"
   cache:
     - key:
         files:
+          - Project.toml
           - Manifest.toml
           - requirements.txt
         prefix: jb
       paths:
-        - docs/_build/
+        - docs/_build/.jupyter_cache
+    - key:
+        files:
+          - Project.toml
+          - Manifest.toml
+        prefix: julia
+      paths:
+        - $CI_PROJECT_PATH/.julia/artifacts
+        - $CI_PROJECT_PATH/.julia/compiled
+        - $CI_PROJECT_PATH/.julia/packages
+        - $CI_PROJECT_PATH/.julia/registries
   before_script:
+    - julia --project=@. -e 'using Pkg; Pkg.instantiate()'
+    - julia -e 'using Pkg; Pkg.add("IJulia"); Pkg.build("IJulia")'
     # Uncomment if you want parallel notebook execution
     # - find docs -type f -name "*.ipynb" -print0 | parallel -0 -j2 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --ExecutePreprocessor.kernel_name=julia-1.7 --execute --inplace {}
-    - jupyter-book build docs
+    - jupyter-book build docs --warningiserror --keep-going -v
   script:
     - "Test build completed."
   artifacts:
@@ -122,7 +87,7 @@ pages:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "push"
   script:
     - mv docs/_build/html public
-    # - find public -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\|svg\|xml\)$' -exec gzip -f -k {} \; -exec  -f -k {} \; || echo 'Compression failed. Skipping...'
+    - find public -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\|svg\|xml\)$' -exec gzip -f -k {} \; -exec  -f -k {} \; || echo 'Compression failed. Skipping...'
   artifacts:
     paths:
       - public
