@@ -48,8 +48,9 @@ jobs:
             ~/.julia/compiled
             ~/.julia/packages
             ~/.julia/registries
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/Project.toml') }}
+          ey: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/Project.toml') }}-${{ hashFiles('**/Manifest.toml') }}
           restore-keys: |
+            ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/Project.toml') }}-
             ${{ runner.os }}-${{ env.cache-name }}-
       - name: Install Julia dependencies
         run: |
