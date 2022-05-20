@@ -1,0 +1,5 @@
+# Ignore git and caches
+.git/
+.github/
+.cache/
+docs/
