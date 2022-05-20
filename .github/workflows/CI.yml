@@ -61,7 +61,7 @@ jobs:
       - name: Push Docker Image
         # Do not push on PR's
         if: github.event_name != 'pull_request'
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           context: .
           file: ./docker/Dockerfile
