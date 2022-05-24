@@ -1,8 +1,9 @@
 name: Check markdown links
 
 env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  JULIA_NUM_THREADS: 2
+  JULIA_VER: "1.7"
+  PYTHON_VER: "3.10"
 
 on:
   workflow_dispatch:
@@ -14,5 +15,36 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Link check
-        run: docker run -v ${{ github.workspace }}:/work ${{ env.REGISTRY }}/{{ env.IMAGE_NAME }}:latest jb build /work/docs --builder linkcheck -v
+      - name: Setup Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Restore Python virtualenv
+        uses: syphar/restore-virtualenv@v1
+        id: cache-virtualenv
+      - name: Download Pip cache
+        uses: syphar/restore-pip-download-cache@v1
+        if: steps.cache-virtualenv.outputs.cache-hit != 'true'
+      - name: Install Python dependencies if cache miss
+        run: pip install -r requirements.txt
+        if: steps.cache-virtualenv.outputs.cache-hit != 'true'
+      - name: Setup Julia ${{ env.JULIA_VER }}
+        uses: julia-actions/setup-julia@v1
+        with:
+          version: ${{ env.JULIA_VER }}
+      - name: Cache Julia
+        uses: actions/cache@v3
+        env:
+          cache-name: "julia"
+        with:
+          path: |
+            ~/.julia
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/Project.toml') }}-${{ hashFiles('**/Manifest.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/Project.toml') }}-
+            ${{ runner.os }}-${{ env.cache-name }}-
+      - name: Install Julia dependencies and IJulia kernel
+        run: |
+          julia --project=@. -e 'using Pkg; Pkg.instantiate(); using IJulia; installkernel("Julia", "--project=@.",env=Dict("JULIA_NUM_THREADS"=>"2"))'
+      - name: Check external links
+        run: jupyter-book build docs --builder linkcheck
