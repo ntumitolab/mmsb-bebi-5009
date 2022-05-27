@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y build-essential git gzip brotli paralle
 # Julia
 ENV JULIA_PATH /usr/local/julia
 ENV PATH $JULIA_PATH/bin:$PATH
-COPY --from=julia:1.7.2 ${JULIA_PATH} /usr/local/
+COPY --from=julia:1.7.3 ${JULIA_PATH} /usr/local/
 
 # Python deps (jupyter-book and matplotlib)
 COPY requirements.txt .
