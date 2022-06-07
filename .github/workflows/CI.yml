@@ -53,7 +53,8 @@ jobs:
           file: .ci/Dockerfile
           load: true
           tags: ${{ env.IMAGE_NAME }}:test
-          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Run notebooks and build website
         uses: addnab/docker-run-action@v3
@@ -74,7 +75,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-to: type=inline
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Deploy Website
         uses: peaceiris/actions-gh-pages@v3.8.0
