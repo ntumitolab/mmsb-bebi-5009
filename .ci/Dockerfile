@@ -11,7 +11,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Build Julia environment
 COPY Project.toml Manifest.toml build.jl ./
 # COPY src/ src
-RUN julia --threads=auto --color=yes --project=@. -e 'import Pkg; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()' && julia --threads=auto --color=yes build.jl
+RUN julia --threads=auto --color=yes --project=@. -e 'import Pkg; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()' && julia --threads=auto --color=yes --project=@. build.jl
 
 # Julia command
 CMD ["julia"]
