@@ -1,5 +1,4 @@
 # Adapted from https://github.com/terasakisatoshi/sysimage_creator/
-import Pkg
 
 nthreads = Threads.nthreads()
 
