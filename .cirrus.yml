@@ -7,11 +7,14 @@ jupyter_book_task:
     use_in_memory_disk: true
   julia_cache:
     folder: ~/.julia
-    populate_script:
-      - julia --threads=auto --project=@. --color=yes -e 'import Pkg; Pkg.instantiate()'
-  kernel_script: julia --threads=auto --project=@. --color=yes build.jl
+    fingerprint_script:
+      - cat Project.toml
+      - cat Manifest.toml
+  install_script: |
+    julia --threads=auto --project=@. --color=yes -e 'import Pkg; Pkg.instantiate()'
+    julia --threads=auto --project=@. --color=yes build.jl
   build_script: |
-    find docs -type f -name "*.ipynb" -print0 | parallel -0 -j4 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --execute --inplace {}
+    find docs -type f -name "*.ipynb" -print0 | parallel -0 -j4 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=1000 --execute --inplace {}
     jupyter-book build docs -v
   # pages_script: |
   #   if [[ $CIRRUS_BRANCH == "main" ]]; then
