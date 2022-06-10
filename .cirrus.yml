@@ -5,6 +5,7 @@ jupyter_book_task:
     cpu: 4
     memory: 16G
     use_in_memory_disk: true
+  pip_script: pip install -r requirements.txt
   julia_cache:
     folder: ~/.julia
     fingerprint_script:
