@@ -1,0 +1,17 @@
+# https://github.com/jupyterhub/repo2docker-action
+name: Binder
+on:
+  push:
+    branches: [main]
+
+jobs:
+  Create-MyBinderOrg-Cache:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: cache binder build on mybinder.org
+        uses: jupyterhub/repo2docker-action@master
+        with:
+          NO_PUSH: true
+          MYBINDERORG_TAG: ${{ github.event.ref }} # This builds the container on mybinder.org with the branch that was pushed on.
