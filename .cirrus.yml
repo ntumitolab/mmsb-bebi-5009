@@ -11,9 +11,8 @@ jupyter_book_task:
     fingerprint_script:
       - cat Project.toml
       - cat Manifest.toml
-  install_script: |
-    julia --threads=auto --project=@. --color=yes -e 'import Pkg; Pkg.instantiate()'
-    julia --threads=auto --project=@. --color=yes build.jl
+    populate_script: julia --threads=auto --project=@. --color=yes -e 'import Pkg; Pkg.instantiate()'
+  install_script: julia --threads=auto --project=@. --color=yes build.jl
   build_script: |
     find docs -type f -name "*.ipynb" -print0 | parallel -0 -j4 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=1000 --execute --inplace {}
     jupyter-book build docs -v
