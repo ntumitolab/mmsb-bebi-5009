@@ -21,7 +21,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
+      # Python part
       - name: Setup Python ${{ env.PYTHON_VER }}
         uses: actions/setup-python@v4
         with:
@@ -35,34 +35,43 @@ jobs:
       - name: Install Python dependencies if cache miss
         run: pip install -r .ci/requirements.txt -r requirements.txt
         if: steps.cache-virtualenv.outputs.cache-hit != 'true'
-
+      # Julia part
       - name: Setup Julia ${{ env.JULIA_VER }}
         uses: julia-actions/setup-julia@v1
         with:
           version: ${{ env.JULIA_VER }}
       - name: Cache Julia
         uses: actions/cache@v3
+        id: cachejulia
         env:
           cache-name: "julia"
         with:
           path: |
-            ~/.julia/artifacts
-            ~/.julia/compiled
-            ~/.julia/packages
-            ~/.julia/registries
+            ~/.julia
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/Project.toml') }}-${{ hashFiles('**/Manifest.toml') }}
           restore-keys: |
             ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/Project.toml') }}-
             ${{ runner.os }}-${{ env.cache-name }}-
-      - name: Install Julia dependencies and IJulia kernel
+      - name: Install Julia dependencies
+        if: steps.cachejulia.outputs.cache-hit != 'true'
         run: |
           julia --threads=auto --project=@. --color=yes -e 'using Pkg; Pkg.instantiate();'
+      - name: Install IJulia kernel
+        run: |
           julia --threads=auto --project=@. --color=yes build.jl
+      # Jupyter Book part
+      - name: Cache Jupyter book outputs
+        uses: actions/cache@v3
+        env:
+          cache-name: "jb-01"
+        with:
+          path: docs/_build/.jupyter_cache
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/Manifest.toml', '**/requirements.txt') }}-${{ hashFiles('docs/**/*.md', 'docs/**/*.ipynb') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/Manifest.toml', '**/requirements.txt') }}
 
       - name: Build Jupyter Books
-        run: |
-          find docs -type f -name "*.ipynb" -print0 | parallel -0 -j2 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --execute --inplace {}
-          jupyter-book build docs -v
+        run: jb build docs --warningiserror --keep-going -v
 
       - name: Deploy Website
         uses: peaceiris/actions-gh-pages@v3.8.0

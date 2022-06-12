@@ -16,7 +16,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
+      # Python part
       - name: Setup Python ${{ env.PYTHON_VER }}
         uses: actions/setup-python@v4
         with:
@@ -28,8 +28,32 @@ jobs:
         uses: syphar/restore-pip-download-cache@v1
         if: steps.cache-virtualenv.outputs.cache-hit != 'true'
       - name: Install Python dependencies if cache miss
-        run: pip install pip install -r .ci/requirements.txt -r requirements.txt
+        run: pip install -r .ci/requirements.txt -r requirements.txt
         if: steps.cache-virtualenv.outputs.cache-hit != 'true'
-
+      # Julia part
+      - name: Setup Julia ${{ env.JULIA_VER }}
+        uses: julia-actions/setup-julia@v1
+        with:
+          version: ${{ env.JULIA_VER }}
+      - name: Cache Julia dependencies
+        uses: actions/cache@v3
+        id: cachejulia
+        env:
+          cache-name: "julia"
+        with:
+          path: |
+            ~/.julia
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/Project.toml') }}-${{ hashFiles('**/Manifest.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/Project.toml') }}-
+            ${{ runner.os }}-${{ env.cache-name }}-
+      - name: Install Julia dependencies
+        if: steps.cachejulia.outputs.cache-hit != 'true'
+        run: |
+          julia --threads=auto --project=@. --color=yes -e 'using Pkg; Pkg.instantiate();'
+      - name: Install IJulia kernel
+        run: |
+          julia --threads=auto --project=@. --color=yes build.jl
+      # Jupyter Book part
       - name: Check Links
         run: jupyter-book build docs --builder linkcheck
