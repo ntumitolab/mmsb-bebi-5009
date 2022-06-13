@@ -1,59 +1,18 @@
 name: Check markdown links
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
 on:
   workflow_dispatch:
   schedule:
     - cron: "0 0 1 * *" # Every month
 
-env:
-  JULIA_VER: "1.7"
-  PYTHON_VER: "3.10"
-  JULIA_NUM_THREADS: 2
-
 jobs:
   linkcheck:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      # Python part
-      - name: Setup Python ${{ env.PYTHON_VER }}
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ env.PYTHON_VER }}
-      - name: Restore Python virtualenv
-        uses: syphar/restore-virtualenv@v1
-        id: cache-virtualenv
-      - name: Download Pip cache
-        uses: syphar/restore-pip-download-cache@v1
-        if: steps.cache-virtualenv.outputs.cache-hit != 'true'
-      - name: Install Python dependencies if cache miss
-        run: pip install -r .ci/requirements.txt -r requirements.txt
-        if: steps.cache-virtualenv.outputs.cache-hit != 'true'
-      # Julia part
-      - name: Setup Julia ${{ env.JULIA_VER }}
-        uses: julia-actions/setup-julia@v1
-        with:
-          version: ${{ env.JULIA_VER }}
-      - name: Cache Julia dependencies
-        uses: actions/cache@v3
-        id: cachejulia
-        env:
-          cache-name: "julia"
-        with:
-          path: |
-            ~/.julia
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/Project.toml') }}-${{ hashFiles('**/Manifest.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('**/Project.toml') }}-
-            ${{ runner.os }}-${{ env.cache-name }}-
-      - name: Install Julia dependencies
-        if: steps.cachejulia.outputs.cache-hit != 'true'
-        run: |
-          julia --threads=auto --project=@. --color=yes -e 'using Pkg; Pkg.instantiate();'
-      - name: Install IJulia kernel
-        run: |
-          julia --threads=auto --project=@. --color=yes build.jl
-      # Jupyter Book part
-      - name: Check Links
-        run: jupyter-book build docs --builder linkcheck
+      - uses: actions/checkout@v3
+      - name: Build Jupyter Books
+        run: docker run -v ${{ github.workspace }}:/work ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest jupyter-book build /work/docs --builder linkcheck
