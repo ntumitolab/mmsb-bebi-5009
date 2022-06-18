@@ -6,23 +6,23 @@ root: index
 parts:
   - caption: Introduction to Julia
     chapters:
-      - file: intro/01-first-steps.ipynb
-      - file: intro/02-plotting
-      - file: intro/03-diffeq
-      - file: intro/04-gillespie
+      - file: intro-01-first-steps.ipynb
+      - file: intro-02-plotting
+      - file: intro-03-diffeq
+      - file: intro-04-gillespie
   - caption: Textbook and Lectures
     chapters:
-      - file: lecture/README
+      - file: lecture-README
         sections:
-          - file: lecture/ch1
-          - file: lecture/ch2
-      - file: mmsb/README
+          - file: lecture-ch1
+          - file: lecture-ch2
+      - file: mmsb-README
         sections:
-          - file: mmsb/ch01
-          - file: mmsb/ch02
-          - file: mmsb/ch03
-          - file: mmsb/ch04
+          - file: mmsb-ch01
+          - file: mmsb-ch02
+          - file: mmsb-ch03
+          - file: mmsb-ch04
   - caption: Homework
     chapters:
-      - file: hw/hw-00
-      - file: hw/hw-01
+      - file: hw-00
+      - file: hw-01

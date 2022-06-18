@@ -1,8 +1,10 @@
 # Adapted from https://github.com/terasakisatoshi/sysimage_creator/
-
-nthreads = Threads.nthreads()
+using Pkg
+Pkg.instantiate()
 
 using IJulia
+nthreads = Threads.nthreads()
+
 IJulia.installkernel(
     "Julia",
     "--project=@.";
