@@ -17,21 +17,89 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  ci:
+  docker:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-
-      # Docker
       - uses: docker/setup-buildx-action@v2
-
-      - name: Login to the Container registry
-        uses: docker/login-action@v2
+      - uses: docker/login-action@v2
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build Docker Image
+        # if: github.event_name != 'pull_request'
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: .ci/Dockerfile
+          push: false
+          tags: ${{ env.IMAGE_NAME }}:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+  execute:
+    needs: docker
+    strategy:
+      fail-fast: false
+      matrix:
+        notebook:
+          - index
+          - hw-01
+          - intro-01-first-steps
+          - intro-02-plotting
+          - intro-03-diffeq
+          - intro-04-gillespie
+          - mmsb-ch01
+          - mmsb-ch02
+          - mmsb-ch03
+          - mmsb-ch04
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/setup-buildx-action@v2
+      - uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build Docker Image
+        # if: github.event_name != 'pull_request'
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: .ci/Dockerfile
+          load: true
+          tags: ${{ env.IMAGE_NAME }}:test
+          cache-from: type=gha
 
+      - name: Build a Notebook
+        run: docker run -v ${{ github.workspace }}:/work ${{ env.IMAGE_NAME }}:test jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --execute --inplace /work/docs/${{ matrix.notebook }}.ipynb
+
+      - name: Upload a Notebook
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.notebook }}
+          path: docs/${{ matrix.notebook }}.ipynb
+
+  jupyter-book:
+    needs: [execute, docker]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - run: mkdir out
+      - name: Download notebooks
+        uses: actions/download-artifact@v3
+        with:
+          path: out/
+      - name: Move notebooks
+        run: find out/ -type f -iname '*.ipynb' -exec mv -t docs/ {} +
+      - uses: docker/setup-buildx-action@v2
+      - uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v4
@@ -44,7 +112,6 @@ jobs:
             type=sha,enable=true,priority=100,prefix=,suffix=,format=long
           flavor: |
             latest=false
-
       - name: Build Docker Image
         # if: github.event_name != 'pull_request'
         uses: docker/build-push-action@v3
@@ -54,16 +121,9 @@ jobs:
           load: true
           tags: ${{ env.IMAGE_NAME }}:test
           cache-from: type=gha
-          cache-to: type=gha,mode=max
 
-      - name: Run notebooks and build website
-        uses: addnab/docker-run-action@v3
-        with:
-          image: ${{ env.IMAGE_NAME }}:test
-          options: -v ${{ github.workspace }}:/work
-          run: |
-            find /work/docs -type f -name "*.ipynb" -print0 | parallel -0 -j2 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --execute --inplace {}
-            jupyter-book build /work/docs -v
+      - name: Build website
+        run: docker run -v ${{ github.workspace }}:/work ${{ env.IMAGE_NAME }}:test jupyter-book build /work/docs -v
 
       - name: Push Docker Image
         # Do not push on PR's
@@ -78,11 +138,11 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      # - name: Deploy Website
-      #   uses: peaceiris/actions-gh-pages@v3.8.0
-      #   if: github.ref == 'refs/heads/main'
-      #   with:
-      #     github_token: ${{ secrets.GITHUB_TOKEN }}
-      #     force_orphan: true
-      #     publish_dir: docs/_build/html
-      #     full_commit_message: ${{ github.event.head_commit.message }}
+      - name: Deploy Website
+        uses: peaceiris/actions-gh-pages@v3.8.0
+        if: github.ref == 'refs/heads/main'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          force_orphan: true
+          publish_dir: docs/_build/html
+          full_commit_message: ${{ github.event.head_commit.message }}
