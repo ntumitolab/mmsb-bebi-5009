@@ -3,6 +3,7 @@ name: Auto update Julia dependencies
 env:
   JULIA_VERSION: "1.7"
   JULIA_PKG_PRECOMPILE_AUTO: 0
+  JULIA_NUM_THREADS: 2
 
 on:
   workflow_dispatch:
@@ -27,10 +28,3 @@ jobs:
         with:
           # PAT with repo access
           token: ${{ secrets.PAT }}
-      - name: Enable Pull Request Automerge
-        if: steps.cpr.outputs.pull-request-operation == 'created'
-        uses: peter-evans/enable-pull-request-automerge@v2
-        with:
-          token: ${{ secrets.PAT }}
-          pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
-          merge-method: squash
