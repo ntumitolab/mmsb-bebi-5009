@@ -1,4 +1,4 @@
-FROM ghcr.io/sosiristseng/docker-juliabook:1.7.3.11
+FROM ghcr.io/sosiristseng/docker-juliabook:1.7.3.12
 
 ENV LC_ALL C.UTF-8
 
