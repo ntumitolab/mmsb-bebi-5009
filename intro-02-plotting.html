@@ -1,0 +1,829 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Plotting with Julia &#8212; Mathematical Modeling in Systems Biology</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=62ba249389abaaa9ffc34bf36a076bdc1d65ee18" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?digest=f31d14ad54b65d19161ba51d4ffff3a77ae00456"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Solving differential equations in Julia" href="intro-03-diffeq.html" />
+    <link rel="prev" title="First steps to Julia" href="intro-01-first-steps.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay overlay-navbar" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<!-- Checkboxes to toggle the in-page toc -->
+<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
+<label class="overlay overlay-pagetoc" for="__page-toc">
+    <div class="visually-hidden">Toggle in-page Table of Contents</div>
+</label>
+<!-- Headers at the top -->
+<div class="announcement header-item noprint"></div>
+<div class="header header-item noprint"></div>
+
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<!-- Sidebar -->
+<div class="bd-sidebar noprint" id="site-navigation">
+    <div class="bd-sidebar__content">
+        <div class="bd-sidebar__top"><div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="index.html">
+      
+      
+      
+      <h1 class="site-logo" id="site-title">Mathematical Modeling in Systems Biology</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="index.html">
+                    Mathematical Modeling in Systems Biology
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Introduction to Julia
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="intro-01-first-steps.html">
+   First steps to Julia
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Plotting with Julia
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="intro-03-diffeq.html">
+   Solving differential equations in Julia
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="intro-04-gillespie.html">
+   Stochastic simulations
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Textbook and Lectures
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="lecture-README.html">
+   Class lectures
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lecture-ch1.html">
+     Chapter 1
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lecture-ch2.html">
+     Chapter 2
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="mmsb-README.html">
+   Textbook figures
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="mmsb-ch01.html">
+     Chapter 1
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="mmsb-ch02.html">
+     Chapter 2
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="mmsb-ch03.html">
+     Chapter 3
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="mmsb-ch04.html">
+     Chapter 4
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Homework
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="hw-00.html">
+   Rules for programming homeworks
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="hw-01.html">
+   Homework 1: Solving an ODE
+  </a>
+ </li>
+</ul>
+
+    </div>
+</nav></div>
+        <div class="bd-sidebar__bottom">
+             <!-- To handle the deprecated key -->
+            
+            <div class="navbar_extra_footer">
+            Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+            </div>
+            
+        </div>
+    </div>
+    <div id="rtd-footer-container"></div>
+</div>
+
+
+          
+
+
+          
+<!-- A tiny helper pixel to detect if we've scrolled -->
+<div class="sbt-scroll-pixel-helper"></div>
+<!-- Main content -->
+<div class="col py-0 content-container">
+    
+    <div class="header-article row sticky-top noprint">
+        
+
+
+
+<div class="col py-1 d-flex header-article-main">
+    <div class="header-article__left">
+        
+        <label for="__navigation"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="right"
+title="Toggle navigation"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-bars"></i>
+  </span>
+
+</label>
+
+        
+    </div>
+    <div class="header-article__right">
+<div class="menu-dropdown menu-dropdown-launch-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Launch interactive content">
+      <i class="fas fa-rocket"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://mybinder.org/v2/gh/ntumitolab/mmsb-bebi-5009/main?urlpath=tree/docs/intro-02-plotting.ipynb"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Launch on Binder"
+>
+  
+
+<span class="headerbtn__icon-container">
+  
+    <img src="_static/images/logo_binder.svg">
+  </span>
+<span class="headerbtn__text-container">Binder</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+<button onclick="toggleFullScreen()"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="bottom"
+title="Fullscreen mode"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+<a href="https://github.com/ntumitolab/mmsb-bebi-5009"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="bottom"
+title="Source repository"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+<div class="menu-dropdown menu-dropdown-download-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Download this page">
+      <i class="fas fa-download"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="_sources/intro-02-plotting.ipynb"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download source file"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="headerbtn__text-container">.ipynb</span>
+</a>
+
+      </li>
+      
+      <li>
+        
+<button onclick="printPdf(this)"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="left"
+title="Print to PDF"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="headerbtn__text-container">.pdf</span>
+</button>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
+
+    </div>
+</div>
+
+<!-- Table of contents -->
+<div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#vector-field">
+   Vector field
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#plots-jl">
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       Plots.jl
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#pyplot-jl">
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       PyPlot.jl
+      </span>
+     </code>
+     :
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+    </nav>
+</div>
+    </div>
+    <div class="article row">
+        <div class="col pl-md-3 pl-lg-5 content-container">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>Plotting with Julia</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#vector-field">
+   Vector field
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#plots-jl">
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       Plots.jl
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#pyplot-jl">
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       PyPlot.jl
+      </span>
+     </code>
+     :
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <main id="main-content" role="main">
+                
+              <div>
+                
+  <section class="tex2jax_ignore mathjax_ignore" id="plotting-with-julia">
+<h1>Plotting with Julia<a class="headerlink" href="#plotting-with-julia" title="Permalink to this headline">#</a></h1>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/JuliaPlots/Plots.jl">Plots.jl</a>: powerful and convenient visualization mwith ultiple backends. See also <a class="reference external" href="http://docs.juliaplots.org/latest/">Plots.jl docs</a></p></li>
+<li><p><a class="reference external" href="https://github.com/JuliaPy/PyPlot.jl">PyPlot.jl</a>: <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> in Julia. See also <a class="reference external" href="https://matplotlib.org/stable/index.html">matplotlib docs</a></p></li>
+<li><p><a class="reference external" href="https://github.com/JuliaPlots/Makie.jl">Makie.jl</a>: a data visualization ecosystem for the Julia programming language, with high performance and extensibility. See also <a class="reference external" href="https://makie.juliaplots.org/stable/tutorials/">Makie.jl docs</a></p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">Plots</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sin</span><span class="p">(</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>f (generic function with 1 method)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">xs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0</span><span class="o">:</span><span class="mf">0.1</span><span class="o">:</span><span class="mi">4</span><span class="nb">pi</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.0:0.1:12.5
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">ys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="o">.</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>126-element Vector{Float64}:
+ 0.8414709848078965
+ 0.8911317861333838
+ 0.9315560826328598
+ 0.9623501813639228
+ 0.9835960588100923
+ 0.9958285928692856
+ 0.9999810651039218
+ 0.9973058625146969
+ 0.9892793281920914
+ 0.9775002586636391
+ 0.9635907245418334
+ 0.9491060405792519
+ 0.9354583090330478
+ ⋮
+ 0.08058400266618558
+ 0.12422607398385804
+ 0.17624596561456454
+ 0.2357754296709225
+ 0.30169969146476955
+ 0.3726498227859906
+ 0.44701633928081586
+ 0.5229877415734713
+ 0.5986147895910303
+ 0.6718978181818495
+ 0.7408908673778799
+ 0.8038134083524772
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="c"># Line plots connect the data points</span><span class="w"></span>
+<span class="n">plot</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span><span class="w"> </span><span class="n">ys</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/intro-02-plotting_5_0.svg" src="_images/intro-02-plotting_5_0.svg" /></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="c"># scatter plots show the data points only</span><span class="w"></span>
+<span class="n">scatter</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span><span class="w"> </span><span class="n">ys</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/intro-02-plotting_6_0.svg" src="_images/intro-02-plotting_6_0.svg" /></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="c"># you can plot functions directly</span><span class="w"></span>
+<span class="n">plot</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="n">xs</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/intro-02-plotting_7_0.svg" src="_images/intro-02-plotting_7_0.svg" /></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="c"># plot a function with a range</span><span class="w"></span>
+<span class="n">plot</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="nb">pi</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/intro-02-plotting_8_0.svg" src="_images/intro-02-plotting_8_0.svg" /></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="c"># Customizations</span><span class="w"></span>
+<span class="n">plot</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="n">xs</span><span class="p">,</span><span class="w"> </span>
+<span class="w">     </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;My line&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">legend</span><span class="o">=</span><span class="ss">:bottom</span><span class="p">,</span><span class="w"> </span>
+<span class="w">     </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;My Title&quot;</span><span class="p">,</span><span class="w">  </span><span class="n">line</span><span class="o">=</span><span class="p">(</span><span class="ss">:red</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">),</span><span class="w"></span>
+<span class="w">     </span><span class="n">xlim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">5.0</span><span class="p">),</span><span class="w"> </span><span class="n">ylim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.5</span><span class="p">),</span><span class="w"></span>
+<span class="w">     </span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;time&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;My Mood&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">border</span><span class="o">=</span><span class="ss">:box</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/intro-02-plotting_9_0.svg" src="_images/intro-02-plotting_9_0.svg" /></div>
+</div>
+<p>Multiple series: each row is one observation; each column is a variable.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">f2</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cos</span><span class="p">(</span><span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>f2 (generic function with 1 method)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">y2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f2</span><span class="o">.</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>126-element Vector{Float64}:
+ -0.4161468365471424
+ -0.4115989626245442
+ -0.39793995394658593
+ -0.37513292022522066
+ -0.3431464165959406
+ -0.3019964901426669
+ -0.251799567898706
+ -0.1928303905605429
+ -0.12557796104012148
+ -0.050791777273393006
+  0.030489295156121407
+  0.11693208142980759
+  0.2069325218043063
+  ⋮
+  0.17637792096399765
+  0.0873799893855719
+  0.002506694401771309
+ -0.07672453661400838
+ -0.14907836040441386
+ -0.21361508187450767
+ -0.2696770419201289
+ -0.31685309804973233
+ -0.35492824797420097
+ -0.38382617162484306
+ -0.40355226239464964
+ -0.41414381043612153
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="n">ys</span><span class="w"> </span><span class="n">y2</span><span class="p">])</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/intro-02-plotting_13_0.svg" src="_images/intro-02-plotting_13_0.svg" /></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="c"># Plotting two functions with customizations</span><span class="w"></span>
+<span class="n">plot</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="n">f2</span><span class="p">],</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;f1&quot;</span><span class="w"> </span><span class="s">&quot;f2&quot;</span><span class="p">],</span><span class="w"> </span><span class="n">lc</span><span class="o">=</span><span class="p">[</span><span class="ss">:black</span><span class="w"> </span><span class="ss">:green</span><span class="p">],</span><span class="w"> </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;Two time series&quot;</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/intro-02-plotting_14_0.svg" src="_images/intro-02-plotting_14_0.svg" /></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="c"># Building the plot in multiple steps</span><span class="w"></span>
+<span class="c"># in the object-oriented way (recommended)</span><span class="w"></span>
+
+<span class="n">xMin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0</span><span class="w"></span>
+<span class="n">xMax</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">4.0</span><span class="nb">π</span><span class="w"></span>
+<span class="n">p1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">plot</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="n">xMin</span><span class="p">,</span><span class="w"> </span><span class="n">xMax</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;f1&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">lc</span><span class="o">=</span><span class="ss">:black</span><span class="p">)</span><span class="w"></span>
+<span class="n">plot!</span><span class="p">(</span><span class="n">p1</span><span class="w"> </span><span class="p">,</span><span class="w"> </span><span class="n">f2</span><span class="p">,</span><span class="w"> </span><span class="n">xMin</span><span class="p">,</span><span class="w"> </span><span class="n">xMax</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;f2&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">lc</span><span class="o">=</span><span class="ss">:lightsalmon</span><span class="p">)</span><span class="w"></span>
+<span class="n">plot!</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;My title&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">legend</span><span class="o">=</span><span class="ss">:outertop</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/intro-02-plotting_15_0.svg" src="_images/intro-02-plotting_15_0.svg" /></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="c"># Parametric plot</span><span class="w"></span>
+<span class="n">xₜ</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sin</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"></span>
+<span class="n">yₜ</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span><span class="n">t</span><span class="p">)</span><span class="w"></span>
+
+<span class="n">plot</span><span class="p">(</span><span class="n">xₜ</span><span class="p">,</span><span class="w"> </span><span class="n">yₜ</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="nb">π</span><span class="p">,</span><span class="w"> </span><span class="n">leg</span><span class="o">=</span><span class="nb">false</span><span class="p">,</span><span class="w"> </span><span class="n">fill</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="ss">:orange</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/intro-02-plotting_16_0.svg" src="_images/intro-02-plotting_16_0.svg" /></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="c"># Subplots</span><span class="w"></span>
+<span class="n">p1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">plot</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="n">xs</span><span class="p">)</span><span class="w"></span>
+<span class="n">p2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">plot</span><span class="p">(</span><span class="n">f2</span><span class="p">,</span><span class="w"> </span><span class="n">xs</span><span class="p">)</span><span class="w"></span>
+<span class="n">plot</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span><span class="w"> </span><span class="n">p2</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/intro-02-plotting_17_0.svg" src="_images/intro-02-plotting_17_0.svg" /></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span><span class="w"> </span><span class="n">p2</span><span class="p">,</span><span class="w"> </span><span class="n">layout</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/intro-02-plotting_18_0.svg" src="_images/intro-02-plotting_18_0.svg" /></div>
+</div>
+<section id="vector-field">
+<h2>Vector field<a class="headerlink" href="#vector-field" title="Permalink to this headline">#</a></h2>
+<section id="plots-jl">
+<h3><code class="docutils literal notranslate"><span class="pre">Plots.jl</span></code><a class="headerlink" href="#plots-jl" title="Permalink to this headline">#</a></h3>
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="c"># Quiver plot</span><span class="w"></span>
+<span class="n">quiver</span><span class="p">(</span><span class="n">vec</span><span class="p">(</span><span class="n">x2d</span><span class="p">),</span><span class="w"> </span><span class="n">vec</span><span class="p">(</span><span class="n">y2d</span><span class="p">),</span><span class="w"> </span><span class="n">quiver</span><span class="o">=</span><span class="p">(</span><span class="n">vec</span><span class="p">(</span><span class="n">vx2d</span><span class="p">),</span><span class="w"> </span><span class="n">vec</span><span class="p">(</span><span class="n">vy2d</span><span class="p">))</span><span class="w"></span>
+<span class="c"># Or this</span><span class="w"></span>
+<span class="n">quiver</span><span class="p">(</span><span class="n">x2d</span><span class="p">,</span><span class="w"> </span><span class="n">y2d</span><span class="p">,</span><span class="w"> </span><span class="n">quiver</span><span class="o">=</span><span class="n">f</span><span class="p">)</span><span class="w"> </span><span class="c"># Where f = (x,y) -&gt; (vx, vy)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>See also: Using quiver plots in <a class="reference external" href="https://ntumito.gitlab.io/wen-wei-tseng/learn-julia-visualization/plotsjl-gallery.html#quiver-plots">Plots.jl</a></p>
+</section>
+<section id="pyplot-jl">
+<h3><code class="docutils literal notranslate"><span class="pre">PyPlot.jl</span></code>:<a class="headerlink" href="#pyplot-jl" title="Permalink to this headline">#</a></h3>
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">quiver</span><span class="p">(</span><span class="n">X2d</span><span class="p">,</span><span class="n">Y2d</span><span class="p">,</span><span class="n">U2d</span><span class="p">,</span><span class="n">V2d</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>See also: Using quiver plots in <a class="reference external" href="https://ntumito.gitlab.io/wen-wei-tseng/learn-julia-visualization/pyplot-gizmaa.html#quiver-plots">PyPlot.jl</a> and <a class="reference external" href="https://matplotlib.org/stable/gallery/images_contours_and_fields/quiver_demo.html#sphx-glr-gallery-images-contours-and-fields-quiver-demo-py">matplotlib: quiver plot</a></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">Plots</span><span class="w"></span>
+
+<span class="c"># ∇ = \nabla &lt;TAB&gt;</span><span class="w"></span>
+<span class="k">function</span><span class="w"> </span><span class="n">∇f</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">;</span><span class="w"> </span><span class="n">scale</span><span class="o">=</span><span class="n">hypot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="o">^</span><span class="mf">0.5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">[</span><span class="o">-</span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">]</span><span class="w"> </span><span class="o">./</span><span class="w"> </span><span class="n">scale</span><span class="w"></span>
+<span class="k">end</span><span class="w"></span>
+
+<span class="c"># x mesh and y mesh</span><span class="w"></span>
+<span class="n">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mf">1.0</span><span class="o">:</span><span class="mf">0.2</span><span class="o">:</span><span class="mf">1.0</span><span class="w"></span>
+<span class="n">xx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">x</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">r</span><span class="p">]</span><span class="w"></span>
+<span class="n">yy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">y</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">r</span><span class="p">]</span><span class="w"></span>
+
+<span class="n">quiver</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span><span class="w"> </span><span class="n">yy</span><span class="p">,</span><span class="w"> </span><span class="n">quiver</span><span class="o">=</span><span class="n">∇f</span><span class="p">,</span><span class="w"> </span><span class="n">aspect_ratio</span><span class="o">=</span><span class="ss">:equal</span><span class="p">,</span><span class="w"> </span><span class="n">line</span><span class="o">=</span><span class="p">(</span><span class="ss">:black</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/intro-02-plotting_20_0.svg" src="_images/intro-02-plotting_20_0.svg" /></div>
+</div>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "julia-1.7"
+        },
+        kernelOptions: {
+            kernelName: "julia-1.7",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'julia-1.7'</script>
+
+              </div>
+              
+            </main>
+            <footer class="footer-article noprint">
+                
+    <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="intro-01-first-steps.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">First steps to Julia</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="intro-03-diffeq.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Solving differential equations in Julia</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+            </footer>
+        </div>
+    </div>
+    <div class="footer-content row">
+        <footer class="col footer"><p>
+  
+    By Wen-Wei Tseng<br/>
+  
+      &copy; Copyright 2022.<br/>
+</p>
+        </footer>
+    </div>
+    
+</div>
+
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+
+
+  </body>
+</html>

@@ -1,0 +1,1450 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Chapter 4 &#8212; Mathematical Modeling in Systems Biology</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=62ba249389abaaa9ffc34bf36a076bdc1d65ee18" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?digest=f31d14ad54b65d19161ba51d4ffff3a77ae00456"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Rules for programming homeworks" href="hw-00.html" />
+    <link rel="prev" title="Chapter 3" href="mmsb-ch03.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay overlay-navbar" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<!-- Checkboxes to toggle the in-page toc -->
+<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
+<label class="overlay overlay-pagetoc" for="__page-toc">
+    <div class="visually-hidden">Toggle in-page Table of Contents</div>
+</label>
+<!-- Headers at the top -->
+<div class="announcement header-item noprint"></div>
+<div class="header header-item noprint"></div>
+
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<!-- Sidebar -->
+<div class="bd-sidebar noprint" id="site-navigation">
+    <div class="bd-sidebar__content">
+        <div class="bd-sidebar__top"><div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="index.html">
+      
+      
+      
+      <h1 class="site-logo" id="site-title">Mathematical Modeling in Systems Biology</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="index.html">
+                    Mathematical Modeling in Systems Biology
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Introduction to Julia
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="intro-01-first-steps.html">
+   First steps to Julia
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="intro-02-plotting.html">
+   Plotting with Julia
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="intro-03-diffeq.html">
+   Solving differential equations in Julia
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="intro-04-gillespie.html">
+   Stochastic simulations
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Textbook and Lectures
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="lecture-README.html">
+   Class lectures
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lecture-ch1.html">
+     Chapter 1
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lecture-ch2.html">
+     Chapter 2
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 current active has-children">
+  <a class="reference internal" href="mmsb-README.html">
+   Textbook figures
+  </a>
+  <input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="current">
+   <li class="toctree-l2">
+    <a class="reference internal" href="mmsb-ch01.html">
+     Chapter 1
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="mmsb-ch02.html">
+     Chapter 2
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="mmsb-ch03.html">
+     Chapter 3
+    </a>
+   </li>
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
+     Chapter 4
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Homework
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="hw-00.html">
+   Rules for programming homeworks
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="hw-01.html">
+   Homework 1: Solving an ODE
+  </a>
+ </li>
+</ul>
+
+    </div>
+</nav></div>
+        <div class="bd-sidebar__bottom">
+             <!-- To handle the deprecated key -->
+            
+            <div class="navbar_extra_footer">
+            Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+            </div>
+            
+        </div>
+    </div>
+    <div id="rtd-footer-container"></div>
+</div>
+
+
+          
+
+
+          
+<!-- A tiny helper pixel to detect if we've scrolled -->
+<div class="sbt-scroll-pixel-helper"></div>
+<!-- Main content -->
+<div class="col py-0 content-container">
+    
+    <div class="header-article row sticky-top noprint">
+        
+
+
+
+<div class="col py-1 d-flex header-article-main">
+    <div class="header-article__left">
+        
+        <label for="__navigation"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="right"
+title="Toggle navigation"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-bars"></i>
+  </span>
+
+</label>
+
+        
+    </div>
+    <div class="header-article__right">
+<div class="menu-dropdown menu-dropdown-launch-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Launch interactive content">
+      <i class="fas fa-rocket"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://mybinder.org/v2/gh/ntumitolab/mmsb-bebi-5009/main?urlpath=tree/docs/mmsb-ch04.ipynb"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Launch on Binder"
+>
+  
+
+<span class="headerbtn__icon-container">
+  
+    <img src="_static/images/logo_binder.svg">
+  </span>
+<span class="headerbtn__text-container">Binder</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+<button onclick="toggleFullScreen()"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="bottom"
+title="Fullscreen mode"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+<a href="https://github.com/ntumitolab/mmsb-bebi-5009"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="bottom"
+title="Source repository"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+<div class="menu-dropdown menu-dropdown-download-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Download this page">
+      <i class="fas fa-download"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="_sources/mmsb-ch04.ipynb"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download source file"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="headerbtn__text-container">.ipynb</span>
+</a>
+
+      </li>
+      
+      <li>
+        
+<button onclick="printPdf(this)"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="left"
+title="Print to PDF"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="headerbtn__text-container">.pdf</span>
+</button>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
+
+    </div>
+</div>
+
+<!-- Table of contents -->
+<div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#figure-4-1-4-2-and-4-3">
+   Figure 4.1, 4.2, and 4.3
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#figure-4-4-4-5">
+   Figure 4.4, 4.5
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#figure-4-7-4-8-4-9-and-4-19a">
+   Figure 4.7, 4.8, 4.9, and 4.19A
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#figure-4-11">
+   Figure 4.11
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#figure-4-15-4-16-and-4-17">
+   Figure 4.15, 4.16, and 4.17
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#figure-4-18-continuation-diagram">
+   Figure 4.18 Continuation diagram
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#figure-4-22-tangent-line">
+   Figure 4.22 Tangent line
+  </a>
+ </li>
+</ul>
+
+    </nav>
+</div>
+    </div>
+    <div class="article row">
+        <div class="col pl-md-3 pl-lg-5 content-container">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>Chapter 4</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#figure-4-1-4-2-and-4-3">
+   Figure 4.1, 4.2, and 4.3
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#figure-4-4-4-5">
+   Figure 4.4, 4.5
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#figure-4-7-4-8-4-9-and-4-19a">
+   Figure 4.7, 4.8, 4.9, and 4.19A
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#figure-4-11">
+   Figure 4.11
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#figure-4-15-4-16-and-4-17">
+   Figure 4.15, 4.16, and 4.17
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#figure-4-18-continuation-diagram">
+   Figure 4.18 Continuation diagram
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#figure-4-22-tangent-line">
+   Figure 4.22 Tangent line
+  </a>
+ </li>
+</ul>
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <main id="main-content" role="main">
+                
+              <div>
+                
+  <section class="tex2jax_ignore mathjax_ignore" id="chapter-4">
+<h1>Chapter 4<a class="headerlink" href="#chapter-4" title="Permalink to this headline">#</a></h1>
+<section id="figure-4-1-4-2-and-4-3">
+<h2>Figure 4.1, 4.2, and 4.3<a class="headerlink" href="#figure-4-1-4-2-and-4-3" title="Permalink to this headline">#</a></h2>
+<p>Steady states and phase plots in an assymetric network.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">DifferentialEquations</span><span class="w"></span>
+<span class="k">using</span><span class="w"> </span><span class="n">ModelingToolkit</span><span class="w"></span>
+<span class="k">using</span><span class="w"> </span><span class="n">Plots</span><span class="w"></span>
+<span class="k">using</span><span class="w"> </span><span class="n">LinearAlgebra</span><span class="w"></span>
+<span class="c"># plotting default option(s)</span><span class="w"></span>
+<span class="n">Plots</span><span class="o">.</span><span class="n">gr</span><span class="p">(</span><span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Plots.GRBackend()
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="c"># Convenience functions</span><span class="w"></span>
+<span class="n">hill</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">k</span><span class="p">)</span><span class="w"></span>
+<span class="n">hill</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hill</span><span class="p">(</span><span class="n">x</span><span class="o">^</span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="o">^</span><span class="n">n</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hill (generic function with 2 methods)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="nd">@parameters</span><span class="w"> </span><span class="n">k</span><span class="p">[</span><span class="mi">1</span><span class="o">:</span><span class="mi">5</span><span class="p">]</span><span class="w"> </span><span class="n">n</span><span class="w"></span>
+<span class="nd">@variables</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="n">A</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"> </span><span class="n">B</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"></span>
+<span class="n">D</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Differential</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(::Differential) (generic function with 2 methods)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">eqs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">D</span><span class="p">(</span><span class="n">A</span><span class="p">)</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">k</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">hill</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">B</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="n">k</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">k</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span><span class="o">*</span><span class="w"> </span><span class="n">A</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="n">D</span><span class="p">(</span><span class="n">B</span><span class="p">)</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">k</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">k</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">k</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">B</span><span class="p">]</span><span class="w"></span>
+<span class="nd">@named</span><span class="w"> </span><span class="n">sys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ODESystem</span><span class="p">(</span><span class="n">eqs</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_latex math notranslate nohighlight">
+\[\begin{split} \begin{align}
+\frac{dA(t)}{dt} =&amp; \frac{1^{n} k_1}{1^{n} + \left( B\left( t \right) \right)^{n}} - \left( k_3 + k_5 \right) A\left( t \right) \\
+\frac{dB(t)}{dt} =&amp; A\left( t \right) k_5 - B\left( t \right) k_4 + k_2
+\end{align}
+ \end{split}\]</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Dict</span><span class="p">(</span><span class="n">k</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">=&gt;</span><span class="mf">20.0</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">=&gt;</span><span class="mf">5.0</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">=&gt;</span><span class="mf">5.0</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">=&gt;</span><span class="mf">5.0</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">=&gt;</span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="o">=&gt;</span><span class="mi">4</span><span class="p">)</span><span class="w"></span>
+
+<span class="n">u0s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">Dict</span><span class="p">(</span><span class="n">A</span><span class="o">=&gt;</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="n">B</span><span class="o">=&gt;</span><span class="mf">0.0</span><span class="p">),</span><span class="w"> </span>
+<span class="w">       </span><span class="kt">Dict</span><span class="p">(</span><span class="n">A</span><span class="o">=&gt;</span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="n">B</span><span class="o">=&gt;</span><span class="mf">0.6</span><span class="p">),</span><span class="w"></span>
+<span class="w">       </span><span class="kt">Dict</span><span class="p">(</span><span class="n">A</span><span class="o">=&gt;</span><span class="mf">0.17</span><span class="p">,</span><span class="w"> </span><span class="n">B</span><span class="o">=&gt;</span><span class="mf">1.1</span><span class="p">),</span><span class="w"></span>
+<span class="w">       </span><span class="kt">Dict</span><span class="p">(</span><span class="n">A</span><span class="o">=&gt;</span><span class="mf">0.25</span><span class="p">,</span><span class="w"> </span><span class="n">B</span><span class="o">=&gt;</span><span class="mf">1.9</span><span class="p">),</span><span class="w"></span>
+<span class="w">       </span><span class="kt">Dict</span><span class="p">(</span><span class="n">A</span><span class="o">=&gt;</span><span class="mf">1.85</span><span class="p">,</span><span class="w"> </span><span class="n">B</span><span class="o">=&gt;</span><span class="mf">1.70</span><span class="p">))</span><span class="w"></span>
+
+<span class="n">tend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.5</span><span class="w"></span>
+
+<span class="n">sols</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">map</span><span class="p">(</span><span class="n">u0s</span><span class="p">)</span><span class="w"> </span><span class="k">do</span><span class="w"> </span><span class="n">u0</span><span class="w"></span>
+<span class="w">    </span><span class="n">prob</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ODEProblem</span><span class="p">(</span><span class="n">sys</span><span class="p">,</span><span class="w"> </span><span class="n">u0</span><span class="p">,</span><span class="w"> </span><span class="n">tend</span><span class="p">,</span><span class="w"> </span><span class="n">params</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">sol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span><span class="w"></span>
+<span class="k">end</span><span class="p">;</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span><span class="p">(</span><span class="n">sols</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;Time&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;Concentration&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;Fig. 4.2 A (Time series)&quot;</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/mmsb-ch04_7_0.svg" src="_images/mmsb-ch04_7_0.svg" /></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span><span class="p">(</span><span class="n">sols</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="n">vars</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">),</span><span class="w"> </span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;[A]&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;[B]&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">aspect_ratio</span><span class="o">=</span><span class="ss">:equal</span><span class="p">,</span><span class="w"></span>
+<span class="w">     </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;Fig. 4.2 B (Phase plot)&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ylims</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">),</span><span class="w"> </span><span class="n">xlims</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">),</span><span class="w"> </span>
+<span class="w">     </span><span class="n">legend</span><span class="o">=</span><span class="nb">nothing</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/mmsb-ch04_8_0.svg" src="_images/mmsb-ch04_8_0.svg" /></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">p3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">plot</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;Time&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;Concentration&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;Fig. 4.3A (Multiple time series)&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">	</span>
+<span class="k">for</span><span class="w"> </span><span class="n">sol</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">sols</span><span class="w"></span>
+<span class="w">    </span><span class="n">plot!</span><span class="p">(</span><span class="n">p3</span><span class="p">,</span><span class="w"> </span><span class="n">sol</span><span class="p">,</span><span class="w"> </span><span class="n">linealpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="n">legend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">nothing</span><span class="p">)</span><span class="w"></span>
+<span class="k">end</span><span class="w"></span>
+
+<span class="n">p3</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/mmsb-ch04_9_0.svg" src="_images/mmsb-ch04_9_0.svg" /></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">p4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">plot</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">&quot;Fig. 4.3B (Phase plot)&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;[A]&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;[B]&quot;</span><span class="p">)</span><span class="w"></span>
+
+<span class="k">for</span><span class="w"> </span><span class="n">sol</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">sols</span><span class="w"></span>
+<span class="w">    </span><span class="n">plot!</span><span class="p">(</span><span class="n">p4</span><span class="p">,</span><span class="w"> </span><span class="n">sol</span><span class="p">,</span><span class="w"> </span><span class="n">vars</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">),</span><span class="w"> </span><span class="n">linealpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span><span class="w"> </span><span class="n">legend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">nothing</span><span class="p">)</span><span class="w"></span>
+<span class="k">end</span><span class="w"></span>
+
+<span class="n">plot</span><span class="p">(</span><span class="n">p4</span><span class="p">,</span><span class="w"> </span><span class="n">aspect_ratio</span><span class="o">=</span><span class="ss">:equal</span><span class="p">,</span><span class="w"> </span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span><span class="w"> </span><span class="mi">600</span><span class="p">),</span><span class="w"> </span><span class="n">ylims</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">),</span><span class="w"> </span><span class="n">xlims</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/mmsb-ch04_10_0.svg" src="_images/mmsb-ch04_10_0.svg" /></div>
+</div>
+</section>
+<section id="figure-4-4-4-5">
+<h2>Figure 4.4, 4.5<a class="headerlink" href="#figure-4-4-4-5" title="Permalink to this headline">#</a></h2>
+<p>Vector fields in phase plots.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="c"># Nullclines</span><span class="w"></span>
+
+<span class="n">nullcline_a</span><span class="p">(</span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">params</span><span class="p">[</span><span class="n">k</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="n">k</span><span class="p">[</span><span class="mi">5</span><span class="p">]]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">params</span><span class="p">[</span><span class="n">k</span><span class="p">[</span><span class="mi">4</span><span class="p">]])</span><span class="w">  </span><span class="o">*</span><span class="w"> </span><span class="n">hill</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">params</span><span class="p">[</span><span class="n">n</span><span class="p">])</span><span class="w"></span>
+<span class="n">nullcline_b</span><span class="p">(</span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="n">k</span><span class="p">[</span><span class="mi">4</span><span class="p">]]</span><span class="o">*</span><span class="n">b</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">params</span><span class="p">[</span><span class="n">k</span><span class="p">[</span><span class="mi">2</span><span class="p">]])</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">params</span><span class="p">[</span><span class="n">k</span><span class="p">[</span><span class="mi">5</span><span class="p">]]</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>nullcline_b (generic function with 1 method)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="c"># Generate a good old function f(u,p,t) from the ODE system</span><span class="w"></span>
+<span class="n">ode_f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ODEFunction</span><span class="p">(</span><span class="n">sys</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">B</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="n">k</span><span class="o">...</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">])</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(::ODEFunction{true, ModelingToolkit.var&quot;#f#414&quot;{RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :t), ModelingToolkit.var&quot;#_RGF_ModTag&quot;, ModelingToolkit.var&quot;#_RGF_ModTag&quot;, (0x460df007, 0x88f35ae7, 0xf3fdb75f, 0x6a513a52, 0x343a42dd)}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋out, :ˍ₋arg1, :ˍ₋arg2, :t), ModelingToolkit.var&quot;#_RGF_ModTag&quot;, ModelingToolkit.var&quot;#_RGF_ModTag&quot;, (0x46dfd4da, 0xea4cc04b, 0x205c50cd, 0x86dd9669, 0xca3f9b03)}}, UniformScaling{Bool}, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Vector{Symbol}, Symbol, ModelingToolkit.var&quot;#474#generated_observed#421&quot;{Bool, ODESystem, Dict{Any, Any}}, Nothing}) (generic function with 1 method)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="c"># Try to plug in the inputs</span><span class="w"></span>
+<span class="n">ode_f</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">],</span><span class="w"> </span><span class="mf">0.0</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2-element Vector{Float64}:
+ 20.0
+  5.0
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="c"># function for the vector field</span><span class="w"></span>
+<span class="k">function</span><span class="w"> </span><span class="n">∂F</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">params</span><span class="p">;</span><span class="w"> </span><span class="n">scale</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span><span class="w"></span>
+<span class="w">	</span><span class="n">du</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ode_f</span><span class="p">([</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">],</span><span class="w"> </span><span class="n">params</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">)</span><span class="w"></span>
+<span class="w">	</span><span class="k">return</span><span class="w"> </span><span class="n">du</span><span class="w"> </span><span class="o">./</span><span class="w"> </span><span class="p">(</span><span class="n">norm</span><span class="p">(</span><span class="n">du</span><span class="p">)</span><span class="o">^</span><span class="mf">0.5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">scale</span><span class="p">)</span><span class="w"></span>
+<span class="k">end</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>∂F (generic function with 1 method)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="c"># Mesh points</span><span class="w"></span>
+<span class="n">xx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">x</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mf">0.0</span><span class="o">:</span><span class="mf">0.1</span><span class="o">:</span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mf">0.0</span><span class="o">:</span><span class="mf">0.1</span><span class="o">:</span><span class="mf">2.0</span><span class="p">];</span><span class="w"></span>
+<span class="n">yy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">y</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mf">0.0</span><span class="o">:</span><span class="mf">0.1</span><span class="o">:</span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mf">0.0</span><span class="o">:</span><span class="mf">0.1</span><span class="o">:</span><span class="mf">2.0</span><span class="p">];</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">∂F1</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">∂F</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">])</span><span class="w"></span>
+
+<span class="n">p1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">plot</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">&quot;Fig. 4.4 A (Phase plot with vector field)&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;[A]&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;[B]&quot;</span><span class="p">)</span><span class="w"></span>
+
+<span class="k">for</span><span class="w"> </span><span class="n">sol</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">sols</span><span class="w"></span>
+<span class="w">    </span><span class="n">plot!</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span><span class="w"> </span><span class="n">sol</span><span class="p">,</span><span class="w"> </span><span class="n">vars</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">),</span><span class="w"> </span><span class="n">linealpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span><span class="w"> </span><span class="n">legend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">nothing</span><span class="p">)</span><span class="w"></span>
+<span class="k">end</span><span class="w"></span>
+
+<span class="n">p1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">quiver!</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span><span class="w"> </span><span class="n">xx</span><span class="p">,</span><span class="w"> </span><span class="n">yy</span><span class="p">,</span><span class="w"> </span><span class="n">quiver</span><span class="o">=</span><span class="n">∂F1</span><span class="p">,</span><span class="w"> </span><span class="n">line</span><span class="o">=</span><span class="p">(</span><span class="ss">:lightgrey</span><span class="p">))</span><span class="w"></span>
+
+<span class="n">plot!</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span><span class="w"> </span><span class="n">aspect_ratio</span><span class="o">=</span><span class="ss">:equal</span><span class="p">,</span><span class="w"> </span><span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">),</span><span class="w"> </span><span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">),</span><span class="w"> </span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span><span class="w"> </span><span class="mi">600</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/mmsb-ch04_17_0.svg" src="_images/mmsb-ch04_17_0.svg" /></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="c"># Figure 4.5A</span><span class="w"></span>
+<span class="n">p45a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">plot</span><span class="p">(</span><span class="n">aspect_ratio</span><span class="o">=</span><span class="ss">:equal</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;Fig. 4.5 A (Phase plot with nullclines)&quot;</span><span class="p">)</span><span class="w"></span>
+
+<span class="c"># Phase plots</span><span class="w"></span>
+<span class="k">for</span><span class="w"> </span><span class="n">sol</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">sols</span><span class="w"></span>
+<span class="w">    </span><span class="n">plot!</span><span class="p">(</span><span class="n">p45a</span><span class="p">,</span><span class="w"> </span><span class="n">sol</span><span class="p">,</span><span class="w"> </span><span class="n">vars</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">),</span><span class="w"> </span><span class="n">linealpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span><span class="w"> </span><span class="n">lab</span><span class="o">=</span><span class="nb">nothing</span><span class="p">)</span><span class="w"></span>
+<span class="k">end</span><span class="w"></span>
+
+<span class="c"># Parametric plots for nullclines</span><span class="w"></span>
+<span class="n">plot!</span><span class="p">(</span><span class="n">p45a</span><span class="p">,</span><span class="w"> </span><span class="n">nullcline_a</span><span class="p">,</span><span class="w"> </span><span class="n">identity</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;A nullcline&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">line</span><span class="o">=</span><span class="p">(</span><span class="ss">:black</span><span class="p">,</span><span class="w"> </span><span class="ss">:dot</span><span class="p">))</span><span class="w"></span>
+<span class="n">plot!</span><span class="p">(</span><span class="n">p45a</span><span class="p">,</span><span class="w"> </span><span class="n">nullcline_b</span><span class="p">,</span><span class="w"> </span><span class="n">identity</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;B nullcline&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">line</span><span class="o">=</span><span class="p">(</span><span class="ss">:black</span><span class="p">,</span><span class="w"> </span><span class="ss">:dash</span><span class="p">))</span><span class="w"></span>
+<span class="n">plot!</span><span class="p">(</span><span class="n">p45a</span><span class="p">,</span><span class="w"> </span><span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">),</span><span class="w"> </span><span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">),</span><span class="w"> </span><span class="n">legend</span><span class="o">=</span><span class="ss">:bottomright</span><span class="p">,</span><span class="w"> </span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span><span class="w"> </span><span class="mi">600</span><span class="p">),</span><span class="w"> </span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;[A]&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;[B]&quot;</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/mmsb-ch04_18_0.svg" src="_images/mmsb-ch04_18_0.svg" /></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">p45b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">quiver</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span><span class="w"> </span><span class="n">yy</span><span class="p">,</span><span class="w"> </span><span class="n">quiver</span><span class="o">=</span><span class="n">∂F1</span><span class="p">,</span><span class="w"> </span><span class="n">line</span><span class="o">=</span><span class="p">(</span><span class="ss">:lightgray</span><span class="p">),</span><span class="w"> </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;Fig. 4.5 B (Vector field with nullclines)&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;[A]&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;[B]&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="n">plot!</span><span class="p">(</span><span class="n">p45b</span><span class="p">,</span><span class="w"> </span><span class="n">nullcline_a</span><span class="p">,</span><span class="w"> </span><span class="n">identity</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;A nullcline&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">line</span><span class="o">=</span><span class="p">(</span><span class="ss">:black</span><span class="p">,</span><span class="w"> </span><span class="ss">:dot</span><span class="p">))</span><span class="w"></span>
+<span class="n">plot!</span><span class="p">(</span><span class="n">p45b</span><span class="p">,</span><span class="w"> </span><span class="n">nullcline_b</span><span class="p">,</span><span class="w"> </span><span class="n">identity</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;B nullcline&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">line</span><span class="o">=</span><span class="p">(</span><span class="ss">:black</span><span class="p">,</span><span class="w"> </span><span class="ss">:dash</span><span class="p">))</span><span class="w"></span>
+<span class="n">plot!</span><span class="p">(</span><span class="n">p45b</span><span class="p">,</span><span class="w"> </span><span class="n">aspect_ratio</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">),</span><span class="w"> </span><span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">),</span><span class="w"> </span><span class="n">legend</span><span class="o">=</span><span class="ss">:bottomright</span><span class="p">,</span><span class="w"> </span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span><span class="w"> </span><span class="mi">600</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/mmsb-ch04_19_0.svg" src="_images/mmsb-ch04_19_0.svg" /></div>
+</div>
+</section>
+<section id="figure-4-7-4-8-4-9-and-4-19a">
+<h2>Figure 4.7, 4.8, 4.9, and 4.19A<a class="headerlink" href="#figure-4-7-4-8-4-9-and-4-19a" title="Permalink to this headline">#</a></h2>
+<p>Symmetric (bistable) biological networks.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">DifferentialEquations</span><span class="w"></span>
+<span class="k">using</span><span class="w"> </span><span class="n">ModelingToolkit</span><span class="w"></span>
+<span class="k">using</span><span class="w"> </span><span class="n">Plots</span><span class="w"></span>
+<span class="k">using</span><span class="w"> </span><span class="n">LinearAlgebra</span><span class="w"></span>
+<span class="c"># Default options for Plots.jl</span><span class="w"></span>
+<span class="n">Plots</span><span class="o">.</span><span class="n">gr</span><span class="p">(</span><span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Plots.GRBackend()
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">hill</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">k</span><span class="p">)</span><span class="w"></span>
+<span class="n">hill</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hill</span><span class="p">(</span><span class="n">x</span><span class="o">^</span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="o">^</span><span class="n">n</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hill (generic function with 2 methods)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="c"># Model of symmetric network from Figure 4.6. This code generates Figures 4.7, 4.8, 4.9, and 4.19A</span><span class="w"></span>
+
+<span class="nd">@parameters</span><span class="w"> </span><span class="n">k</span><span class="p">[</span><span class="mi">1</span><span class="o">:</span><span class="mi">4</span><span class="p">]</span><span class="w"> </span><span class="n">n</span><span class="p">[</span><span class="mi">1</span><span class="o">:</span><span class="mi">2</span><span class="p">]</span><span class="w"></span>
+<span class="nd">@variables</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="n">S</span><span class="p">[</span><span class="mi">1</span><span class="o">:</span><span class="mi">2</span><span class="p">](</span><span class="n">t</span><span class="p">)</span><span class="w"></span>
+<span class="n">D</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Differential</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"></span>
+
+<span class="n">eqs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">D</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">k</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">hill</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">S</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="w"> </span><span class="n">n</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">k</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">S</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="w"></span>
+<span class="w">        </span><span class="n">D</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">k</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">hill</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">S</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="n">n</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">k</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">S</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span><span class="w"></span>
+<span class="nd">@named</span><span class="w"> </span><span class="n">sys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ODESystem</span><span class="p">(</span><span class="n">eqs</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>┌ Warning: The variable syntax (S[1:2])(t) is deprecated. Use (S(t))[1:2] instead.
+│                   The former creates an array of functions, while the latter creates an array valued function.
+│                   The deprecated syntax will cause an error in the next major release of Symbolics.
+│                   This change will facilitate better implementation of various features of Symbolics.
+└ @ Symbolics /root/.julia/packages/Symbolics/kG5bl/src/variable.jl:129
+</pre></div>
+</div>
+<div class="output text_latex math notranslate nohighlight">
+\[\begin{split} \begin{align}
+\frac{dS_1(t)}{dt} =&amp; \frac{1^{n_1} k_1}{\left( \mathrm{S_2}\left( t \right) \right)^{n_1} + 1^{n_1}} - \mathrm{S_1}\left( t \right) k_3 \\
+\frac{dS_2(t)}{dt} =&amp; \frac{1^{n_2} k_2}{\left( \mathrm{S_1}\left( t \right) \right)^{n_2} + 1^{n_2}} - \mathrm{S_2}\left( t \right) k_4
+\end{align}
+ \end{split}\]</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">ode_f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ODEFunction</span><span class="p">(</span><span class="n">sys</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="n">S</span><span class="o">...</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="n">k</span><span class="o">...</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="o">...</span><span class="p">])</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(::ODEFunction{true, ModelingToolkit.var&quot;#f#414&quot;{RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :t), ModelingToolkit.var&quot;#_RGF_ModTag&quot;, ModelingToolkit.var&quot;#_RGF_ModTag&quot;, (0x84fdd8dd, 0xef1bf695, 0x1678f6b3, 0xebfcc445, 0x760a768a)}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋out, :ˍ₋arg1, :ˍ₋arg2, :t), ModelingToolkit.var&quot;#_RGF_ModTag&quot;, ModelingToolkit.var&quot;#_RGF_ModTag&quot;, (0xa000e108, 0xc237d551, 0x88be20ec, 0xcebce978, 0x937351cb)}}, UniformScaling{Bool}, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Vector{Symbol}, Symbol, ModelingToolkit.var&quot;#474#generated_observed#421&quot;{Bool, ODESystem, Dict{Any, Any}}, Nothing}) (generic function with 1 method)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="n">∂F</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">params</span><span class="p">;</span><span class="w"> </span><span class="n">scale</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span><span class="w"></span>
+<span class="w">	</span><span class="n">du</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ode_f</span><span class="p">([</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">],</span><span class="w"> </span><span class="n">params</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">)</span><span class="w"></span>
+<span class="w">	</span><span class="c"># Tweaking arrow length</span><span class="w"></span>
+<span class="w">	</span><span class="k">return</span><span class="w"> </span><span class="n">du</span><span class="w"> </span><span class="o">./</span><span class="w"> </span><span class="p">(</span><span class="n">norm</span><span class="p">(</span><span class="n">du</span><span class="p">)</span><span class="o">^</span><span class="mf">0.5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">scale</span><span class="p">)</span><span class="w"></span>
+<span class="k">end</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>∂F (generic function with 1 method)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">20.0</span><span class="p">,</span><span class="w"> </span><span class="mf">20.0</span><span class="p">,</span><span class="w"> </span><span class="mf">5.0</span><span class="p">,</span><span class="w"> </span><span class="mf">5.0</span><span class="p">,</span><span class="w"> </span><span class="mf">4.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">]</span><span class="w"></span>
+<span class="n">tend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">4.0</span><span class="w"></span>
+<span class="n">sol1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">ODEProblem</span><span class="p">(</span><span class="n">ode_f</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mf">3.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">],</span><span class="w"> </span><span class="n">tend</span><span class="p">,</span><span class="w"> </span><span class="n">params</span><span class="p">))</span><span class="w"></span>
+<span class="n">sol2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">ODEProblem</span><span class="p">(</span><span class="n">ode_f</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">3.0</span><span class="p">],</span><span class="w"> </span><span class="n">tend</span><span class="p">,</span><span class="w"> </span><span class="n">params</span><span class="p">))</span><span class="w"></span>
+
+<span class="n">p1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">plot</span><span class="p">(</span><span class="n">sol1</span><span class="p">,</span><span class="w"> </span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;Time&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;Concentration&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">legend</span><span class="o">=</span><span class="ss">:right</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Fig 4.7A (1)&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="n">p2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">plot</span><span class="p">(</span><span class="n">sol2</span><span class="p">,</span><span class="w"> </span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;Time&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;Concentration&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">legend</span><span class="o">=</span><span class="ss">:right</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Fig 4.7A (2)&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="n">fig47a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">plot</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span><span class="w"> </span><span class="n">p2</span><span class="p">,</span><span class="w"> </span><span class="n">layout</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">),</span><span class="w"> </span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span><span class="w"> </span><span class="mi">600</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/mmsb-ch04_26_0.svg" src="_images/mmsb-ch04_26_0.svg" /></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">nullclineS1</span><span class="p">(</span><span class="n">B</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">params</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">params</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">hill</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">B</span><span class="p">,</span><span class="w"> </span><span class="n">params</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span><span class="w"></span>
+<span class="n">nullclineS2</span><span class="p">(</span><span class="n">A</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">params</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">params</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">hill</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">params</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>nullclineS2 (generic function with 1 method)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">LinRange</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">5.0</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">)</span><span class="w"></span>
+<span class="n">xx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">x</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">r</span><span class="p">]</span><span class="w"></span>
+<span class="n">yy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">y</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">r</span><span class="p">]</span><span class="w"></span>
+
+<span class="n">∂F1</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w">  </span><span class="n">∂F</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">params</span><span class="p">)</span><span class="w"></span>
+<span class="n">pl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">quiver</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span><span class="w"> </span><span class="n">yy</span><span class="p">,</span><span class="w"> </span><span class="n">quiver</span><span class="o">=</span><span class="n">∂F1</span><span class="p">,</span><span class="w"> </span><span class="n">line</span><span class="o">=</span><span class="p">(</span><span class="ss">:lightgrey</span><span class="p">))</span><span class="w"></span>
+
+<span class="n">plot!</span><span class="p">(</span><span class="n">pl</span><span class="p">,</span><span class="w"> </span><span class="n">nullclineS1</span><span class="p">,</span><span class="w"> </span><span class="n">identity</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">5.0</span><span class="p">,</span><span class="w"> </span><span class="n">lab</span><span class="o">=</span><span class="s">&quot;Nullcline S1&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">line</span><span class="o">=</span><span class="p">(</span><span class="ss">:dash</span><span class="p">,</span><span class="w"> </span><span class="ss">:red</span><span class="p">))</span><span class="w"></span>
+<span class="n">plot!</span><span class="p">(</span><span class="n">pl</span><span class="p">,</span><span class="w"> </span><span class="n">identity</span><span class="p">,</span><span class="w"> </span><span class="n">nullclineS2</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">5.0</span><span class="p">,</span><span class="w"> </span><span class="n">lab</span><span class="o">=</span><span class="s">&quot;Nullcline S2&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">line</span><span class="o">=</span><span class="p">(</span><span class="ss">:dash</span><span class="p">,</span><span class="w"> </span><span class="ss">:blue</span><span class="p">))</span><span class="w"></span>
+<span class="n">plot!</span><span class="p">(</span><span class="n">pl</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;Fig 4.7 B&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">5.0</span><span class="p">),</span><span class="w"> </span><span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">5.0</span><span class="p">),</span><span class="w"> </span><span class="n">aspect_ratio</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mi">600</span><span class="p">,</span><span class="w"> </span><span class="mi">600</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/mmsb-ch04_28_0.svg" src="_images/mmsb-ch04_28_0.svg" /></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">20.0</span><span class="p">,</span><span class="w"> </span><span class="mf">20.0</span><span class="p">,</span><span class="w"> </span><span class="mf">5.0</span><span class="p">,</span><span class="w"> </span><span class="mf">5.0</span><span class="p">,</span><span class="w"> </span><span class="mf">4.0</span><span class="p">,</span><span class="w"> </span><span class="mf">4.0</span><span class="p">]</span><span class="w"></span>
+
+<span class="n">tend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">4.0</span><span class="w"></span>
+<span class="n">sol1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">ODEProblem</span><span class="p">(</span><span class="n">ode_f</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mf">3.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">],</span><span class="w"> </span><span class="n">tend</span><span class="p">,</span><span class="w"> </span><span class="n">params</span><span class="p">))</span><span class="w"></span>
+<span class="n">sol2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">ODEProblem</span><span class="p">(</span><span class="n">ode_f</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">3.0</span><span class="p">],</span><span class="w"> </span><span class="n">tend</span><span class="p">,</span><span class="w"> </span><span class="n">params</span><span class="p">))</span><span class="w"></span>
+
+<span class="n">pl1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">plot</span><span class="p">(</span><span class="n">sol1</span><span class="p">,</span><span class="w"> </span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;Time&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;Concentration&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">legend</span><span class="o">=</span><span class="ss">:right</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Fig 4.8A (1)&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="n">pl2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">plot</span><span class="p">(</span><span class="n">sol2</span><span class="p">,</span><span class="w"> </span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;Time&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;Concentration&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">legend</span><span class="o">=</span><span class="ss">:right</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Fig 4.8A (2)&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="n">fig48a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">plot</span><span class="p">(</span><span class="n">pl1</span><span class="p">,</span><span class="w"> </span><span class="n">pl2</span><span class="p">,</span><span class="w"> </span><span class="n">layout</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">),</span><span class="w"> </span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span><span class="w"> </span><span class="mi">600</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/mmsb-ch04_29_0.svg" src="_images/mmsb-ch04_29_0.svg" /></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">∂F2</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">∂F</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">])</span><span class="w"></span>
+
+<span class="n">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">LinRange</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">5.0</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">)</span><span class="w"></span>
+<span class="n">xx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">x</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">r</span><span class="p">]</span><span class="w"></span>
+<span class="n">yy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">y</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">r</span><span class="p">]</span><span class="w"></span>
+
+<span class="n">pl1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">quiver</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span><span class="w"> </span><span class="n">yy</span><span class="p">,</span><span class="w"> </span><span class="n">quiver</span><span class="o">=</span><span class="n">∂F2</span><span class="p">,</span><span class="w"> </span><span class="n">line</span><span class="o">=</span><span class="p">(</span><span class="ss">:lightgrey</span><span class="p">))</span><span class="w"></span>
+<span class="n">plot!</span><span class="p">(</span><span class="n">pl1</span><span class="p">,</span><span class="w"> </span><span class="n">nullclineS1</span><span class="p">,</span><span class="w"> </span><span class="n">identity</span><span class="p">,</span><span class="w"> </span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="n">r</span><span class="p">[</span><span class="k">end</span><span class="p">],</span><span class="w"> </span><span class="n">lab</span><span class="o">=</span><span class="s">&quot;Nullcline S1&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">line</span><span class="o">=</span><span class="p">(</span><span class="ss">:dash</span><span class="p">,</span><span class="w"> </span><span class="ss">:red</span><span class="p">))</span><span class="w"></span>
+<span class="n">plot!</span><span class="p">(</span><span class="n">pl1</span><span class="p">,</span><span class="w"> </span><span class="n">identity</span><span class="p">,</span><span class="w"> </span><span class="n">nullclineS2</span><span class="p">,</span><span class="w"> </span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="n">r</span><span class="p">[</span><span class="k">end</span><span class="p">],</span><span class="w"> </span><span class="n">lab</span><span class="o">=</span><span class="s">&quot;Nullcline S2&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">line</span><span class="o">=</span><span class="p">(</span><span class="ss">:dash</span><span class="p">,</span><span class="w"> </span><span class="ss">:blue</span><span class="p">))</span><span class="w"></span>
+<span class="n">plot!</span><span class="p">(</span><span class="n">pl1</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;Fig 4.8 B&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="n">r</span><span class="p">[</span><span class="k">end</span><span class="p">]),</span><span class="w"> </span><span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="n">r</span><span class="p">[</span><span class="k">end</span><span class="p">]),</span><span class="w"> </span><span class="n">aspect_ratio</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ss">:equal</span><span class="p">)</span><span class="w"></span>
+
+<span class="n">r2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">LinRange</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.5</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">)</span><span class="w"></span>
+<span class="n">xx2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">x</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">r2</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">r2</span><span class="p">]</span><span class="w"></span>
+<span class="n">yy2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">y</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">r2</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">r2</span><span class="p">]</span><span class="w"></span>
+
+<span class="n">pl2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">quiver</span><span class="p">(</span><span class="n">xx2</span><span class="p">,</span><span class="w"> </span><span class="n">yy2</span><span class="p">,</span><span class="w"> </span><span class="n">quiver</span><span class="o">=</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">∂F2</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="o">./</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="n">line</span><span class="o">=</span><span class="p">(</span><span class="ss">:lightgrey</span><span class="p">))</span><span class="w"></span>
+<span class="w">	</span>
+<span class="n">plot!</span><span class="p">(</span><span class="n">pl2</span><span class="p">,</span><span class="w"> </span><span class="n">nullclineS1</span><span class="p">,</span><span class="w"> </span><span class="n">identity</span><span class="p">,</span><span class="w"> </span><span class="n">r2</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="n">r2</span><span class="p">[</span><span class="k">end</span><span class="p">],</span><span class="w"> </span><span class="n">lab</span><span class="o">=</span><span class="s">&quot;Nullcline S1&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">line</span><span class="o">=</span><span class="p">(</span><span class="ss">:dash</span><span class="p">,</span><span class="w"> </span><span class="ss">:red</span><span class="p">))</span><span class="w"></span>
+<span class="n">plot!</span><span class="p">(</span><span class="n">pl2</span><span class="p">,</span><span class="w"> </span><span class="n">identity</span><span class="p">,</span><span class="w"> </span><span class="n">nullclineS2</span><span class="p">,</span><span class="w"> </span><span class="n">r2</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="n">r2</span><span class="p">[</span><span class="k">end</span><span class="p">],</span><span class="w"> </span><span class="n">lab</span><span class="o">=</span><span class="s">&quot;Nullcline S2&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">line</span><span class="o">=</span><span class="p">(</span><span class="ss">:dash</span><span class="p">,</span><span class="w"> </span><span class="ss">:blue</span><span class="p">))</span><span class="w"></span>
+<span class="n">plot!</span><span class="p">(</span><span class="n">pl2</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;Fig 4.8 B (close up)&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="n">r2</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="n">r2</span><span class="p">[</span><span class="k">end</span><span class="p">]),</span><span class="w"> </span><span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="n">r2</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="n">r2</span><span class="p">[</span><span class="k">end</span><span class="p">]),</span><span class="w"> </span><span class="n">aspect_ratio</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ss">:equal</span><span class="p">,</span><span class="w"> </span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;[S1]&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;[S2]&quot;</span><span class="p">)</span><span class="w"></span>
+
+<span class="n">plot</span><span class="p">(</span><span class="n">pl1</span><span class="p">,</span><span class="w"> </span><span class="n">pl2</span><span class="p">,</span><span class="w"> </span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span><span class="w"> </span><span class="mi">500</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/mmsb-ch04_30_0.svg" src="_images/mmsb-ch04_30_0.svg" /></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">pls</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">map</span><span class="p">((</span><span class="mf">8.0</span><span class="p">,</span><span class="w"> </span><span class="mf">16.0</span><span class="p">,</span><span class="w"> </span><span class="mf">20.0</span><span class="p">,</span><span class="w"> </span><span class="mf">35.0</span><span class="p">))</span><span class="w"> </span><span class="k">do</span><span class="w"> </span><span class="n">k1</span><span class="w"></span>
+<span class="w">    </span><span class="n">params</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">k1</span><span class="w"></span>
+<span class="w">    </span><span class="n">plot</span><span class="p">(</span><span class="n">nullclineS1</span><span class="p">,</span><span class="w"> </span><span class="n">identity</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">7.0</span><span class="p">,</span><span class="w"> </span><span class="n">lab</span><span class="o">=</span><span class="s">&quot;Nullcline S1&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">plot!</span><span class="p">(</span><span class="n">identity</span><span class="p">,</span><span class="w"> </span><span class="n">nullclineS2</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">7.0</span><span class="p">,</span><span class="w"> </span><span class="n">lab</span><span class="o">=</span><span class="s">&quot;Nullcline S2&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">plot!</span><span class="p">(</span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;K1 = </span><span class="si">$k1</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">7.0</span><span class="p">),</span><span class="w"> </span><span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">7.0</span><span class="p">),</span><span class="w"> </span>
+<span class="w">      </span><span class="n">aspect_ratio</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mi">800</span><span class="p">,</span><span class="w"> </span><span class="mi">800</span><span class="p">),</span><span class="w"> </span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;[S1]&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;[S2]&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="k">end</span><span class="w"></span>
+
+<span class="n">params</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">20</span><span class="w"></span>
+
+<span class="n">plot</span><span class="p">(</span><span class="n">pls</span><span class="o">...</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/mmsb-ch04_31_0.svg" src="_images/mmsb-ch04_31_0.svg" /></div>
+</div>
+</section>
+<section id="figure-4-11">
+<h2>Figure 4.11<a class="headerlink" href="#figure-4-11" title="Permalink to this headline">#</a></h2>
+<p>Surface plots.</p>
+<p>Reference: <a class="reference external" href="https://goropikari.github.io/PlotsGallery.jl/src/surface.html">surface plots &#64; PlotsGallery.jl</a></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">Plots</span><span class="w"></span>
+<span class="n">Plots</span><span class="o">.</span><span class="n">gr</span><span class="p">(</span><span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Plots.GRBackend()
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">z1</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="o">^</span><span class="mi">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">0.5</span><span class="n">y</span><span class="o">^</span><span class="mi">2</span><span class="w"></span>
+<span class="n">z2</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mf">.2</span><span class="n">x</span><span class="o">^</span><span class="mi">2</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">^</span><span class="mi">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">y</span><span class="o">^</span><span class="mi">2</span><span class="w"></span>
+<span class="n">x1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">y1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">range</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="o">=</span><span class="mi">51</span><span class="p">)</span><span class="w"></span>
+<span class="n">x2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">range</span><span class="p">(</span><span class="o">-</span><span class="mf">2.75</span><span class="p">,</span><span class="w"> </span><span class="mf">2.75</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="o">=</span><span class="mi">80</span><span class="p">)</span><span class="w"></span>
+<span class="n">y2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">range</span><span class="p">(</span><span class="o">-</span><span class="mf">0.75</span><span class="p">,</span><span class="w"> </span><span class="mf">0.75</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="o">=</span><span class="mi">80</span><span class="p">)</span><span class="w"></span>
+<span class="n">p1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">surface</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span><span class="w"> </span><span class="n">y1</span><span class="p">,</span><span class="w"> </span><span class="n">z1</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;Single-well potential&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="n">p2</span><span class="o">=</span><span class="w"> </span><span class="n">contourf</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span><span class="w"> </span><span class="n">y1</span><span class="p">,</span><span class="w"> </span><span class="n">z1</span><span class="p">)</span><span class="w"></span>
+<span class="n">p3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">surface</span><span class="p">(</span><span class="n">x2</span><span class="p">,</span><span class="w"> </span><span class="n">y2</span><span class="p">,</span><span class="w"> </span><span class="n">z2</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;Double-well potential&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="n">p4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">contourf</span><span class="p">(</span><span class="n">x2</span><span class="p">,</span><span class="w"> </span><span class="n">y2</span><span class="p">,</span><span class="w"> </span><span class="n">z2</span><span class="p">)</span><span class="w"></span>
+
+<span class="n">plot</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span><span class="w"> </span><span class="n">p2</span><span class="p">,</span><span class="w"> </span><span class="n">p3</span><span class="p">,</span><span class="w"> </span><span class="n">p4</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">800</span><span class="p">,</span><span class="w"> </span><span class="mi">600</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/mmsb-ch04_34_0.svg" src="_images/mmsb-ch04_34_0.svg" /></div>
+</div>
+</section>
+<section id="figure-4-15-4-16-and-4-17">
+<h2>Figure 4.15, 4.16, and 4.17<a class="headerlink" href="#figure-4-15-4-16-and-4-17" title="Permalink to this headline">#</a></h2>
+<p>Oscillatory network.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">DifferentialEquations</span><span class="w"></span>
+<span class="k">using</span><span class="w"> </span><span class="n">ModelingToolkit</span><span class="w"></span>
+<span class="k">using</span><span class="w"> </span><span class="n">Plots</span><span class="w"></span>
+<span class="k">using</span><span class="w"> </span><span class="n">LinearAlgebra</span><span class="w"></span>
+<span class="n">Plots</span><span class="o">.</span><span class="n">gr</span><span class="p">(</span><span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Plots.GRBackend()
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">hill</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">k</span><span class="p">)</span><span class="w"></span>
+<span class="n">hill</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hill</span><span class="p">(</span><span class="n">x</span><span class="o">^</span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="o">^</span><span class="n">n</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hill (generic function with 2 methods)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="c"># Model of oscillatory network from Figure 4.14. This code generates Figures 4.15, 4.16, and 4.17</span><span class="w"></span>
+<span class="nd">@parameters</span><span class="w"> </span><span class="n">k_0</span><span class="w"> </span><span class="n">k_1</span><span class="w"> </span><span class="n">k_2</span><span class="w"> </span><span class="n">n</span><span class="w"></span>
+<span class="nd">@variables</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="n">A</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"> </span><span class="n">B</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"></span>
+<span class="n">D</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Differential</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(::Differential) (generic function with 2 methods)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">eqs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">D</span><span class="p">(</span><span class="n">A</span><span class="p">)</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">k_0</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">k_1</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">B</span><span class="o">^</span><span class="n">n</span><span class="p">),</span><span class="w"></span>
+<span class="w">       </span><span class="n">D</span><span class="p">(</span><span class="n">B</span><span class="p">)</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">k_1</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">B</span><span class="o">^</span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">k_2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">B</span><span class="p">]</span><span class="w"></span>
+
+<span class="c"># Secure positions of state variable and parameters </span><span class="w"></span>
+<span class="nd">@named</span><span class="w"> </span><span class="n">sys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ODESystem</span><span class="p">(</span><span class="n">eqs</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_latex math notranslate nohighlight">
+\[\begin{split} \begin{align}
+\frac{dA(t)}{dt} =&amp; k_{0} - k_{1} \left( 1 + \left( B\left( t \right) \right)^{n} \right) A\left( t \right) \\
+\frac{dB(t)}{dt} =&amp; k_{1} \left( 1 + \left( B\left( t \right) \right)^{n} \right) A\left( t \right) - k_{2} B\left( t \right)
+\end{align}
+ \end{split}\]</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">ode_f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ODEFunction</span><span class="p">(</span><span class="n">sys</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">B</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="n">k_0</span><span class="p">,</span><span class="w"> </span><span class="n">k_1</span><span class="p">,</span><span class="w"> </span><span class="n">k_2</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">])</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(::ODEFunction{true, ModelingToolkit.var&quot;#f#414&quot;{RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋arg1, :ˍ₋arg2, :t), ModelingToolkit.var&quot;#_RGF_ModTag&quot;, ModelingToolkit.var&quot;#_RGF_ModTag&quot;, (0xe5993f91, 0x94be17a7, 0xd424d359, 0xfff2da2b, 0x286f5f2e)}, RuntimeGeneratedFunctions.RuntimeGeneratedFunction{(:ˍ₋out, :ˍ₋arg1, :ˍ₋arg2, :t), ModelingToolkit.var&quot;#_RGF_ModTag&quot;, ModelingToolkit.var&quot;#_RGF_ModTag&quot;, (0xeeb7b342, 0x784a7dc3, 0x55952ed6, 0x0541c150, 0xee4807b4)}}, UniformScaling{Bool}, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Nothing, Vector{Symbol}, Symbol, ModelingToolkit.var&quot;#474#generated_observed#421&quot;{Bool, ODESystem, Dict{Any, Any}}, Nothing}) (generic function with 1 method)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="n">figure0415</span><span class="p">(;</span><span class="w"> </span><span class="n">ps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">k_0</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">8.0</span><span class="p">,</span><span class="w"> </span><span class="n">k_1</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="n">k_2</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">5.0</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">2</span><span class="p">],</span><span class="w"></span>
+<span class="w">	                  </span><span class="n">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">LinRange</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">4.0</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">),</span><span class="w"></span>
+<span class="w">	                  </span><span class="n">tend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">8.0</span><span class="p">,</span><span class="w"></span>
+<span class="w">	                  </span><span class="n">figtitle</span><span class="o">=</span><span class="s">&quot;Fig 4.15&quot;</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">	</span><span class="n">u0s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="p">[</span><span class="n">A</span><span class="o">=&gt;</span><span class="mf">1.5</span><span class="p">,</span><span class="w"> </span><span class="n">B</span><span class="o">=&gt;</span><span class="mf">1.0</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="n">A</span><span class="o">=&gt;</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="n">B</span><span class="o">=&gt;</span><span class="mf">1.0</span><span class="p">],</span><span class="w"></span>
+<span class="w">        	</span><span class="p">[</span><span class="n">A</span><span class="o">=&gt;</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="n">B</span><span class="o">=&gt;</span><span class="mf">3.0</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="n">A</span><span class="o">=&gt;</span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="n">B</span><span class="o">=&gt;</span><span class="mf">0.0</span><span class="p">])</span><span class="w"></span>
+<span class="w">    </span><span class="n">parvals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">last</span><span class="o">.</span><span class="p">(</span><span class="n">ps</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">	</span><span class="n">sols</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">map</span><span class="p">(</span><span class="n">u0s</span><span class="p">)</span><span class="w"> </span><span class="k">do</span><span class="w"> </span><span class="n">u0</span><span class="w"></span>
+<span class="w">		</span><span class="n">ODEProblem</span><span class="p">(</span><span class="n">sys</span><span class="p">,</span><span class="w"> </span><span class="n">u0</span><span class="p">,</span><span class="w"> </span><span class="n">tend</span><span class="p">,</span><span class="w"> </span><span class="n">ps</span><span class="p">)</span><span class="w"> </span><span class="o">|&gt;</span><span class="w"> </span><span class="n">solve</span><span class="w"></span>
+<span class="w">	</span><span class="k">end</span><span class="w"></span>
+
+<span class="w">	</span><span class="c"># Fig 4.15 A</span><span class="w"></span>
+<span class="w">	</span><span class="n">p1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">plot</span><span class="p">(</span><span class="n">sols</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;Time&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;Concentration&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="s">&quot;</span><span class="si">$figtitle</span><span class="s"> (A)&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">xlims</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">8.0</span><span class="p">))</span><span class="w"></span>
+<span class="w">	</span>
+<span class="w">	</span><span class="c"># Fig 4.15 B: Vetor field</span><span class="w"></span>
+<span class="w">	</span><span class="k">function</span><span class="w"> </span><span class="n">∂F</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">;</span><span class="w"> </span><span class="n">scale</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span><span class="w"></span>
+<span class="w">		</span><span class="n">dxdy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ode_f</span><span class="p">([</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">],</span><span class="w"> </span><span class="n">parvals</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">		</span><span class="k">return</span><span class="w"> </span><span class="n">dxdy</span><span class="w"> </span><span class="o">./</span><span class="w"> </span><span class="p">(</span><span class="n">hypot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="o">^</span><span class="mf">0.5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">scale</span><span class="p">)</span><span class="w"></span>
+<span class="w">	</span><span class="k">end</span><span class="w"></span>
+<span class="w">	</span>
+<span class="w">	</span><span class="n">nullcline_s1</span><span class="p">(</span><span class="n">s2</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">parvals</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">parvals</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">hill</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">s2</span><span class="p">,</span><span class="w"> </span><span class="n">parvals</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span><span class="w"></span>
+<span class="w">	</span><span class="n">nullcline_s2</span><span class="p">(</span><span class="n">s2</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">parvals</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">s2</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="n">parvals</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">s2</span><span class="o">^</span><span class="n">parvals</span><span class="p">[</span><span class="mi">4</span><span class="p">]))</span><span class="w"></span>
+<span class="w">	</span>
+<span class="w">	</span>
+<span class="w">	</span><span class="n">xx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">x</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">r</span><span class="p">]</span><span class="w"></span>
+<span class="w">	</span><span class="n">yy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">y</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">r</span><span class="p">]</span><span class="w"></span>
+<span class="w">	</span><span class="n">p2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">plot</span><span class="p">(</span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;</span><span class="si">$figtitle</span><span class="s"> (B)&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;[A]&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;[B]&quot;</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">	</span><span class="k">for</span><span class="w"> </span><span class="n">sol</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">sols</span><span class="w"></span>
+<span class="w">		</span><span class="n">plot!</span><span class="p">(</span><span class="n">p2</span><span class="p">,</span><span class="w"> </span><span class="n">sol</span><span class="p">,</span><span class="w"> </span><span class="n">vars</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">),</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="nb">nothing</span><span class="p">)</span><span class="w"></span>
+<span class="w">	</span><span class="k">end</span><span class="w"></span>
+<span class="w">	</span>
+<span class="w">	</span><span class="n">rMin</span><span class="p">,</span><span class="w"> </span><span class="n">rMax</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">r</span><span class="p">[</span><span class="k">begin</span><span class="p">],</span><span class="w"> </span><span class="n">r</span><span class="p">[</span><span class="k">end</span><span class="p">]</span><span class="w"></span>
+<span class="w">	</span>
+<span class="w">	</span><span class="n">plot!</span><span class="p">(</span><span class="n">p2</span><span class="p">,</span><span class="w"> </span><span class="n">nullcline_s1</span><span class="p">,</span><span class="w"> </span><span class="n">identity</span><span class="p">,</span><span class="w"> </span><span class="n">rMin</span><span class="p">,</span><span class="w"> </span><span class="n">rMax</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;Nullcline A&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">line</span><span class="o">=</span><span class="p">(</span><span class="ss">:dash</span><span class="p">,</span><span class="w"> </span><span class="ss">:red</span><span class="p">))</span><span class="w"></span>
+<span class="w">	</span><span class="n">plot!</span><span class="p">(</span><span class="n">p2</span><span class="p">,</span><span class="w"> </span><span class="n">nullcline_s2</span><span class="p">,</span><span class="w"> </span><span class="n">identity</span><span class="p">,</span><span class="w"> </span><span class="n">rMin</span><span class="p">,</span><span class="w"> </span><span class="n">rMax</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;Nullcline B&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">line</span><span class="o">=</span><span class="p">(</span><span class="ss">:dash</span><span class="p">,</span><span class="w"> </span><span class="ss">:blue</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="n">quiver!</span><span class="p">(</span><span class="n">p2</span><span class="p">,</span><span class="w"> </span><span class="n">xx</span><span class="p">,</span><span class="w"> </span><span class="n">yy</span><span class="p">,</span><span class="w"> </span><span class="n">quiver</span><span class="o">=</span><span class="n">∂F</span><span class="p">,</span><span class="w"> </span><span class="n">line</span><span class="o">=</span><span class="p">(</span><span class="ss">:lightgrey</span><span class="p">),</span><span class="w"> </span>
+<span class="w">        </span><span class="n">xlims</span><span class="o">=</span><span class="p">(</span><span class="n">rMin</span><span class="p">,</span><span class="w"> </span><span class="n">rMax</span><span class="p">),</span><span class="w"> </span><span class="n">ylims</span><span class="o">=</span><span class="p">(</span><span class="n">rMin</span><span class="p">,</span><span class="w"> </span><span class="n">rMax</span><span class="p">),</span><span class="w"> </span>
+<span class="w">        </span><span class="n">aspect_ratio</span><span class="o">=</span><span class="ss">:equal</span><span class="p">,</span><span class="w"> </span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">700</span><span class="p">,</span><span class="w"> </span><span class="mi">700</span><span class="p">))</span><span class="w"></span>
+<span class="w">	</span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">p1</span><span class="p">,</span><span class="w"> </span><span class="n">p2</span><span class="p">)</span><span class="w"></span>
+<span class="k">end</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>figure0415 (generic function with 1 method)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">fig415a</span><span class="p">,</span><span class="w"> </span><span class="n">fig415b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">figure0415</span><span class="p">()</span><span class="w"></span>
+<span class="n">fig415a</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/mmsb-ch04_42_0.svg" src="_images/mmsb-ch04_42_0.svg" /></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">fig415b</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/mmsb-ch04_43_0.svg" src="_images/mmsb-ch04_43_0.svg" /></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">fig416a</span><span class="p">,</span><span class="w"> </span><span class="n">fig416b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">figure0415</span><span class="p">(</span><span class="n">ps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">k_0</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">8.0</span><span class="p">,</span><span class="w"> </span><span class="n">k_1</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="n">k_2</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">5.0</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">2.5</span><span class="p">],</span><span class="w"> </span><span class="n">tend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1000.0</span><span class="p">,</span><span class="w"> </span><span class="n">figtitle</span><span class="o">=</span><span class="s">&quot;Fig 4.16&quot;</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(Plot{Plots.GRBackend() n=2}, Plot{Plots.GRBackend() n=26})
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">fig416a</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/mmsb-ch04_45_0.svg" src="_images/mmsb-ch04_45_0.svg" /></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">fig416b</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/mmsb-ch04_46_0.svg" src="_images/mmsb-ch04_46_0.svg" /></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">ps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">k_0</span><span class="o">=&gt;</span><span class="mi">8</span><span class="p">,</span><span class="w"> </span><span class="n">k_1</span><span class="o">=&gt;</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">k_2</span><span class="o">=&gt;</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="o">=&gt;</span><span class="mf">2.5</span><span class="p">]</span><span class="w"></span>
+<span class="n">parvals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">last</span><span class="o">.</span><span class="p">(</span><span class="n">ps</span><span class="p">)</span><span class="w"></span>
+
+<span class="n">prob</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ODEProblem</span><span class="p">(</span><span class="n">sys</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="n">A</span><span class="o">=&gt;</span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="n">B</span><span class="o">=&gt;</span><span class="mf">1.5</span><span class="p">],</span><span class="w"> </span><span class="mf">10.0</span><span class="p">,</span><span class="w"> </span><span class="n">ps</span><span class="p">)</span><span class="w"></span>
+
+<span class="n">sol417</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span><span class="w"></span>
+
+<span class="n">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">LinRange</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">4.0</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">)</span><span class="w"></span>
+<span class="n">xx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">x</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">r</span><span class="p">]</span><span class="w"></span>
+<span class="n">yy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">y</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">r</span><span class="p">]</span><span class="w"></span>
+
+<span class="s">&quot;Vector field&quot;</span><span class="w"></span>
+<span class="k">function</span><span class="w"> </span><span class="n">∂F</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">;</span><span class="w"> </span><span class="n">scale</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">dxdy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ode_f</span><span class="p">([</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">],</span><span class="w"> </span><span class="n">parvals</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">dxdy</span><span class="w"> </span><span class="o">./</span><span class="w"> </span><span class="p">(</span><span class="n">hypot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">)</span><span class="o">^</span><span class="mf">0.5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">scale</span><span class="p">)</span><span class="w"></span>
+<span class="k">end</span><span class="w"></span>
+
+<span class="n">nullcline_s1</span><span class="p">(</span><span class="n">s2</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">parvals</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">parvals</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">hill</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">s2</span><span class="p">,</span><span class="w"> </span><span class="n">parvals</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span><span class="w"></span>
+<span class="n">nullcline_s2</span><span class="p">(</span><span class="n">s2</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">parvals</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">s2</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="n">parvals</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">s2</span><span class="o">^</span><span class="n">parvals</span><span class="p">[</span><span class="mi">4</span><span class="p">]))</span><span class="w"></span>
+
+<span class="n">xx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">x</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">r</span><span class="p">]</span><span class="w"></span>
+<span class="n">yy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">y</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">r</span><span class="p">]</span><span class="w"></span>
+
+<span class="n">quiver</span><span class="p">(</span><span class="n">xx</span><span class="p">,</span><span class="w"> </span><span class="n">yy</span><span class="p">,</span><span class="w"> </span><span class="n">quiver</span><span class="o">=</span><span class="n">∂F</span><span class="p">,</span><span class="w"> </span><span class="n">line</span><span class="o">=</span><span class="p">(</span><span class="ss">:lightgrey</span><span class="p">))</span><span class="w"></span>
+<span class="n">plot!</span><span class="p">(</span><span class="n">sol417</span><span class="p">,</span><span class="w"> </span><span class="n">vars</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">),</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="nb">nothing</span><span class="p">,</span><span class="w"> </span><span class="n">line</span><span class="o">=</span><span class="p">(</span><span class="ss">:black</span><span class="p">),</span><span class="w"> </span><span class="n">arrow</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span><span class="w"></span>
+<span class="n">plot!</span><span class="p">(</span><span class="n">nullcline_s1</span><span class="p">,</span><span class="w"> </span><span class="n">identity</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">4.0</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;Nullcline S1&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">line</span><span class="o">=</span><span class="p">(</span><span class="ss">:dash</span><span class="p">,</span><span class="w"> </span><span class="ss">:red</span><span class="p">))</span><span class="w"></span>
+<span class="n">plot!</span><span class="p">(</span><span class="n">nullcline_s2</span><span class="p">,</span><span class="w"> </span><span class="n">identity</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">4.0</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;Nullcline S2&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">line</span><span class="o">=</span><span class="p">(</span><span class="ss">:dash</span><span class="p">,</span><span class="w"> </span><span class="ss">:blue</span><span class="p">))</span><span class="w"></span>
+<span class="n">plot!</span><span class="p">(</span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Fig. 4.17&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;[S1]&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;[S2]&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="n">xlims</span><span class="o">=</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">3.0</span><span class="p">),</span><span class="w"> </span><span class="n">ylims</span><span class="o">=</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">3.0</span><span class="p">),</span><span class="w"> </span><span class="n">aspect_ratio</span><span class="o">=</span><span class="ss">:equal</span><span class="p">,</span><span class="w"> </span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">700</span><span class="p">,</span><span class="w"> </span><span class="mi">700</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/mmsb-ch04_47_0.svg" src="_images/mmsb-ch04_47_0.svg" /></div>
+</div>
+</section>
+<section id="figure-4-18-continuation-diagram">
+<h2>Figure 4.18 Continuation diagram<a class="headerlink" href="#figure-4-18-continuation-diagram" title="Permalink to this headline">#</a></h2>
+<p><strong>NOTE</strong></p>
+<p><a class="reference external" href="https://github.com/tkf/Bifurcations.jl">Bifurcations.jl</a> does not work (As I am writing this).
+And <a class="reference external" href="https://github.com/rveltz/BifurcationKit.jl">BifurcationKit.jl</a> might be too complex for this example.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">DifferentialEquations</span><span class="w"></span>
+<span class="k">using</span><span class="w"> </span><span class="n">ModelingToolkit</span><span class="w"></span>
+<span class="k">using</span><span class="w"> </span><span class="n">Plots</span><span class="w"></span>
+<span class="n">Plots</span><span class="o">.</span><span class="n">gr</span><span class="p">(</span><span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Plots.GRBackend()
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="c"># Convenience functions</span><span class="w"></span>
+<span class="n">hill</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">k</span><span class="p">)</span><span class="w"></span>
+<span class="n">hill</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hill</span><span class="p">(</span><span class="n">x</span><span class="o">^</span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="o">^</span><span class="n">n</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hill (generic function with 2 methods)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="nd">@variables</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="n">A</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"> </span><span class="n">B</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"></span>
+<span class="nd">@parameters</span><span class="w"> </span><span class="n">k_1</span><span class="p">,</span><span class="w"> </span><span class="n">k_2</span><span class="p">,</span><span class="w"> </span><span class="n">k_3</span><span class="p">,</span><span class="w"> </span><span class="n">k_4</span><span class="p">,</span><span class="w"> </span><span class="n">k_5</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="w"></span>
+
+<span class="n">D</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Differential</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(::Differential) (generic function with 2 methods)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">eqs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">D</span><span class="p">(</span><span class="n">A</span><span class="p">)</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">k_1</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">hill</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">B</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="n">k_5</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">k_3</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">A</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="n">D</span><span class="p">(</span><span class="n">B</span><span class="p">)</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">k_2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">k_5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">k_4</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">B</span><span class="p">]</span><span class="w"></span>
+
+<span class="nd">@named</span><span class="w"> </span><span class="n">sys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ODESystem</span><span class="p">(</span><span class="n">eqs</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">B</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="n">k_1</span><span class="p">,</span><span class="w"> </span><span class="n">k_2</span><span class="p">,</span><span class="w"> </span><span class="n">k_3</span><span class="p">,</span><span class="w"> </span><span class="n">k_4</span><span class="p">,</span><span class="w"> </span><span class="n">k_5</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">])</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_latex math notranslate nohighlight">
+\[\begin{split} \begin{align}
+\frac{dA(t)}{dt} =&amp; \frac{1^{n} k_{1}}{1^{n} + \left( B\left( t \right) \right)^{n}} - \left( k_{3} + k_{5} \right) A\left( t \right) \\
+\frac{dB(t)}{dt} =&amp; k_{2} + k_{5} A\left( t \right) - k_{4} B\left( t \right)
+\end{align}
+ \end{split}\]</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Dict</span><span class="p">(</span><span class="n">k_1</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">20.0</span><span class="p">,</span><span class="w"> </span><span class="n">k_2</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">5.0</span><span class="p">,</span><span class="w"> </span><span class="n">k_3</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">5.0</span><span class="p">,</span><span class="w"> </span><span class="n">k_4</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">5.0</span><span class="p">,</span><span class="w"> </span><span class="n">k_5</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">4</span><span class="p">)</span><span class="w"></span>
+<span class="n">u0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">A</span><span class="o">=&gt;</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="n">B</span><span class="o">=&gt;</span><span class="mf">0.0</span><span class="p">]</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2-element Vector{Pair{Num, Float64}}:
+ A(t) =&gt; 0.0
+ B(t) =&gt; 0.0
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="c"># Could also use ensemble analysis: https://diffeq.sciml.ai/stable/features/ensemble/</span><span class="w"></span>
+<span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">map</span><span class="p">(</span><span class="kt">LinRange</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1000.0</span><span class="p">,</span><span class="w"> </span><span class="mi">50</span><span class="p">))</span><span class="w"> </span><span class="k">do</span><span class="w"> </span><span class="n">k1</span><span class="w"></span>
+<span class="w">    </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">copy</span><span class="p">(</span><span class="n">params</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">p</span><span class="p">[</span><span class="n">k_1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">k1</span><span class="w"></span>
+<span class="w">	</span><span class="n">prob</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SteadyStateProblem</span><span class="p">(</span><span class="n">sys</span><span class="p">,</span><span class="w"> </span><span class="n">u0</span><span class="p">,</span><span class="w"> </span><span class="n">p</span><span class="p">)</span><span class="w"></span>
+<span class="w">	</span><span class="n">sol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">prob</span><span class="p">,</span><span class="w"> </span><span class="n">DynamicSS</span><span class="p">(</span><span class="n">Rodas5</span><span class="p">()))</span><span class="w"></span>
+<span class="w">	</span><span class="n">sol</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"></span>
+<span class="k">end</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>50-element Vector{Float64}:
+ 0.0
+ 0.7535911916031875
+ 1.1001047707163405
+ 1.3363327385883506
+ 1.5188534281751964
+ 1.6690621641551218
+ 1.7974922922969292
+ 1.9101562980661422
+ 2.010828608162696
+ 2.1020421737474906
+ 2.1855857307755087
+ 2.262774357676392
+ 2.3345992595996754
+ ⋮
+ 3.4183944195623073
+ 3.4458806023213495
+ 3.472810877319885
+ 3.4992099864408446
+ 3.525100957923153
+ 3.5505052977704943
+ 3.575443143230411
+ 3.599934034219197
+ 3.623994424419684
+ 3.647641154904433
+ 3.6708910118911313
+ 3.693757289305842
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span><span class="p">(</span><span class="kt">LinRange</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1000.0</span><span class="p">,</span><span class="w"> </span><span class="mi">50</span><span class="p">),</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Fig 4.18 Continuation diagram&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">     </span><span class="n">xlabel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;K1&quot;</span><span class="w"> </span><span class="p">,</span><span class="w"> </span><span class="n">ylabel</span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Steady state [A]&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">     </span><span class="n">legend</span><span class="o">=</span><span class="nb">nothing</span><span class="p">,</span><span class="w"> </span><span class="n">ylim</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">4.0</span><span class="p">),</span><span class="w"> </span><span class="n">xlim</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1000</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/mmsb-ch04_55_0.svg" src="_images/mmsb-ch04_55_0.svg" /></div>
+</div>
+</section>
+<section id="figure-4-22-tangent-line">
+<h2>Figure 4.22 Tangent line<a class="headerlink" href="#figure-4-22-tangent-line" title="Permalink to this headline">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">Plots</span><span class="w"></span>
+<span class="n">Plots</span><span class="o">.</span><span class="n">gr</span><span class="p">(</span><span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Plots.GRBackend()
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">curve</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="n">t</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+<span class="n">tange</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.5</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="n">t</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">4</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">0.75</span><span class="w"></span>
+
+<span class="n">plot</span><span class="p">(</span><span class="n">curve</span><span class="p">,</span><span class="w"> </span><span class="mf">2.2</span><span class="p">,</span><span class="w"> </span><span class="mf">8.0</span><span class="p">,</span><span class="w"> </span><span class="n">lab</span><span class="o">=</span><span class="s">&quot;Curve&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="n">plot!</span><span class="p">(</span><span class="n">tange</span><span class="p">,</span><span class="w"> </span><span class="mf">2.7</span><span class="p">,</span><span class="w"> </span><span class="mf">5.3</span><span class="p">,</span><span class="w"> </span><span class="n">lab</span><span class="o">=</span><span class="s">&quot;Tangent line&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="n">plot!</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">&quot;Fig 4.22&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;Reaction rate&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;Inhibitor concentration&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">      </span><span class="n">xlims</span><span class="o">=</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="mf">8.0</span><span class="p">),</span><span class="w"> </span><span class="n">ylims</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">4.0</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/mmsb-ch04_58_0.svg" src="_images/mmsb-ch04_58_0.svg" /></div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "julia-1.7"
+        },
+        kernelOptions: {
+            kernelName: "julia-1.7",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'julia-1.7'</script>
+
+              </div>
+              
+            </main>
+            <footer class="footer-article noprint">
+                
+    <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="mmsb-ch03.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Chapter 3</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="hw-00.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Rules for programming homeworks</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+            </footer>
+        </div>
+    </div>
+    <div class="footer-content row">
+        <footer class="col footer"><p>
+  
+    By Wen-Wei Tseng<br/>
+  
+      &copy; Copyright 2022.<br/>
+</p>
+        </footer>
+    </div>
+    
+</div>
+
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+
+
+  </body>
+</html>

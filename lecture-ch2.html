@@ -1,0 +1,716 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Chapter 2 &#8212; Mathematical Modeling in Systems Biology</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=62ba249389abaaa9ffc34bf36a076bdc1d65ee18" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?digest=f31d14ad54b65d19161ba51d4ffff3a77ae00456"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Textbook figures" href="mmsb-README.html" />
+    <link rel="prev" title="Chapter 1" href="lecture-ch1.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay overlay-navbar" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<!-- Checkboxes to toggle the in-page toc -->
+<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
+<label class="overlay overlay-pagetoc" for="__page-toc">
+    <div class="visually-hidden">Toggle in-page Table of Contents</div>
+</label>
+<!-- Headers at the top -->
+<div class="announcement header-item noprint"></div>
+<div class="header header-item noprint"></div>
+
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<!-- Sidebar -->
+<div class="bd-sidebar noprint" id="site-navigation">
+    <div class="bd-sidebar__content">
+        <div class="bd-sidebar__top"><div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="index.html">
+      
+      
+      
+      <h1 class="site-logo" id="site-title">Mathematical Modeling in Systems Biology</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="index.html">
+                    Mathematical Modeling in Systems Biology
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Introduction to Julia
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="intro-01-first-steps.html">
+   First steps to Julia
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="intro-02-plotting.html">
+   Plotting with Julia
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="intro-03-diffeq.html">
+   Solving differential equations in Julia
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="intro-04-gillespie.html">
+   Stochastic simulations
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Textbook and Lectures
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1 current active has-children">
+  <a class="reference internal" href="lecture-README.html">
+   Class lectures
+  </a>
+  <input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="current">
+   <li class="toctree-l2">
+    <a class="reference internal" href="lecture-ch1.html">
+     Chapter 1
+    </a>
+   </li>
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
+     Chapter 2
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="mmsb-README.html">
+   Textbook figures
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="mmsb-ch01.html">
+     Chapter 1
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="mmsb-ch02.html">
+     Chapter 2
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="mmsb-ch03.html">
+     Chapter 3
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="mmsb-ch04.html">
+     Chapter 4
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Homework
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="hw-00.html">
+   Rules for programming homeworks
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="hw-01.html">
+   Homework 1: Solving an ODE
+  </a>
+ </li>
+</ul>
+
+    </div>
+</nav></div>
+        <div class="bd-sidebar__bottom">
+             <!-- To handle the deprecated key -->
+            
+            <div class="navbar_extra_footer">
+            Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+            </div>
+            
+        </div>
+    </div>
+    <div id="rtd-footer-container"></div>
+</div>
+
+
+          
+
+
+          
+<!-- A tiny helper pixel to detect if we've scrolled -->
+<div class="sbt-scroll-pixel-helper"></div>
+<!-- Main content -->
+<div class="col py-0 content-container">
+    
+    <div class="header-article row sticky-top noprint">
+        
+
+
+
+<div class="col py-1 d-flex header-article-main">
+    <div class="header-article__left">
+        
+        <label for="__navigation"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="right"
+title="Toggle navigation"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-bars"></i>
+  </span>
+
+</label>
+
+        
+    </div>
+    <div class="header-article__right">
+<button onclick="toggleFullScreen()"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="bottom"
+title="Fullscreen mode"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+<a href="https://github.com/ntumitolab/mmsb-bebi-5009"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="bottom"
+title="Source repository"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+<div class="menu-dropdown menu-dropdown-download-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Download this page">
+      <i class="fas fa-download"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="_sources/lecture-ch2.md"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download source file"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="headerbtn__text-container">.md</span>
+</a>
+
+      </li>
+      
+      <li>
+        
+<button onclick="printPdf(this)"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="left"
+title="Print to PDF"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="headerbtn__text-container">.pdf</span>
+</button>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
+
+    </div>
+</div>
+
+<!-- Table of contents -->
+<div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#chemical-reaction-network">
+   Chemical reaction network
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#closed-vs-open-network">
+     Closed vs open network
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#assumptions-about-chemical-reaction-network">
+     Assumptions about Chemical reaction network
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#the-law-of-mass-action">
+   The Law of Mass Action
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#using-derivatives-to-describe-rates-of-change">
+   Using derivatives to describe rates of change
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#decay-reaction">
+     Decay reaction
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#production-and-decay">
+     Production and decay
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#irreversible-conversion-in-closed-system">
+     Irreversible Conversion in closed system
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#reversible-conversion-in-closed-system">
+     Reversible Conversion in closed system
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#differential-equations">
+   Differential Equations
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#numerial-simulations-of-differential-equations">
+   Numerial simulations of differential equations
+  </a>
+ </li>
+</ul>
+
+    </nav>
+</div>
+    </div>
+    <div class="article row">
+        <div class="col pl-md-3 pl-lg-5 content-container">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>Chapter 2</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#chemical-reaction-network">
+   Chemical reaction network
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#closed-vs-open-network">
+     Closed vs open network
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#assumptions-about-chemical-reaction-network">
+     Assumptions about Chemical reaction network
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#the-law-of-mass-action">
+   The Law of Mass Action
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#using-derivatives-to-describe-rates-of-change">
+   Using derivatives to describe rates of change
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#decay-reaction">
+     Decay reaction
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#production-and-decay">
+     Production and decay
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#irreversible-conversion-in-closed-system">
+     Irreversible Conversion in closed system
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#reversible-conversion-in-closed-system">
+     Reversible Conversion in closed system
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#differential-equations">
+   Differential Equations
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#numerial-simulations-of-differential-equations">
+   Numerial simulations of differential equations
+  </a>
+ </li>
+</ul>
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <main id="main-content" role="main">
+                
+              <div>
+                
+  <section class="tex2jax_ignore mathjax_ignore" id="chapter-2">
+<h1>Chapter 2<a class="headerlink" href="#chapter-2" title="Permalink to this headline">#</a></h1>
+<p><strong>Modeling of Chemical Reaction Network</strong></p>
+<section id="chemical-reaction-network">
+<h2>Chemical reaction network<a class="headerlink" href="#chemical-reaction-network" title="Permalink to this headline">#</a></h2>
+<p>The foundation for dynamic modeling of cellular behavior.</p>
+<ul class="simple">
+<li><p>Component (state variables): molecular species, chemically distinct molecules</p></li>
+<li><p>Interaction (arrows): a range of process forming a chemical reaction network.</p>
+<ul>
+<li><p>Binding/unbinding</p></li>
+<li><p>Reaction catalysis</p></li>
+<li><p>Activity regulation</p></li>
+</ul>
+</li>
+<li><p>Rates: production, consumption, and transport of the molecules</p></li>
+</ul>
+<p>The organization of the network is apparent if we re-arrange the reactions in the form of an interaction graph.</p>
+<section id="closed-vs-open-network">
+<h3>Closed vs open network<a class="headerlink" href="#closed-vs-open-network" title="Permalink to this headline">#</a></h3>
+<ul class="simple">
+<li><p>Closed system: No exchange of material  between the system and the environment. At steady state, all net reaction rates are zero, i.e. thermal equilibrium.</p></li>
+<li><p>Open system: exchanging material with outside environment. At steady state, there are steady flux throght the system. Most biochemical networks belong to this.</p></li>
+</ul>
+</section>
+<section id="assumptions-about-chemical-reaction-network">
+<h3>Assumptions about Chemical reaction network<a class="headerlink" href="#assumptions-about-chemical-reaction-network" title="Permalink to this headline">#</a></h3>
+<p>So that we could use ODE systems to solve the problem.</p>
+<ul class="simple">
+<li><p><em>Spatial homogeneity</em>: Well stirred. Otherwise, we should use compartmentalizations or even PDEs. (e.g. action potentials travelling along the axon)</p></li>
+<li><p><em>Continuum hypothesis</em>: Great many molecules to smooth out random noise. Otherwise, we should use stochastic simulation. (e.g. gene regulatory networks)</p></li>
+</ul>
+</section>
+</section>
+<section id="the-law-of-mass-action">
+<h2>The Law of Mass Action<a class="headerlink" href="#the-law-of-mass-action" title="Permalink to this headline">#</a></h2>
+<p>The rate of a chemical reaction is proportional to the product of the concentrations of the reactants.</p>
+<ul class="simple">
+<li><p>On the molecular level: the probability of a reaction occurring is proportional to the probability of the reactants colliding with one another.</p></li>
+<li><p>Kinetic order: the <em>exponent</em> on the reactant in a reaction.</p></li>
+<li><p>Rate constant</p></li>
+</ul>
+</section>
+<section id="using-derivatives-to-describe-rates-of-change">
+<h2>Using derivatives to describe rates of change<a class="headerlink" href="#using-derivatives-to-describe-rates-of-change" title="Permalink to this headline">#</a></h2>
+<section id="decay-reaction">
+<h3>Decay reaction<a class="headerlink" href="#decay-reaction" title="Permalink to this headline">#</a></h3>
+<p>For a decay reaction <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">=&gt;</span> <span class="pre">0</span></code>, the rate of change of concentration of species A could be described as</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{da(t)}{dt} = -ka(t)
+\]</div>
+<p>The solution is a exponential decay: (<span class="math notranslate nohighlight">\(A_0\)</span> is the initial concentration of A)</p>
+<div class="math notranslate nohighlight">
+\[
+a(t) = A_0e^{-kt}
+\]</div>
+<ul class="simple">
+<li><p>Time constant <span class="math notranslate nohighlight">\(\tau = 1/k\)</span> (also called the time scale, telling how fast will the system go)</p></li>
+<li><p>Half-life = <span class="math notranslate nohighlight">\(\tau_{0.5} = \tau ln2\)</span></p></li>
+</ul>
+</section>
+<section id="production-and-decay">
+<h3>Production and decay<a class="headerlink" href="#production-and-decay" title="Permalink to this headline">#</a></h3>
+<p>For a chemical reaction <code class="docutils literal notranslate"><span class="pre">0</span> <span class="pre">=&gt;</span> <span class="pre">A</span> <span class="pre">=&gt;</span> <span class="pre">0</span></code>, with production rate <span class="math notranslate nohighlight">\(k_0\)</span> and decaying rate <span class="math notranslate nohighlight">\(k_1\)</span>, the rate of change of concentration of species A could be described as</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{da(t)}{dt} = k_0 - k_1a(t)
+\]</div>
+<p>The solution is an asymptotic to the steady-state concentration of <span class="math notranslate nohighlight">\(k_0/k_1\)</span>.</p>
+<div class="math notranslate nohighlight">
+\[
+a(t) = (A_0 - k_0/k_1) e^{-k_1t} + k_0/k_1
+\]</div>
+<p>when <span class="math notranslate nohighlight">\(t \rightarrow \infty\)</span>, <span class="math notranslate nohighlight">\(a(t) \rightarrow k_0/k_1\)</span>.</p>
+</section>
+<section id="irreversible-conversion-in-closed-system">
+<h3>Irreversible Conversion in closed system<a class="headerlink" href="#irreversible-conversion-in-closed-system" title="Permalink to this headline">#</a></h3>
+<p>For a reaction <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">=&gt;</span> <span class="pre">B</span></code>, the rates of change of concentrations of species A and B could be described as</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\frac{d}{dt}a(t) &amp;= -ka(t)  \\
+\frac{d}{dt}b(t) &amp;= ka(t)  \\
+\end{aligned}
+\end{split}\]</div>
+<p>And the solution is</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+a(t) &amp;= A_0e^{-kt}  \\
+b(t) &amp;= B_0 + A_0 - A_0e^{-kt} = B_0 + A_0 - a(t)\\
+\end{aligned}
+\end{split}\]</div>
+<p>The system can be reduced to a single ODE by using the <em>conservation relationship</em> <span class="math notranslate nohighlight">\(A_0 + B_0 = const\)</span>.</p>
+</section>
+<section id="reversible-conversion-in-closed-system">
+<h3>Reversible Conversion in closed system<a class="headerlink" href="#reversible-conversion-in-closed-system" title="Permalink to this headline">#</a></h3>
+<p>For a reaction <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">&lt;=&gt;</span> <span class="pre">B</span></code>, the rates of change of concentrations of species A and B could be described as</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\frac{d}{dt}a(t) &amp;= -ka(t) + k_{-1}b(t)  \\
+\frac{d}{dt}b(t) &amp;= ka(t) - k_{-1}b(t)   \\
+\end{aligned}
+\end{split}\]</div>
+<p>And the solution is</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+a(t) &amp;= (A_0 - a_{ss})e^{-(k_1 + k_{-1})t} + a_{ss}  \\
+b(t) &amp;= T - a(t) \\
+a_{ss} &amp;= \frac{k_{-1}}{k_{-1} + k_1}T \\
+T &amp;= A_0 + B_0
+\end{aligned}
+\end{split}\]</div>
+<p>The equilibrium constant <span class="math notranslate nohighlight">\(K_{eq} = \frac{b_{ss}}{a_{ss}} = \frac{k_1}{k_{-1}}\)</span></p>
+</section>
+</section>
+<section id="differential-equations">
+<h2>Differential Equations<a class="headerlink" href="#differential-equations" title="Permalink to this headline">#</a></h2>
+<ul class="simple">
+<li><p>Ordinary differential equation (ODE): species vs time</p></li>
+<li><p>Partial differential equation (PDE): species vs time and space</p></li>
+<li><p>Autonomous differential equation: does not explicitly depend on the independent variable (e.g. time).</p></li>
+<li><p>Non-autonomous: some term(s) rely on the independent variable. (e.g. some parameters changes with time)</p></li>
+</ul>
+</section>
+<section id="numerial-simulations-of-differential-equations">
+<h2>Numerial simulations of differential equations<a class="headerlink" href="#numerial-simulations-of-differential-equations" title="Permalink to this headline">#</a></h2>
+<p>Proceeding step by step, treating the solution trajectory as linear. The higher order methods usually better eliminate truncation errors in the Taylor series.</p>
+<ul class="simple">
+<li><p>(Forward) Euler method</p></li>
+<li><p>Runge-Kutta methods e.g. (RK4)</p></li>
+<li><p>Dormand-Prince (DP5, <code class="docutils literal notranslate"><span class="pre">ode45</span></code> in MATLAB): adpative. The solver will find <code class="docutils literal notranslate"><span class="pre">dt</span></code> for itself.</p></li>
+<li><p>Tsitouras (<code class="docutils literal notranslate"><span class="pre">Tsit5</span></code> in Julia): a more efficient DP5.</p></li>
+</ul>
+<p>These <a class="reference external" href="https://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods">solvers</a> above use Butcher tableau to describe how to calculate the intermediate steps and finally the next step.</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+            </main>
+            <footer class="footer-article noprint">
+                
+    <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="lecture-ch1.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Chapter 1</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="mmsb-README.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Textbook figures</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+            </footer>
+        </div>
+    </div>
+    <div class="footer-content row">
+        <footer class="col footer"><p>
+  
+    By Wen-Wei Tseng<br/>
+  
+      &copy; Copyright 2022.<br/>
+</p>
+        </footer>
+    </div>
+    
+</div>
+
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+
+
+  </body>
+</html>

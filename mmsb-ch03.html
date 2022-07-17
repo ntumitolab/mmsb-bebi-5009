@@ -1,0 +1,929 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Chapter 3 &#8212; Mathematical Modeling in Systems Biology</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=62ba249389abaaa9ffc34bf36a076bdc1d65ee18" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?digest=f31d14ad54b65d19161ba51d4ffff3a77ae00456"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Chapter 4" href="mmsb-ch04.html" />
+    <link rel="prev" title="Chapter 2" href="mmsb-ch02.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay overlay-navbar" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<!-- Checkboxes to toggle the in-page toc -->
+<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
+<label class="overlay overlay-pagetoc" for="__page-toc">
+    <div class="visually-hidden">Toggle in-page Table of Contents</div>
+</label>
+<!-- Headers at the top -->
+<div class="announcement header-item noprint"></div>
+<div class="header header-item noprint"></div>
+
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<!-- Sidebar -->
+<div class="bd-sidebar noprint" id="site-navigation">
+    <div class="bd-sidebar__content">
+        <div class="bd-sidebar__top"><div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="index.html">
+      
+      
+      
+      <h1 class="site-logo" id="site-title">Mathematical Modeling in Systems Biology</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="index.html">
+                    Mathematical Modeling in Systems Biology
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Introduction to Julia
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="intro-01-first-steps.html">
+   First steps to Julia
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="intro-02-plotting.html">
+   Plotting with Julia
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="intro-03-diffeq.html">
+   Solving differential equations in Julia
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="intro-04-gillespie.html">
+   Stochastic simulations
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Textbook and Lectures
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="lecture-README.html">
+   Class lectures
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lecture-ch1.html">
+     Chapter 1
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lecture-ch2.html">
+     Chapter 2
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 current active has-children">
+  <a class="reference internal" href="mmsb-README.html">
+   Textbook figures
+  </a>
+  <input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="current">
+   <li class="toctree-l2">
+    <a class="reference internal" href="mmsb-ch01.html">
+     Chapter 1
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="mmsb-ch02.html">
+     Chapter 2
+    </a>
+   </li>
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
+     Chapter 3
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="mmsb-ch04.html">
+     Chapter 4
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Homework
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="hw-00.html">
+   Rules for programming homeworks
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="hw-01.html">
+   Homework 1: Solving an ODE
+  </a>
+ </li>
+</ul>
+
+    </div>
+</nav></div>
+        <div class="bd-sidebar__bottom">
+             <!-- To handle the deprecated key -->
+            
+            <div class="navbar_extra_footer">
+            Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+            </div>
+            
+        </div>
+    </div>
+    <div id="rtd-footer-container"></div>
+</div>
+
+
+          
+
+
+          
+<!-- A tiny helper pixel to detect if we've scrolled -->
+<div class="sbt-scroll-pixel-helper"></div>
+<!-- Main content -->
+<div class="col py-0 content-container">
+    
+    <div class="header-article row sticky-top noprint">
+        
+
+
+
+<div class="col py-1 d-flex header-article-main">
+    <div class="header-article__left">
+        
+        <label for="__navigation"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="right"
+title="Toggle navigation"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-bars"></i>
+  </span>
+
+</label>
+
+        
+    </div>
+    <div class="header-article__right">
+<div class="menu-dropdown menu-dropdown-launch-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Launch interactive content">
+      <i class="fas fa-rocket"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://mybinder.org/v2/gh/ntumitolab/mmsb-bebi-5009/main?urlpath=tree/docs/mmsb-ch03.ipynb"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Launch on Binder"
+>
+  
+
+<span class="headerbtn__icon-container">
+  
+    <img src="_static/images/logo_binder.svg">
+  </span>
+<span class="headerbtn__text-container">Binder</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+<button onclick="toggleFullScreen()"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="bottom"
+title="Fullscreen mode"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+<a href="https://github.com/ntumitolab/mmsb-bebi-5009"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="bottom"
+title="Source repository"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+<div class="menu-dropdown menu-dropdown-download-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Download this page">
+      <i class="fas fa-download"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="_sources/mmsb-ch03.ipynb"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download source file"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="headerbtn__text-container">.ipynb</span>
+</a>
+
+      </li>
+      
+      <li>
+        
+<button onclick="printPdf(this)"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="left"
+title="Print to PDF"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="headerbtn__text-container">.pdf</span>
+</button>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
+
+    </div>
+</div>
+
+<!-- Table of contents -->
+<div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#figure-3-03-michaelis-menten-kinetics">
+   Figure 3.03 Michaelis-Menten kinetics
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#problem-3-7-5-reduced-michaelis-menten">
+   Problem 3.7.5 Reduced Michaelis-Menten
+  </a>
+ </li>
+</ul>
+
+    </nav>
+</div>
+    </div>
+    <div class="article row">
+        <div class="col pl-md-3 pl-lg-5 content-container">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>Chapter 3</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#figure-3-03-michaelis-menten-kinetics">
+   Figure 3.03 Michaelis-Menten kinetics
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#problem-3-7-5-reduced-michaelis-menten">
+   Problem 3.7.5 Reduced Michaelis-Menten
+  </a>
+ </li>
+</ul>
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <main id="main-content" role="main">
+                
+              <div>
+                
+  <section class="tex2jax_ignore mathjax_ignore" id="chapter-3">
+<h1>Chapter 3<a class="headerlink" href="#chapter-3" title="Permalink to this headline">#</a></h1>
+<section id="figure-3-03-michaelis-menten-kinetics">
+<h2>Figure 3.03 Michaelis-Menten kinetics<a class="headerlink" href="#figure-3-03-michaelis-menten-kinetics" title="Permalink to this headline">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">DifferentialEquations</span><span class="w"></span>
+<span class="k">using</span><span class="w"> </span><span class="n">ModelingToolkit</span><span class="w"></span>
+<span class="k">using</span><span class="w"> </span><span class="n">Plots</span><span class="w"></span>
+<span class="n">Plots</span><span class="o">.</span><span class="n">gr</span><span class="p">(</span><span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Plots.GRBackend()
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">hill</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">k</span><span class="p">)</span><span class="w"></span>
+<span class="n">hill</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hill</span><span class="p">(</span><span class="n">x</span><span class="o">^</span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="o">^</span><span class="n">n</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>hill (generic function with 2 methods)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="nd">@parameters</span><span class="w"> </span><span class="n">eT</span><span class="w"> </span><span class="n">k1</span><span class="w"> </span><span class="n">km1</span><span class="w"> </span><span class="n">k2</span><span class="w"></span>
+<span class="nd">@variables</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="n">S</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"> </span><span class="n">ES</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"> </span><span class="n">P</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"> </span><span class="n">eFree</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"> </span><span class="n">v1</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"> </span><span class="n">v2</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"></span>
+<span class="n">D</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Differential</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(::Differential) (generic function with 2 methods)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="nd">@named</span><span class="w"> </span><span class="n">fullSys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ODESystem</span><span class="p">([</span><span class="w"></span>
+<span class="w">    </span><span class="n">eFree</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">eT</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">ES</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">v1</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">k1</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">S</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">eFree</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">km1</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">ES</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">v2</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">k2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">ES</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">D</span><span class="p">(</span><span class="n">S</span><span class="p">)</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="o">-</span><span class="n">v1</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">D</span><span class="p">(</span><span class="n">ES</span><span class="p">)</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">v2</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">D</span><span class="p">(</span><span class="n">P</span><span class="p">)</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">v2</span><span class="w"></span>
+<span class="p">])</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_latex math notranslate nohighlight">
+\[\begin{split} \begin{align}
+\frac{dS(t)}{dt} =&amp;  - \mathrm{v1}\left( t \right) \\
+\frac{dES(t)}{dt} =&amp;  - \mathrm{v2}\left( t \right) + \mathrm{v1}\left( t \right) \\
+\frac{dP(t)}{dt} =&amp; \mathrm{v2}\left( t \right) \\
+\mathrm{eFree}\left( t \right) =&amp; eT - \mathrm{ES}\left( t \right) \\
+\mathrm{v1}\left( t \right) =&amp;  - km1 \mathrm{ES}\left( t \right) + k1 S\left( t \right) \mathrm{eFree}\left( t \right) \\
+\mathrm{v2}\left( t \right) =&amp; k2 \mathrm{ES}\left( t \right)
+\end{align}
+ \end{split}\]</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">fullSys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">structural_simplify</span><span class="p">(</span><span class="n">fullSys</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_latex math notranslate nohighlight">
+\[\begin{split} \begin{align}
+\frac{dS(t)}{dt} =&amp;  - \mathrm{v1}\left( t \right) \\
+\frac{dES(t)}{dt} =&amp;  - \mathrm{v2}\left( t \right) + \mathrm{v1}\left( t \right) \\
+\frac{dP(t)}{dt} =&amp; \mathrm{v2}\left( t \right)
+\end{align}
+ \end{split}\]</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="c"># Apply QSSA on the ES complex to somplify the model</span><span class="w"></span>
+<span class="nd">@named</span><span class="w"> </span><span class="n">simpSys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ODESystem</span><span class="p">([</span><span class="w"></span>
+<span class="w">    </span><span class="n">D</span><span class="p">(</span><span class="n">S</span><span class="p">)</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="o">-</span><span class="n">k2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">eT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">hill</span><span class="p">(</span><span class="n">S</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">km1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">k2</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">k1</span><span class="p">),</span><span class="w"></span>
+<span class="p">])</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_latex math notranslate nohighlight">
+\[ \begin{align}
+\frac{dS(t)}{dt} =&amp; \frac{ - eT k2 S\left( t \right)}{\frac{k2 + km1}{k1} + S\left( t \right)}
+\end{align}
+ \]</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">u0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">S</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">5.0</span><span class="p">,</span><span class="w"> </span><span class="n">ES</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="n">P</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">0.0</span><span class="p">]</span><span class="w"></span>
+<span class="n">tend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="w"></span>
+<span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">eT</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="n">k1</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">30.0</span><span class="p">,</span><span class="w"> </span><span class="n">km1</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="n">k2</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">10.0</span><span class="p">]</span><span class="w"></span>
+<span class="n">sol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">ODEProblem</span><span class="p">(</span><span class="n">fullSys</span><span class="p">,</span><span class="w"> </span><span class="n">u0</span><span class="p">,</span><span class="w"> </span><span class="n">tend</span><span class="p">,</span><span class="w"> </span><span class="n">params</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>retcode: Success
+Interpolation: specialized 4th order &quot;free&quot; interpolation, specialized 2nd order &quot;free&quot; stiffness-aware interpolation
+t: 40-element Vector{Float64}:
+ 0.0
+ 6.665333466693315e-6
+ 7.331866813362645e-5
+ 0.00048642648778993874
+ 0.001246310413218641
+ 0.002255916309079525
+ 0.0036389198801181095
+ 0.00545583363850392
+ 0.007824959232785294
+ 0.010840766550417302
+ 0.014621903142810278
+ 0.019277403182029782
+ 0.02494507816841159
+ ⋮
+ 0.48521164547537693
+ 0.540201092224572
+ 0.5962935027711986
+ 0.6498572521804434
+ 0.6992361514843274
+ 0.7455747283559686
+ 0.7903699610737671
+ 0.8349926147758184
+ 0.8806910467990131
+ 0.9286579589754566
+ 0.9801092099749458
+ 1.0
+u: 40-element Vector{Vector{Float64}}:
+ [5.0, 0.0, 0.0]
+ [4.999000802751873, 0.000999163942258781, 3.330586857606668e-8]
+ [4.989074749914229, 0.010921237104096317, 4.012981675171883e-6]
+ [4.930127947317353, 0.06969993676229858, 0.00017211592034861722]
+ [4.832226261833521, 0.16669487025589977, 0.0010788679105792774]
+ [4.720095603915227, 0.276571299767534, 0.0033330963172395283]
+ [4.593086952160523, 0.39887587512202227, 0.008037172717454948]
+ [4.461543547981366, 0.5219980786041243, 0.01645837341451019]
+ [4.332646083947653, 0.6370812655352537, 0.0302726505170938]
+ [4.2146257462090055, 0.7343117830375187, 0.05106247075347632]
+ [4.111199781164874, 0.8084431778308703, 0.08035704100425639]
+ [4.022104087704659, 0.8586065157497812, 0.11928939654556033]
+ [3.94273013116537, 0.8883632044987431, 0.1689066643358876]
+ ⋮
+ [0.4330972891093158, 0.6154853137358121, 3.951417397154873]
+ [0.23210789757958253, 0.5069090684960212, 4.260983033924397]
+ [0.10688422093961325, 0.3824409926320726, 4.510674786428315]
+ [0.04626413910025967, 0.26918678316701966, 4.684549077732722]
+ [0.020977113980381188, 0.18357576649969576, 4.795447119519925]
+ [0.01041495421874948, 0.12369158655992446, 4.865893459221328]
+ [0.005656469763014638, 0.0827625067352505, 4.911581023501737]
+ [0.0032796749721159136, 0.05484217980196184, 4.941878145225925]
+ [0.0019694264524599617, 0.03575368841431783, 4.962276885133225]
+ [0.0011916710708071753, 0.02273525651595728, 4.976073072413238]
+ [0.000710181002696924, 0.013958545194631931, 4.985331273802673]
+ [0.0005834152169982695, 0.011555343089233618, 4.98786124169377]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">p1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">plot</span><span class="p">(</span><span class="n">sol</span><span class="p">,</span><span class="w"> </span><span class="n">vars</span><span class="o">=</span><span class="p">[</span><span class="n">S</span><span class="p">,</span><span class="w"> </span><span class="n">ES</span><span class="p">,</span><span class="w"> </span><span class="n">P</span><span class="p">,</span><span class="w"> </span><span class="n">eFree</span><span class="p">],</span><span class="w"> </span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;Time (AU)&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;Concentration (AU)&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">legend</span><span class="o">=</span><span class="ss">:right</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/mmsb-ch03_9_0.svg" src="_images/mmsb-ch03_9_0.svg" /></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">solsimp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">ODEProblem</span><span class="p">(</span><span class="n">simpSys</span><span class="p">,</span><span class="w"> </span><span class="n">u0</span><span class="p">,</span><span class="w"> </span><span class="n">tend</span><span class="p">,</span><span class="w"> </span><span class="n">params</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>retcode: Success
+Interpolation: specialized 4th order &quot;free&quot; interpolation, specialized 2nd order &quot;free&quot; stiffness-aware interpolation
+t: 15-element Vector{Float64}:
+ 0.0
+ 0.08829951015219592
+ 0.29677254913999207
+ 0.5000004817918403
+ 0.6196473926569502
+ 0.6670104402879965
+ 0.7099275072236977
+ 0.7465737552769465
+ 0.7827003170612313
+ 0.8170029132927924
+ 0.8515324894037792
+ 0.886672833050339
+ 0.9240249076586415
+ 0.9646817171699882
+ 1.0
+u: 15-element Vector{Vector{Float64}}:
+ [5.0]
+ [4.182468228248958]
+ [2.3146741513235356]
+ [0.7140967034844039]
+ [0.13296503742668356]
+ [0.04630251318211275]
+ [0.01563176152085844]
+ [0.005910624946093232]
+ [0.0022299119031116642]
+ [0.0008784935956950156]
+ [0.0003432014396268349]
+ [0.00013175528732374206]
+ [4.7615961869066056e-5]
+ [1.5733009181704544e-5]
+ [6.007498451479797e-6]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">p2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">plot</span><span class="p">(</span><span class="n">sol</span><span class="p">,</span><span class="w"> </span><span class="n">vars</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">],</span><span class="w"> </span><span class="n">line</span><span class="o">=</span><span class="p">(</span><span class="ss">:dash</span><span class="p">),</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;S (full)&quot;</span><span class="w"> </span><span class="s">&quot;P (full)&quot;</span><span class="p">])</span><span class="w"></span>
+<span class="n">plot!</span><span class="p">(</span><span class="n">p2</span><span class="p">,</span><span class="w"> </span><span class="n">solsimp</span><span class="p">,</span><span class="w"> </span><span class="n">line</span><span class="o">=</span><span class="p">(</span><span class="ss">:blue</span><span class="p">),</span><span class="w"> </span><span class="n">lab</span><span class="o">=</span><span class="s">&quot;S (reduced)&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="n">plot!</span><span class="p">(</span><span class="n">p2</span><span class="p">,</span><span class="w"> </span><span class="n">solsimp</span><span class="p">,</span><span class="w"> </span><span class="n">vars</span><span class="o">=</span><span class="p">((</span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">s</span><span class="p">)</span><span class="o">-&gt;</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="mf">5.0</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">s</span><span class="p">),</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">),</span><span class="w"> </span><span class="n">line</span><span class="o">=</span><span class="p">(</span><span class="ss">:red</span><span class="p">),</span><span class="w"> </span><span class="n">lab</span><span class="o">=</span><span class="s">&quot;P (reduced)&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="n">plot!</span><span class="p">(</span><span class="n">p2</span><span class="p">,</span><span class="w"> </span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;Time (AU)&quot;</span><span class="p">,</span><span class="w">  </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;Concentration (AU)&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">xlims</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">1.0</span><span class="p">),</span><span class="w"> </span><span class="n">ylims</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">5.0</span><span class="p">),</span><span class="w"> </span><span class="n">legend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ss">:right</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/mmsb-ch03_11_0.svg" src="_images/mmsb-ch03_11_0.svg" /></div>
+</div>
+</section>
+<section id="problem-3-7-5-reduced-michaelis-menten">
+<h2>Problem 3.7.5 Reduced Michaelis-Menten<a class="headerlink" href="#problem-3-7-5-reduced-michaelis-menten" title="Permalink to this headline">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">Plots</span><span class="w"></span>
+<span class="k">using</span><span class="w"> </span><span class="n">DifferentialEquations</span><span class="w"></span>
+<span class="k">using</span><span class="w"> </span><span class="n">ModelingToolkit</span><span class="w"></span>
+<span class="n">Plots</span><span class="o">.</span><span class="n">gr</span><span class="p">(</span><span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">fmt</span><span class="o">=</span><span class="ss">:png</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Plots.GRBackend()
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="c"># Convenience functions</span><span class="w"></span>
+<span class="n">hill</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">k</span><span class="p">)</span><span class="w"></span>
+<span class="n">hill</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hill</span><span class="p">(</span><span class="n">x</span><span class="o">^</span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="o">^</span><span class="n">n</span><span class="p">)</span><span class="w"></span>
+<span class="n">reducedmm</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">k</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>reducedmm (generic function with 1 method)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="nd">@parameters</span><span class="w"> </span><span class="n">v_0</span><span class="w"> </span><span class="n">v_m1</span><span class="w"> </span><span class="n">v_m2</span><span class="w"> </span><span class="n">v_m3</span><span class="w"> </span><span class="n">Km_1</span><span class="w"> </span><span class="n">Km_2</span><span class="w"> </span><span class="n">Km_3</span><span class="w"></span>
+<span class="nd">@variables</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="n">S1</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"> </span><span class="n">S2</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"> </span><span class="n">S3</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"> </span><span class="n">v1</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"> </span><span class="n">v2</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"> </span><span class="n">v3</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"></span>
+<span class="n">D</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Differential</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(::Differential) (generic function with 2 methods)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">eqsFull</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">v_m1</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">hill</span><span class="p">(</span><span class="n">S1</span><span class="p">,</span><span class="w"> </span><span class="n">Km_1</span><span class="p">),</span><span class="w"></span>
+<span class="w">            </span><span class="n">v2</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">v_m2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">hill</span><span class="p">(</span><span class="n">S2</span><span class="p">,</span><span class="w"> </span><span class="n">Km_2</span><span class="p">),</span><span class="w"></span>
+<span class="w">            </span><span class="n">v3</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">v_m3</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">hill</span><span class="p">(</span><span class="n">S3</span><span class="p">,</span><span class="w"> </span><span class="n">Km_3</span><span class="p">),</span><span class="w"></span>
+<span class="w">            </span><span class="n">D</span><span class="p">(</span><span class="n">S1</span><span class="p">)</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">v_0</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">v1</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="n">D</span><span class="p">(</span><span class="n">S2</span><span class="p">)</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">v2</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="n">D</span><span class="p">(</span><span class="n">S3</span><span class="p">)</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">v2</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">v3</span><span class="p">]</span><span class="w"></span>
+
+<span class="nd">@named</span><span class="w"> </span><span class="n">fullsys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ODESystem</span><span class="p">(</span><span class="n">eqsFull</span><span class="p">)</span><span class="w"></span>
+<span class="n">fullSys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">structural_simplify</span><span class="p">(</span><span class="n">fullsys</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_latex math notranslate nohighlight">
+\[\begin{split} \begin{align}
+\frac{dS1(t)}{dt} =&amp; v_{0} - \mathrm{v1}\left( t \right) \\
+\frac{dS2(t)}{dt} =&amp;  - \mathrm{v2}\left( t \right) + \mathrm{v1}\left( t \right) \\
+\frac{dS3(t)}{dt} =&amp;  - \mathrm{v3}\left( t \right) + \mathrm{v2}\left( t \right)
+\end{align}
+ \end{split}\]</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">eqsRe</span><span class="w"> </span><span class="o">=</span><span class="w">   </span><span class="p">[</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">v_m1</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">S1</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">Km_1</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="n">v2</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">v_m2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">S2</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">Km_2</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="n">v3</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">v_m3</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">S3</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">Km_3</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="n">D</span><span class="p">(</span><span class="n">S1</span><span class="p">)</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">v_0</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">v1</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="n">D</span><span class="p">(</span><span class="n">S2</span><span class="p">)</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">v2</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="n">D</span><span class="p">(</span><span class="n">S3</span><span class="p">)</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">v2</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">v3</span><span class="p">]</span><span class="w"></span>
+<span class="nd">@named</span><span class="w"> </span><span class="n">reSys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ODESystem</span><span class="p">(</span><span class="n">eqsRe</span><span class="p">)</span><span class="w"></span>
+<span class="n">reSys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">structural_simplify</span><span class="p">(</span><span class="n">reSys</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_latex math notranslate nohighlight">
+\[\begin{split} \begin{align}
+\frac{dS1(t)}{dt} =&amp; v_{0} - \mathrm{v1}\left( t \right) \\
+\frac{dS2(t)}{dt} =&amp;  - \mathrm{v2}\left( t \right) + \mathrm{v1}\left( t \right) \\
+\frac{dS3(t)}{dt} =&amp;  - \mathrm{v3}\left( t \right) + \mathrm{v2}\left( t \right)
+\end{align}
+ \end{split}\]</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">u0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">S1</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">0.3</span><span class="p">,</span><span class="w"> </span><span class="n">S2</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">0.2</span><span class="p">,</span><span class="w"> </span><span class="n">S3</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">0.1</span><span class="p">]</span><span class="w"></span>
+<span class="n">tend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">2.0</span><span class="w"></span>
+<span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">v_0</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">v_m1</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">9</span><span class="p">,</span><span class="w"> </span><span class="n">v_m2</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">12</span><span class="p">,</span><span class="w"> </span><span class="n">v_m3</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">15</span><span class="p">,</span><span class="w"> </span><span class="n">Km_1</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="n">Km_2</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">0.4</span><span class="p">,</span><span class="w"> </span><span class="n">Km_3</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">3.0</span><span class="p">]</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>7-element Vector{Pair{Num, Float64}}:
+  v_0 =&gt; 2.0
+ v_m1 =&gt; 9.0
+ v_m2 =&gt; 12.0
+ v_m3 =&gt; 15.0
+ Km_1 =&gt; 1.0
+ Km_2 =&gt; 0.4
+ Km_3 =&gt; 3.0
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">sol1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">ODEProblem</span><span class="p">(</span><span class="n">fullSys</span><span class="p">,</span><span class="w"> </span><span class="n">u0</span><span class="p">,</span><span class="w"> </span><span class="n">tend</span><span class="p">,</span><span class="w"> </span><span class="n">params</span><span class="p">))</span><span class="w"></span>
+
+<span class="n">plot</span><span class="p">(</span><span class="n">sol1</span><span class="p">,</span><span class="w"> </span><span class="n">ylims</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.8</span><span class="p">),</span><span class="w"></span>
+<span class="w">     </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;Problem 3.7.5 (1)&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">     </span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;Time (arbitrary units)&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">     </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;Concentration (arbitrary units)&quot;</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/mmsb-ch03_19_0.png" src="_images/mmsb-ch03_19_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">u1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">S1</span><span class="o">=&gt;</span><span class="mf">6.0</span><span class="p">,</span><span class="w"> </span><span class="n">S2</span><span class="o">=&gt;</span><span class="mf">4.0</span><span class="p">,</span><span class="w"> </span><span class="n">S3</span><span class="o">=&gt;</span><span class="mf">4.0</span><span class="p">]</span><span class="w"></span>
+<span class="n">sol2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">ODEProblem</span><span class="p">(</span><span class="n">fullSys</span><span class="p">,</span><span class="w"> </span><span class="n">u1</span><span class="p">,</span><span class="w"> </span><span class="mf">4.0</span><span class="p">,</span><span class="w"> </span><span class="n">params</span><span class="p">))</span><span class="w"></span>
+
+<span class="n">plot</span><span class="p">(</span><span class="n">sol2</span><span class="p">,</span><span class="w"> </span><span class="n">ylims</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">6.0</span><span class="p">),</span><span class="w"></span>
+<span class="w">     </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;Problem 3.7.5 (2)&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">     </span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;Time (arbitrary units)&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">     </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;Concentration (arbitrary units)&quot;</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/mmsb-ch03_20_0.png" src="_images/mmsb-ch03_20_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">sol3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">ODEProblem</span><span class="p">(</span><span class="n">reSys</span><span class="p">,</span><span class="w"> </span><span class="n">u0</span><span class="p">,</span><span class="w"> </span><span class="n">tend</span><span class="p">,</span><span class="w"> </span><span class="n">params</span><span class="p">))</span><span class="w"></span>
+
+<span class="n">p3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">plot</span><span class="p">(</span><span class="n">sol1</span><span class="p">,</span><span class="w"> </span><span class="n">ylims</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.8</span><span class="p">),</span><span class="w"></span>
+<span class="w">     </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;Problem 3.7.5 (1) (full vs reduced)&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">     </span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;Time (arbitrary units)&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">     </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;Concentration (arbitrary units)&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">     </span><span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;S1 &quot;</span><span class="w"> </span><span class="s">&quot;S2 &quot;</span><span class="w"> </span><span class="s">&quot;S3 &quot;</span><span class="p">],</span><span class="w"> </span><span class="n">ls</span><span class="o">=</span><span class="ss">:dash</span><span class="p">)</span><span class="w"></span>
+<span class="n">plot!</span><span class="p">(</span><span class="n">p3</span><span class="p">,</span><span class="w"> </span><span class="n">sol3</span><span class="p">,</span><span class="w"> </span><span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;S1 (reduced)&quot;</span><span class="w"> </span><span class="s">&quot;S2 (reduced)&quot;</span><span class="w"> </span><span class="s">&quot;S3 (reduced)&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/mmsb-ch03_21_0.png" src="_images/mmsb-ch03_21_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">sol4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">ODEProblem</span><span class="p">(</span><span class="n">reSys</span><span class="p">,</span><span class="w"> </span><span class="n">u1</span><span class="p">,</span><span class="w"> </span><span class="mf">4.0</span><span class="p">,</span><span class="w"> </span><span class="n">params</span><span class="p">))</span><span class="w"></span>
+<span class="n">p4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">plot</span><span class="p">(</span><span class="n">sol2</span><span class="p">,</span><span class="w"> </span><span class="n">ylims</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">8.0</span><span class="p">),</span><span class="w"></span>
+<span class="w">     </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;Problem 3.7.5 (2) (full vs reduced)&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">     </span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;Time (arbitrary units)&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">     </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;Concentration (arbitrary units)&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">     </span><span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;S1 &quot;</span><span class="w"> </span><span class="s">&quot;S2 &quot;</span><span class="w"> </span><span class="s">&quot;S3 &quot;</span><span class="p">],</span><span class="w"> </span><span class="n">ls</span><span class="o">=</span><span class="ss">:dash</span><span class="p">)</span><span class="w"></span>
+<span class="n">plot!</span><span class="p">(</span><span class="n">p4</span><span class="p">,</span><span class="w"> </span><span class="n">sol4</span><span class="p">,</span><span class="w"> </span><span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;S1 (reduced)&quot;</span><span class="w"> </span><span class="s">&quot;S2 (reduced)&quot;</span><span class="w"> </span><span class="s">&quot;S3 (reduced)&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/mmsb-ch03_22_0.png" src="_images/mmsb-ch03_22_0.png" />
+</div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "julia-1.7"
+        },
+        kernelOptions: {
+            kernelName: "julia-1.7",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'julia-1.7'</script>
+
+              </div>
+              
+            </main>
+            <footer class="footer-article noprint">
+                
+    <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="mmsb-ch02.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Chapter 2</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="mmsb-ch04.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Chapter 4</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+            </footer>
+        </div>
+    </div>
+    <div class="footer-content row">
+        <footer class="col footer"><p>
+  
+    By Wen-Wei Tseng<br/>
+  
+      &copy; Copyright 2022.<br/>
+</p>
+        </footer>
+    </div>
+    
+</div>
+
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+
+
+  </body>
+</html>

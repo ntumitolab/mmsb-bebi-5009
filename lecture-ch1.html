@@ -1,0 +1,791 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Chapter 1 &#8212; Mathematical Modeling in Systems Biology</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=62ba249389abaaa9ffc34bf36a076bdc1d65ee18" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?digest=f31d14ad54b65d19161ba51d4ffff3a77ae00456"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Chapter 2" href="lecture-ch2.html" />
+    <link rel="prev" title="Class lectures" href="lecture-README.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay overlay-navbar" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<!-- Checkboxes to toggle the in-page toc -->
+<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
+<label class="overlay overlay-pagetoc" for="__page-toc">
+    <div class="visually-hidden">Toggle in-page Table of Contents</div>
+</label>
+<!-- Headers at the top -->
+<div class="announcement header-item noprint"></div>
+<div class="header header-item noprint"></div>
+
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<!-- Sidebar -->
+<div class="bd-sidebar noprint" id="site-navigation">
+    <div class="bd-sidebar__content">
+        <div class="bd-sidebar__top"><div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="index.html">
+      
+      
+      
+      <h1 class="site-logo" id="site-title">Mathematical Modeling in Systems Biology</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="index.html">
+                    Mathematical Modeling in Systems Biology
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Introduction to Julia
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="intro-01-first-steps.html">
+   First steps to Julia
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="intro-02-plotting.html">
+   Plotting with Julia
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="intro-03-diffeq.html">
+   Solving differential equations in Julia
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="intro-04-gillespie.html">
+   Stochastic simulations
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Textbook and Lectures
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1 current active has-children">
+  <a class="reference internal" href="lecture-README.html">
+   Class lectures
+  </a>
+  <input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="current">
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
+     Chapter 1
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="lecture-ch2.html">
+     Chapter 2
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="mmsb-README.html">
+   Textbook figures
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="mmsb-ch01.html">
+     Chapter 1
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="mmsb-ch02.html">
+     Chapter 2
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="mmsb-ch03.html">
+     Chapter 3
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="mmsb-ch04.html">
+     Chapter 4
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Homework
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="hw-00.html">
+   Rules for programming homeworks
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="hw-01.html">
+   Homework 1: Solving an ODE
+  </a>
+ </li>
+</ul>
+
+    </div>
+</nav></div>
+        <div class="bd-sidebar__bottom">
+             <!-- To handle the deprecated key -->
+            
+            <div class="navbar_extra_footer">
+            Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+            </div>
+            
+        </div>
+    </div>
+    <div id="rtd-footer-container"></div>
+</div>
+
+
+          
+
+
+          
+<!-- A tiny helper pixel to detect if we've scrolled -->
+<div class="sbt-scroll-pixel-helper"></div>
+<!-- Main content -->
+<div class="col py-0 content-container">
+    
+    <div class="header-article row sticky-top noprint">
+        
+
+
+
+<div class="col py-1 d-flex header-article-main">
+    <div class="header-article__left">
+        
+        <label for="__navigation"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="right"
+title="Toggle navigation"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-bars"></i>
+  </span>
+
+</label>
+
+        
+    </div>
+    <div class="header-article__right">
+<button onclick="toggleFullScreen()"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="bottom"
+title="Fullscreen mode"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+<a href="https://github.com/ntumitolab/mmsb-bebi-5009"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="bottom"
+title="Source repository"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+<div class="menu-dropdown menu-dropdown-download-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Download this page">
+      <i class="fas fa-download"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="_sources/lecture-ch1.md"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download source file"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="headerbtn__text-container">.md</span>
+</a>
+
+      </li>
+      
+      <li>
+        
+<button onclick="printPdf(this)"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="left"
+title="Print to PDF"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="headerbtn__text-container">.pdf</span>
+</button>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
+
+    </div>
+</div>
+
+<!-- Table of contents -->
+<div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#systems">
+   Systems
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#negative-feedback">
+     Negative feedback
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#positive-feedback">
+     Positive feedback
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#models">
+   Models
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#dynamic-modelling">
+   Dynamic Modelling
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#aiding-biological-investigation">
+     Aiding biological investigation
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#to-investigate-mechanistic-models">
+     To investigate mechanistic models
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#basic-features-of-dynamic-mathematical-models">
+   BASIC FEATURES OF DYNAMIC MATHEMATICAL MODELS
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#state-variables">
+     State variables
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#model-parameters">
+     Model parameters
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#steady-state-behavior-and-transient-behavior">
+     Steady-State Behavior and Transient Behavior
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#linearity-vs-nonlinearity">
+     Linearity vs nonlinearity
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#saturation">
+     Saturation
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#global-vs-local-behavior">
+     Global vs local behavior
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#deterministic-vs-stochastic">
+     Deterministic vs stochastic
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#tools-to-investigate-dynamic-mathematical-models">
+   Tools to investigate dynamic mathematical models
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#what-we-want-to-know">
+   What we want to know
+  </a>
+ </li>
+</ul>
+
+    </nav>
+</div>
+    </div>
+    <div class="article row">
+        <div class="col pl-md-3 pl-lg-5 content-container">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>Chapter 1</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#systems">
+   Systems
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#negative-feedback">
+     Negative feedback
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#positive-feedback">
+     Positive feedback
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#models">
+   Models
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#dynamic-modelling">
+   Dynamic Modelling
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#aiding-biological-investigation">
+     Aiding biological investigation
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#to-investigate-mechanistic-models">
+     To investigate mechanistic models
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#basic-features-of-dynamic-mathematical-models">
+   BASIC FEATURES OF DYNAMIC MATHEMATICAL MODELS
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#state-variables">
+     State variables
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#model-parameters">
+     Model parameters
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#steady-state-behavior-and-transient-behavior">
+     Steady-State Behavior and Transient Behavior
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#linearity-vs-nonlinearity">
+     Linearity vs nonlinearity
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#saturation">
+     Saturation
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#global-vs-local-behavior">
+     Global vs local behavior
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#deterministic-vs-stochastic">
+     Deterministic vs stochastic
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#tools-to-investigate-dynamic-mathematical-models">
+   Tools to investigate dynamic mathematical models
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#what-we-want-to-know">
+   What we want to know
+  </a>
+ </li>
+</ul>
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <main id="main-content" role="main">
+                
+              <div>
+                
+  <section class="tex2jax_ignore mathjax_ignore" id="chapter-1">
+<h1>Chapter 1<a class="headerlink" href="#chapter-1" title="Permalink to this headline">#</a></h1>
+<p><em>Cells are complex systems</em>: many components, interactions, and feedbacks.</p>
+<section id="systems">
+<h2>Systems<a class="headerlink" href="#systems" title="Permalink to this headline">#</a></h2>
+<ul class="simple">
+<li><p>A collection of interacting <em>components</em>.</p></li>
+<li><p>A <em>boundary</em> separating the system and its external environment.</p></li>
+<li><p>Complex Systems: <strong>nonlinear</strong> interactions and <strong>feedback loops</strong>.</p></li>
+</ul>
+<section id="negative-feedback">
+<h3>Negative feedback<a class="headerlink" href="#negative-feedback" title="Permalink to this headline">#</a></h3>
+<ul class="simple">
+<li><p>System components inhibit their own activity. e.g. a thermostat corrects for deviation of temperature from a set-point.</p></li>
+<li><p>Negative feedback generally stabilizes system behavior manifesting self-regulation and homeostasis.</p></li>
+<li><p>Instabilities and oscillations can arise when there is a lag in the action of a negative feedback loop.</p></li>
+</ul>
+</section>
+<section id="positive-feedback">
+<h3>Positive feedback<a class="headerlink" href="#positive-feedback" title="Permalink to this headline">#</a></h3>
+<ul class="simple">
+<li><p>System components enhance their own activity. e.g. a microphone and an amplifier.</p></li>
+<li><p>Divergent (unconstrained) / saturation (constrained) behavior. e.g. Flip-flop switches.</p></li>
+</ul>
+</section>
+</section>
+<section id="models">
+<h2>Models<a class="headerlink" href="#models" title="Permalink to this headline">#</a></h2>
+<ul class="simple">
+<li><p>Models are abstractions of reality. They could be</p>
+<ul>
+<li><p>physical / biological: mouse model for drug testing</p></li>
+<li><p>conceptual: ball-and-stick molecular model</p></li>
+<li><p>mechanistic: physico-chemical laws</p></li>
+<li><p>predictive: inferred by data</p></li>
+</ul>
+</li>
+<li><p>In this class, we investigate biological processes as dynamic systems with mathematical models that mimic the behavior of intracellular networks. This approach is called <strong>Dynamic Modelling</strong>.</p></li>
+</ul>
+</section>
+<section id="dynamic-modelling">
+<h2>Dynamic Modelling<a class="headerlink" href="#dynamic-modelling" title="Permalink to this headline">#</a></h2>
+<p>Focusing on <strong>rates of change</strong> of each component in the network.</p>
+<section id="aiding-biological-investigation">
+<h3>Aiding biological investigation<a class="headerlink" href="#aiding-biological-investigation" title="Permalink to this headline">#</a></h3>
+<ul class="simple">
+<li><p>Potential insights to mechanisms / behaviors.</p></li>
+<li><p>Transparent description</p></li>
+<li><p>Not affected by limits of lab conditions</p></li>
+<li><p>Omniscient and omnipotent about this system.</p></li>
+</ul>
+</section>
+<section id="to-investigate-mechanistic-models">
+<h3>To investigate mechanistic models<a class="headerlink" href="#to-investigate-mechanistic-models" title="Permalink to this headline">#</a></h3>
+<p>Simulations indicate how a system behaves; model analysis reveals why a system behaves as it does.</p>
+<p>Model simulation:</p>
+<ul class="simple">
+<li><p>Direct approach: solving the <em>forward problem</em></p></li>
+<li><p>Is used to predict system behavior under given conditions</p></li>
+<li><p>Sometimes refer to in silico experiments because they use computer to mimic the
+behavior of biological systems</p></li>
+</ul>
+<p>Model Analysis (Ch.4)</p>
+<ul class="simple">
+<li><p>Solving the <em>reverse problem</em> sometimes involves sophisticated mathematical techniques</p></li>
+<li><p>Investigate directly, yielding insight into their potential behaviors</p></li>
+<li><p>reveal non-intuitive connections between the structure of a system and its consequent
+behavior</p></li>
+</ul>
+</section>
+</section>
+<section id="basic-features-of-dynamic-mathematical-models">
+<h2>BASIC FEATURES OF DYNAMIC MATHEMATICAL MODELS<a class="headerlink" href="#basic-features-of-dynamic-mathematical-models" title="Permalink to this headline">#</a></h2>
+<section id="state-variables">
+<h3>State variables<a class="headerlink" href="#state-variables" title="Permalink to this headline">#</a></h3>
+<ul class="simple">
+<li><p>The primary components in the system.</p></li>
+<li><p>The collection of all of these state variables is called the <strong>state</strong> of the system, a complete description of the system’s condition at any given time.</p></li>
+<li><p>The model’s dynamic behaviour is the time-course for the collection of state variables.</p></li>
+</ul>
+</section>
+<section id="model-parameters">
+<h3>Model parameters<a class="headerlink" href="#model-parameters" title="Permalink to this headline">#</a></h3>
+<ul class="simple">
+<li><p>The environmental effects and interactions among system components. e.g. chemical kinetic constants, temperature, physical constants, buffered concentrations.</p></li>
+<li><p>Typically constant throughout the simulations.</p></li>
+<li><p>How to obtain</p>
+<ul>
+<li><p><em>Databases</em> like <a class="reference external" href="https://www.brenda-enzymes.org/">BRENDA</a>.</p></li>
+<li><p><em>Fitting</em> the model to the experiment results.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="steady-state-behavior-and-transient-behavior">
+<h3>Steady-State Behavior and Transient Behavior<a class="headerlink" href="#steady-state-behavior-and-transient-behavior" title="Permalink to this headline">#</a></h3>
+<ul class="simple">
+<li><p>Steady state: persistent operating state, asymptotic behavior after a significant stretches of time.</p></li>
+<li><p>Transient bahavior: the immediate response of a system to perturbations.</p></li>
+</ul>
+</section>
+<section id="linearity-vs-nonlinearity">
+<h3>Linearity vs nonlinearity<a class="headerlink" href="#linearity-vs-nonlinearity" title="Permalink to this headline">#</a></h3>
+<ul class="simple">
+<li><p>linear: <span class="math notranslate nohighlight">\(x = k_1y + k_2z\)</span>, easier to model (e.g. traditional control system models)</p></li>
+<li><p>nonlinear: <span class="math notranslate nohighlight">\(x = k_1y^2 + k_2z / (k_2z + 1)\)</span>. As in most biochemical models.</p></li>
+</ul>
+</section>
+<section id="saturation">
+<h3>Saturation<a class="headerlink" href="#saturation" title="Permalink to this headline">#</a></h3>
+<ul class="simple">
+<li><p>Hyperbolic saturation: <span class="math notranslate nohighlight">\(y = \frac{x}{x + 1}\)</span> <a class="reference external" href="https://www.desmos.com/calculator/c1nalotl5q">Graph link</a>.</p></li>
+<li><p>Sigmoidal saturation: <span class="math notranslate nohighlight">\(y = \frac{x^4}{x^4 + 1}\)</span> <a class="reference external" href="https://www.desmos.com/calculator/csf4wcaqej">Graph link</a></p></li>
+</ul>
+</section>
+<section id="global-vs-local-behavior">
+<h3>Global vs local behavior<a class="headerlink" href="#global-vs-local-behavior" title="Permalink to this headline">#</a></h3>
+<ul class="simple">
+<li><p>Over small domains, nonlinearities can always be approximated by linear relationships.</p></li>
+<li><p>Local approximation allows one to apply linear analysis tools. (e.g. Jacobian matrix)</p></li>
+<li><p>Local analysis at these points can then provide comprehensive insight into complex global behaviors.</p></li>
+</ul>
+</section>
+<section id="deterministic-vs-stochastic">
+<h3>Deterministic vs stochastic<a class="headerlink" href="#deterministic-vs-stochastic" title="Permalink to this headline">#</a></h3>
+<ul class="simple">
+<li><p>Deterministic: Behavior dependent solely on model states, exactly reproducible for repeated simulations.</p></li>
+<li><p>Stochastic: Randomness introduced into model. Repeated simulations yield a set of results. e.g. for gene regulation networks subject to few molecule conditions sensitive to thermal noise.</p></li>
+</ul>
+</section>
+</section>
+<section id="tools-to-investigate-dynamic-mathematical-models">
+<h2>Tools to investigate dynamic mathematical models<a class="headerlink" href="#tools-to-investigate-dynamic-mathematical-models" title="Permalink to this headline">#</a></h2>
+<ul class="simple">
+<li><p>Differential Equations solvers: dynamic behavior</p></li>
+<li><p>Sensitivity Analysis: dependence of steady-state behaviour on internal and external conditions.</p></li>
+<li><p>Stability Analysis: phase plane analysis, characterizing long-term behaviour. (steady-state or not)</p></li>
+<li><p>Bifurcation Analysis: dependence of system dynamics on internal and external conditions.</p></li>
+</ul>
+</section>
+<section id="what-we-want-to-know">
+<h2>What we want to know<a class="headerlink" href="#what-we-want-to-know" title="Permalink to this headline">#</a></h2>
+<p>Intracellular dynamics</p>
+<ul class="simple">
+<li><p>Metabolism: chemical reaction networks, enzyme-catalysed reactions, allosteric regulation (Chapter 5)</p></li>
+<li><p>Signal Transduction: G protein signalling, MAPK signalling cascade, bacterial chemotaxis, calcium oscillations (Chapter 6)</p></li>
+<li><p>Genetic Networks: switches (lac operon, phage lambda lysis/lysogeny switch, engineered toggle switch), oscillators (Goodwin oscillator, circadian rhythms, cell cycle, repressilator), computation (Chapter 7)</p></li>
+<li><p>Electrophysiology: voltage-gated ion channels, Nernst potential, Morris-Lecar model, intercellular communication (gap junctions, synaptic transmission, neuronal circuits) (Chapter 8)</p></li>
+</ul>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+            </main>
+            <footer class="footer-article noprint">
+                
+    <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="lecture-README.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Class lectures</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="lecture-ch2.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Chapter 2</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+            </footer>
+        </div>
+    </div>
+    <div class="footer-content row">
+        <footer class="col footer"><p>
+  
+    By Wen-Wei Tseng<br/>
+  
+      &copy; Copyright 2022.<br/>
+</p>
+        </footer>
+    </div>
+    
+</div>
+
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+
+
+  </body>
+</html>
