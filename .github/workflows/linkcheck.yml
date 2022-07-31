@@ -5,12 +5,14 @@ on:
   schedule:
     - cron: '0 0 1 * *' # Every month
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
 jobs:
   linkcheck:
     runs-on: ubuntu-latest
-    container:
-      image: hcr.io/sosiristseng/docker-jupyterbook:0.13.0.1
     steps:
       - uses: actions/checkout@v3
       - name: Check Links
-        run: jupyter-book build docs/ --builder linkcheck
+        run: docker run -v ${{ github.workspace }}:/work ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest jupyter-book build /work/docs/ --builder linkcheck

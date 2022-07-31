@@ -12,8 +12,8 @@ jupyter_book_task:
     find docs/ -type f -name "*.ipynb" -print0 | parallel -0 -j4 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --execute --inplace {}
   build_script: |
     jupyter-book build docs --warningiserror --keep-going -v
-  pages_script: |
-    if [[ $CIRRUS_BRANCH == "main" ]]; then
-      ghp-import -n docs/_build/html
-      git push -fq https://${GH_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git gh-pages
-    fi
+  # pages_script: |
+  #   if [[ $CIRRUS_BRANCH == "main" ]]; then
+  #     ghp-import -n docs/_build/html
+  #     git push -fq https://${GH_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git gh-pages
+  #   fi

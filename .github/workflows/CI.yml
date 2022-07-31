@@ -1,14 +1,14 @@
 name: Build Docker Image and Jupyter Notebooks
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   REGISTRY: ghcr.io
@@ -21,11 +21,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: docker/setup-buildx-action@v2
-      - uses: docker/login-action@v2
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build Docker Image
         # if: github.event_name != 'pull_request'
         uses: docker/build-push-action@v3
@@ -56,11 +51,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: docker/setup-buildx-action@v2
-      - uses: docker/login-action@v2
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build Docker Image
         # if: github.event_name != 'pull_request'
         uses: docker/build-push-action@v3
@@ -70,10 +60,8 @@ jobs:
           load: true
           tags: ${{ env.IMAGE_NAME }}:test
           cache-from: type=gha
-
       - name: Build a Notebook
-        run: docker run -v ${{ github.workspace }}:/work ${{ env.IMAGE_NAME }}:test jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --execute --inplace /work/docs/${{ matrix.notebook }}.ipynb
-
+        run: docker run -v ${{ github.workspace }}:/work -e JULIA_NUM_THREADS=$JULIA_NUM_THREADS ${{ env.IMAGE_NAME }}:test jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --execute --inplace /work/docs/${{ matrix.notebook }}.ipynb
       - name: Upload a Notebook
         uses: actions/upload-artifact@v3
         with:
@@ -81,13 +69,20 @@ jobs:
           path: docs/${{ matrix.notebook }}.ipynb
 
   jupyter-book:
-    needs: [execute, docker]
+    needs: execute
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/sosiristseng/docker-jupyterbook:0.13.0.1
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+      - uses: docker/setup-buildx-action@v2
+      - name: Build Docker Image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: .ci/Dockerfile
+          load: true
+          tags: ${{ env.IMAGE_NAME }}:test
+          cache-from: type=gha
       - run: mkdir out
       - name: Download notebooks
         uses: actions/download-artifact@v3
@@ -96,18 +91,15 @@ jobs:
       - name: Move notebooks
         run: find out/ -type f -iname '*.ipynb' -exec mv -t docs/ {} +
       - name: Build website
-        run: jupyter-book build docs/ -v
-      # - name: Deploy Website
-      #   uses: peaceiris/actions-gh-pages@v3.8.0
-      #   if: github.ref == 'refs/heads/main'
-      #   with:
-      #     github_token: ${{ secrets.GITHUB_TOKEN }}
-      #     force_orphan: true
-      #     publish_dir: docs/_build/html
-      #     full_commit_message: ${{ github.event.head_commit.message }}
+        run: docker run -v ${{ github.workspace }}:/work ${{ env.IMAGE_NAME }}:test jb build /work/docs/ -v
+      - name: Upload page artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: docs/_build/html
 
   docker-push:
-    needs: [execute, docker]
+    needs: execute
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -128,8 +120,6 @@ jobs:
           flavor: |
             latest=false
       - name: Push Docker Image
-        # Do not push on PR's
-        if: github.ref == 'refs/heads/main'
         uses: docker/build-push-action@v3
         with:
           context: .
@@ -139,3 +129,19 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+  # Deployment job
+  deploy:
+    needs: jupyter-book
+    if: github.ref == 'refs/heads/main'
+    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
+    permissions:
+      pages: write # to deploy to Pages
+      id-token: write # to verify the deployment originates from an appropriate source
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v1
