@@ -3,20 +3,23 @@ name: Auto update Julia dependencies
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 23 * * 0' # Every week
+    - cron: '0 0 * * 1' # Every week
 
 env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  JULIA_VER: '1.8'
+  JULIA_NUM_THREADS: '2'
+  JULIA_PKG_PRECOMPILE_AUTO: '0'
 
 jobs:
   update-notebook:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
+      - uses: julia-actions/setup-julia@v1
+        with:
+          version: ${{ env.JULIA_VER }}
       - name: Update Julia dependencies
-        run: docker run -v ${{ github.workspace }}:/work -e JULIA_PKG_PRECOMPILE_AUTO=0 ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest julia --color=yes --project=/work --threads=auto -e 'import Pkg; Pkg.update()'
+        run: julia --color=yes --project=@. --threads=auto -e 'import Pkg; Pkg.update()'
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v4

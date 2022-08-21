@@ -52,7 +52,6 @@ jobs:
       - uses: actions/checkout@v3
       - uses: docker/setup-buildx-action@v2
       - name: Build Docker Image
-        # if: github.event_name != 'pull_request'
         uses: docker/build-push-action@v3
         with:
           context: .
@@ -61,7 +60,12 @@ jobs:
           tags: ${{ env.IMAGE_NAME }}:test
           cache-from: type=gha
       - name: Build a Notebook
-        run: docker run -v ${{ github.workspace }}:/work -e JULIA_NUM_THREADS=$JULIA_NUM_THREADS ${{ env.IMAGE_NAME }}:test jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --execute --inplace /work/docs/${{ matrix.notebook }}.ipynb
+        run: >
+          docker run -v ${{ github.workspace }}:/work
+          -e JULIA_NUM_THREADS=${{ env.JULIA_NUM_THREADS }}
+          ${{ env.IMAGE_NAME }}:test
+          jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --execute --inplace
+          /work/docs/${{ matrix.notebook }}.ipynb
       - name: Upload a Notebook
         uses: actions/upload-artifact@v3
         with:
@@ -74,16 +78,17 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - uses: docker/setup-buildx-action@v2
-      - name: Build Docker Image
-        uses: docker/build-push-action@v3
+      - uses: actions/setup-python@v4
         with:
-          context: .
-          file: .ci/Dockerfile
-          load: true
-          tags: ${{ env.IMAGE_NAME }}:test
-          cache-from: type=gha
-      - run: mkdir out
+          python-version: '3.10'
+          cache: 'pip'
+          cache-dependency-path: '**/requirements.txt'
+      - name: Install dependencies
+        run: pip install -r .ci/requirements.txt
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v1
+      - run: mkdir -p out
       - name: Download notebooks
         uses: actions/download-artifact@v3
         with:
@@ -91,14 +96,14 @@ jobs:
       - name: Move notebooks
         run: find out/ -type f -iname '*.ipynb' -exec mv -t docs/ {} +
       - name: Build website
-        run: docker run -v ${{ github.workspace }}:/work ${{ env.IMAGE_NAME }}:test jb build /work/docs/ -v
+        run: jb build docs/ -v
       - name: Upload page artifact
         uses: actions/upload-pages-artifact@v1
         with:
           path: docs/_build/html
 
   docker-push:
-    needs: execute
+    needs: [execute, docker]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
