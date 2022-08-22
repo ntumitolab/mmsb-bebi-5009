@@ -87,7 +87,7 @@ jobs:
         run: pip install -r .ci/requirements.txt
       - name: Setup Pages
         id: pages
-        uses: actions/configure-pages@v1
+        uses: actions/configure-pages@v2
       - run: mkdir -p out
       - name: Download notebooks
         uses: actions/download-artifact@v3
