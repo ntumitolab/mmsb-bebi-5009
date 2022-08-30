@@ -21,14 +21,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: docker/setup-buildx-action@v2
-      - name: Build Docker Image
-        # if: github.event_name != 'pull_request'
+      - name: Build and cache Docker Image
         uses: docker/build-push-action@v3
         with:
           context: .
           file: .ci/Dockerfile
-          push: false
           tags: ${{ env.IMAGE_NAME }}:test
+          outputs: type=cacheonly
           cache-from: type=gha
           cache-to: type=gha,mode=max
   execute:
@@ -59,6 +58,7 @@ jobs:
           load: true
           tags: ${{ env.IMAGE_NAME }}:test
           cache-from: type=gha
+
       - name: Build a Notebook
         run: >
           docker run -v ${{ github.workspace }}:/work
@@ -66,6 +66,7 @@ jobs:
           ${{ env.IMAGE_NAME }}:test
           jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --execute --inplace
           /work/docs/${{ matrix.notebook }}.ipynb
+
       - name: Upload a Notebook
         uses: actions/upload-artifact@v3
         with:
@@ -134,6 +135,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
   # Deployment job
   deploy:
     needs: jupyter-book
