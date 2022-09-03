@@ -21,7 +21,7 @@ RUN pip install --no-cache-dir -U pip wheel setuptools \
 
 # Julia environment
 COPY Project.toml Manifest.toml ./
-COPY src/ src
+# COPY src/ src
 RUN julia --threads=auto --color=yes --project=@. -e 'import Pkg; Pkg.instantiate()'
 
 CMD ["jupyter-book"]
