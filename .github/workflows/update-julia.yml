@@ -7,7 +7,6 @@ on:
 
 env:
   JULIA_VER: '1.8'
-  JULIA_NUM_THREADS: '2'
   JULIA_PKG_PRECOMPILE_AUTO: '0'
 
 jobs:
