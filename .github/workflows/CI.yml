@@ -38,7 +38,7 @@ jobs:
       matrix:
         notebook:
           - index
-          - intro-01-first-steps.ipynb
+          - intro-01-first-steps
           - intro-02-plotting
           - intro-03-diffeq
           - intro-04-gillespie
