@@ -1,4 +1,8 @@
-name: Build Jupyter Notebooks
+name: Build Docker Image and Jupyter Notebooks
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 on:
   push:
@@ -6,64 +10,132 @@ on:
   pull_request:
     branches: [main]
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
   JULIA_NUM_THREADS: 2
   PYTHON_VER: '3.10'
-  JULIA_VER: '1.8'
-  JULIA_CACHE: '1'
 
 jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/setup-buildx-action@v2
+      - name: Build Docker Image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: .ci/Dockerfile
+          tags: ${{ env.IMAGE_NAME }}:test
+          outputs: type=cacheonly
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+  execute:
+    needs: docker
+    strategy:
+      fail-fast: false
+      matrix:
+        notebook:
+          - index
+          - intro-01-first-steps.ipynb
+          - intro-02-plotting
+          - intro-03-diffeq
+          - intro-04-gillespie
+          - mmsb-ch01
+          - mmsb-ch02
+          - mmsb-ch03
+          - mmsb-ch04
+          - hw-01
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/setup-buildx-action@v2
+      - name: Load Docker Image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: .ci/Dockerfile
+          load: true
+          tags: ${{ env.IMAGE_NAME }}:test
+          cache-from: type=gha
+      - name: Build a Notebook
+        run: >
+          docker run -v ${{ github.workspace }}:/work
+          -e JULIA_NUM_THREADS=${{ env.JULIA_NUM_THREADS }}
+          ${{ env.IMAGE_NAME }}:test
+          jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --execute --inplace
+          /work/docs/${{ matrix.notebook }}.ipynb
+      - name: Upload a Notebook
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.notebook }}
+          path: docs/${{ matrix.notebook }}.ipynb
+
   jupyter-book:
+    needs: execute
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Install system packages
-        run: |
-          sudo apt-get update -q
-          sudo apt-get install -qqy parallel
-      - name: Setup Python ${{ env.PYTHON_VER }}
-        uses: actions/setup-python@v4
+      - uses: actions/setup-python@v4
         with:
           python-version: ${{ env.PYTHON_VER }}
           cache: 'pip'
-          cache-dependency-path: '**/requirements.txt'
-      - name: Install Python dependencies
-        run: |
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          if [ -f .ci/requirements.txt ]; then pip install -r .ci/requirements.txt; fi
-      - name: Setup Julia ${{ env.JULIA_VER }}
-        uses: julia-actions/setup-julia@v1
-        with:
-          version: ${{ env.JULIA_VER }}
-      - name: Cache Julia deps
-        uses: actions/cache@v3
-        with:
-          path: ~/.julia
-          key: ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-${{ hashFiles('**/Manifest.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-
-      - name: Install Julia deps
-        run: |
-          julia --color=yes --project=@. -e 'import Pkg; Pkg.instantiate(); Pkg.build("IJulia")'
+          cache-dependency-path: '.ci/requirements.txt'
+      - name: Install dependencies
+        run: pip install -r .ci/requirements.txt
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v2
-      - name: Run Notebooks
-        run: |
-          parallel -j2 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --execute --inplace {} ::: docs/*.ipynb
+      - run: mkdir -p out
+      - name: Download notebooks
+        uses: actions/download-artifact@v3
+        with:
+          path: out/
+      - name: Move notebooks
+        run: find out/ -type f -iname '*.ipynb' -exec mv -t docs/ {} +
       - name: Build website
-        run: jupyter-book build docs --warningiserror --keep-going -v
+        run: jb build docs/ -v
       - name: Upload page artifact
         uses: actions/upload-pages-artifact@v1
         with:
           path: docs/_build/html
 
-  # Deployment job
+  docker-push:
+    needs: [execute, docker]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/setup-buildx-action@v2
+      - uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest,priority=600, enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
+            type=sha,enable=true,priority=100,prefix=,suffix=,format=long
+          flavor: |
+            latest=false
+      - name: Push Docker Image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: .ci/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+  # Deployment to GitHub pages
   deploy:
     needs: jupyter-book
     if: github.ref == 'refs/heads/main'

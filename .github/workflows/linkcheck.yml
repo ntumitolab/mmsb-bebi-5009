@@ -5,14 +5,18 @@ on:
   schedule:
     - cron: '0 0 1 * *' # Every month
 
+env:
+  PYTHON_VER: '3.10'
+
 jobs:
   linkcheck:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - name: Setup Python ${{ env.PYTHON_VER }}
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: ${{ env.PYTHON_VER }}
           cache: 'pip'
           cache-dependency-path: '.ci/requirements.txt'
       - name: Install dependencies
