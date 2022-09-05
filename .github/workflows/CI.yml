@@ -37,7 +37,6 @@ jobs:
       fail-fast: false
       matrix:
         notebook:
-          - index
           - intro-01-first-steps
           - intro-02-plotting
           - intro-03-diffeq
