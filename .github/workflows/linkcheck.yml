@@ -18,6 +18,6 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VER }}
       - name: Install dependencies
-        run: pip install -r .ci/requirements.txt
+        run: pip install jupyter-book
       - name: Check Links
         run: jupyter-book build docs/ --builder linkcheck
