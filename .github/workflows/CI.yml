@@ -28,9 +28,15 @@ jobs:
           context: .
           file: .ci/Dockerfile
           tags: ${{ env.IMAGE_NAME }}:test
-          outputs: type=cacheonly
+          outputs: type=docker,dest=/tmp/myimage.tar
           cache-from: type=gha
           cache-to: type=gha,mode=max
+      - name: Cache Image
+        uses: actions/cache@v3
+        with:
+          path: /tmp/myimage.tar
+          key: ${{ runner.os }}-docker-${{ github.sha }}
+
   execute:
     needs: docker
     strategy:
@@ -50,15 +56,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: docker/setup-buildx-action@v2
-      - name: Load Docker Image
-        uses: docker/build-push-action@v3
+      - name: Cache Image
+        uses: actions/cache@v3
         with:
-          context: .
-          file: .ci/Dockerfile
-          load: true
-          tags: ${{ env.IMAGE_NAME }}:test
-          cache-from: type=gha
+          path: /tmp/myimage.tar
+          key: ${{ runner.os }}-docker-${{ github.sha }}
+      - name: Load Docker Image
+        run: |
+          docker load --input /tmp/myimage.tar
+          docker image ls -a
       - name: Build a Notebook
         run: >
           docker run -v ${{ github.workspace }}:/work
