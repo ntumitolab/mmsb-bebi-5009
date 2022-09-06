@@ -25,4 +25,4 @@ COPY Project.toml Manifest.toml ./
 RUN julia --threads=auto --color=yes --project="" -e 'import Pkg; Pkg.add("IJulia"); Pkg.build("IJulia")' \
 &&  julia --threads=auto --color=yes --project=@. -e 'import Pkg; Pkg.instantiate()'
 
-CMD ["jupyter-book"]
+CMD ["julia"]
