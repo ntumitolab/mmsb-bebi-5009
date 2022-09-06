@@ -11,7 +11,7 @@
 📗 Textbook: Mathematical Modeling in Systems Biology(2013), by Brian P. Ingalls ([pdf](https://www.math.uwaterloo.ca/~bingalls/MMSB/MMSB_w_solutions.pdf), [MATLAB code](https://www.math.uwaterloo.ca/~bingalls/MMSB/MMSB_code.xhtml))
 
 📚 Additional materials
-- An Introduction to Stochastic Processes with Applications to Biology <https://sistemas.fciencias.unam.mx/~silo/Cursos/coronavirus/Allen.pdf>
+- An Introduction to Stochastic Processes with Applications to Biology (Google the pdf file)
 
 ## Course content
 
