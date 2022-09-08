@@ -35,7 +35,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: /tmp/myimage.tar
-          key: ${{ runner.os }}-docker-${{ github.sha }}
+          key: ${{ runner.os }}-docker-${{ hashFiles('**/requirements.txt', '**/Dockerfile', '**/Manifest.toml', '**/Project.toml') }}
 
   execute:
     needs: docker
@@ -60,11 +60,10 @@ jobs:
         uses: actions/cache@v3
         with:
           path: /tmp/myimage.tar
-          key: ${{ runner.os }}-docker-${{ github.sha }}
+          key: ${{ runner.os }}-docker-${{ hashFiles('**/requirements.txt', '**/Dockerfile', '**/Manifest.toml', '**/Project.toml') }}
       - name: Load Docker Image
         run: |
           docker load --input /tmp/myimage.tar
-          docker image ls -a
       - name: Build a Notebook
         run: >
           docker run -v ${{ github.workspace }}:/work
@@ -100,7 +99,7 @@ jobs:
       - name: Move notebooks
         run: find out/ -type f -iname '*.ipynb' -exec mv -t docs/ {} +
       - name: Build website
-        run: jb build docs/ -v
+        run: jupyter-book build docs/ -v
       - name: Upload page artifact
         uses: actions/upload-pages-artifact@v1
         with:
@@ -137,7 +136,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-to: type=gha
   # Deployment to GitHub pages
   deploy:
     needs: jupyter-book
