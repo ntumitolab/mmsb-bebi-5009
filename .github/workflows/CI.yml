@@ -21,7 +21,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: docker/setup-buildx-action@v2
+      - name: Cache Image
+        id: cache-image
+        uses: actions/cache@v3
+        with:
+          path: /tmp/myimage.tar
+          key: ${{ runner.os }}-docker-${{ hashFiles('**/requirements.txt', '**/Dockerfile', '**/Manifest.toml', '**/Project.toml') }}
+      - name: Load Docker Image
+        if: steps.cache-image.outputs.cache-hit
+        run: |
+          docker load --input /tmp/myimage.tar
       - name: Build Docker Image
         uses: docker/build-push-action@v3
         with:
@@ -29,13 +38,7 @@ jobs:
           file: .ci/Dockerfile
           tags: ${{ env.IMAGE_NAME }}:test
           outputs: type=docker,dest=/tmp/myimage.tar
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-      - name: Cache Image
-        uses: actions/cache@v3
-        with:
-          path: /tmp/myimage.tar
-          key: ${{ runner.os }}-docker-${{ hashFiles('**/requirements.txt', '**/Dockerfile', '**/Manifest.toml', '**/Project.toml') }}
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
   execute:
     needs: docker
@@ -88,18 +91,18 @@ jobs:
           python-version: ${{ env.PYTHON_VER }}
       - name: Install dependencies
         run: pip install jupyter-book
-      - name: Setup Pages
-        id: pages
-        uses: actions/configure-pages@v2
       - run: mkdir -p out
       - name: Download notebooks
         uses: actions/download-artifact@v3
         with:
           path: out/
-      - name: Move notebooks
+      - name: Move executed notebooks
         run: find out/ -type f -iname '*.ipynb' -exec mv -t docs/ {} +
       - name: Build website
         run: jupyter-book build docs/ -v
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v2
       - name: Upload page artifact
         uses: actions/upload-pages-artifact@v1
         with:
@@ -111,7 +114,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: docker/setup-buildx-action@v2
+      - name: Cache Image
+        uses: actions/cache@v3
+        with:
+          path: /tmp/myimage.tar
+          key: ${{ runner.os }}-docker-${{ hashFiles('**/requirements.txt', '**/Dockerfile', '**/Manifest.toml', '**/Project.toml') }}
+      - name: Load Docker Image
+        run: |
+          docker load --input /tmp/myimage.tar
       - uses: docker/login-action@v2
         with:
           registry: ${{ env.REGISTRY }}
@@ -135,8 +145,7 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha
+          cache-to: type=inline
   # Deployment to GitHub pages
   deploy:
     needs: jupyter-book
