@@ -13,7 +13,6 @@ concurrency:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  JULIA_NUM_THREADS: 2
   PYTHON_VER: '3.10'
 
 jobs:
@@ -34,9 +33,13 @@ jobs:
 
   execute:
     needs: docker
+    env:
+      JULIA_NUM_THREADS: 2
+      JUPYTER_TIMEOUT: 600
     strategy:
       fail-fast: false
       matrix:
+        # Notebooks need to be executed
         notebook:
           - intro-01-first-steps
           - intro-02-plotting
@@ -60,12 +63,13 @@ jobs:
           tags: ${{ env.IMAGE_NAME }}:test
           load: true
           cache-from: type=gha
-      - name: Build a Notebook
+      - name: Execute a Notebook
         run: >
-          docker run -v ${{ github.workspace }}:/work
+          docker run
+          -v ${{ github.workspace }}:/work
           -e JULIA_NUM_THREADS=${{ env.JULIA_NUM_THREADS }}
           ${{ env.IMAGE_NAME }}:test
-          jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --execute --inplace
+          jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=${{ env.JUPYTER_TIMEOUT }} --execute --inplace
           /work/docs/${{ matrix.notebook }}.ipynb
       - name: Upload a Notebook
         uses: actions/upload-artifact@v3
@@ -76,17 +80,20 @@ jobs:
   jupyter-book:
     needs: execute
     runs-on: ubuntu-latest
+    # store success output flag for ci job
+    outputs:
+      success: ${{ steps.setoutput.outputs.success }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - name: Setup Python ${{ env.PYTHON_VER }}
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ env.PYTHON_VER }}
+          cache: 'pip'
+          cache-dependency-path: '.ci/requirements.txt'
       - name: Install dependencies
-        run: pip install jupyter-book
-      - name: Setup Pages
-        id: pages
-        uses: actions/configure-pages@v2
+        run: pip install -r .ci/requirements.txt
       - run: mkdir -p out
       - name: Download notebooks
         uses: actions/download-artifact@v3
@@ -96,10 +103,38 @@ jobs:
         run: find out/ -type f -iname '*.ipynb' -exec mv -t docs/ {} +
       - name: Build website
         run: jupyter-book build docs/ -v
+      - name: Set output flag
+        id: setoutput
+        run: echo "::set-output name=success::true"
+      - name: Setup Pages
+        if: github.ref == 'refs/heads/main'
+        id: pages
+        uses: actions/configure-pages@v2
       - name: Upload page artifact
+        if: github.ref == 'refs/heads/main'
         uses: actions/upload-pages-artifact@v1
         with:
           path: docs/_build/html
+
+  # This job is for GitHub status check
+  # https://brunoscheufler.com/blog/2022-04-09-the-required-github-status-check-that-wasnt
+  ci:
+    needs: [execute, jupyter-book]
+    runs-on: ubuntu-latest
+    if: always() # always run, so we never skip the check
+    steps:
+      # pass step only when output of previous jupyter-book job is set
+      # in case at least one of the execution fails, jupyter-book is skipped
+      # and the output will not be set, which will then cause the ci job to fail
+      - run: |
+          passed="${{ needs.jupyter-book.outputs.success }}"
+          if [[ $passed == "true" ]]; then
+            echo "Tests passed"
+            exit 0
+          else
+            echo "Tests failed"
+            exit 1
+          fi
 
   docker-push:
     needs: [execute, docker]
