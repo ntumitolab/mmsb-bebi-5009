@@ -13,7 +13,6 @@ concurrency:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  PYTHON_VER: '3.10'
 
 jobs:
   docker:
@@ -34,8 +33,7 @@ jobs:
   execute:
     needs: docker
     env:
-      JULIA_NUM_THREADS: 2
-      JUPYTER_TIMEOUT: 600
+      TIMEOUT: 600
     strategy:
       fail-fast: false
       matrix:
@@ -50,7 +48,6 @@ jobs:
           - mmsb-ch03
           - mmsb-ch04
           - hw-01
-
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -63,13 +60,13 @@ jobs:
           tags: ${{ env.IMAGE_NAME }}:test
           load: true
           cache-from: type=gha
-      - name: Execute a Notebook
+      - name: Execute Notebook
         run: >
           docker run
           -v ${{ github.workspace }}:/work
-          -e JULIA_NUM_THREADS=${{ env.JULIA_NUM_THREADS }}
+          -e JULIA_NUM_THREADS=auto
           ${{ env.IMAGE_NAME }}:test
-          jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=${{ env.JUPYTER_TIMEOUT }} --execute --inplace
+          jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=${{ env.TIMEOUT }} --execute --inplace
           /work/docs/${{ matrix.notebook }}.ipynb
       - name: Upload a Notebook
         uses: actions/upload-artifact@v3
@@ -80,21 +77,14 @@ jobs:
   jupyter-book:
     needs: execute
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/sosiristseng/docker-jupyterbook:0.13.1
     # store success output flag for ci job
     outputs:
       success: ${{ steps.setoutput.outputs.success }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Setup Python ${{ env.PYTHON_VER }}
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ env.PYTHON_VER }}
-          cache: 'pip'
-          cache-dependency-path: '.ci/requirements.txt'
-      - name: Install dependencies
-        run: pip install -r .ci/requirements.txt
-      - run: mkdir -p out
       - name: Download notebooks
         uses: actions/download-artifact@v3
         with:
@@ -102,14 +92,10 @@ jobs:
       - name: Move notebooks
         run: find out/ -type f -iname '*.ipynb' -exec mv -t docs/ {} +
       - name: Build website
-        run: jupyter-book build docs/ -v
+        run: jupyter-book build docs/ -W -v
       - name: Set output flag
         id: setoutput
         run: echo "::set-output name=success::true"
-      - name: Setup Pages
-        if: github.ref == 'refs/heads/main'
-        id: pages
-        uses: actions/configure-pages@v2
       - name: Upload page artifact
         if: github.ref == 'refs/heads/main'
         uses: actions/upload-pages-artifact@v1
