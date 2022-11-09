@@ -5,19 +5,18 @@ on:
   schedule:
     - cron: '0 0 * * 1' # Every week
 
-env:
-  JULIA_VER: '1.8.1'
-  JULIA_PKG_PRECOMPILE_AUTO: '0'
-
 jobs:
   update-notebook:
     runs-on: ubuntu-latest
+    container:
+      image: julia:1.8.2
     steps:
-      - uses: actions/checkout@v3
-      - uses: julia-actions/setup-julia@v1
-        with:
-          version: ${{ env.JULIA_VER }}
+      - run: apt-get update && apt-get install -y git
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Update Julia dependencies
+        env:
+          JULIA_PKG_PRECOMPILE_AUTO: '0'
         run: julia --color=yes --project=@. --threads=auto -e 'import Pkg; Pkg.update()'
       - name: Create Pull Request
         id: cpr

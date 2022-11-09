@@ -9,7 +9,7 @@ jobs:
   linkcheck:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/sosiristseng/docker-jupyterbook:0.13.1
+      image: ghcr.io/sosiristseng/docker-jupyterbook:0.13.1.2
     steps:
       - uses: actions/checkout@v3
       - run: jupyter-book build docs/ --builder linkcheck
