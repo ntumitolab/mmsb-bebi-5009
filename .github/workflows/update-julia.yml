@@ -9,7 +9,7 @@ jobs:
   update-notebook:
     runs-on: ubuntu-latest
     container:
-      image: julia:1.8.2
+      image: julia:1.8.3
     steps:
       - run: apt-get update && apt-get install -y git
       - name: Checkout

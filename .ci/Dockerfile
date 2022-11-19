@@ -3,7 +3,7 @@ FROM python:3.11.0-slim
 # Julia
 ENV JULIA_PATH /usr/local/julia/
 ENV PATH $JULIA_PATH/bin:$PATH
-COPY --from=julia:1.8.2 ${JULIA_PATH} /usr/local/
+COPY --from=julia:1.8.3 ${JULIA_PATH} /usr/local/
 
 # Python dependencies
 COPY .ci/requirements.txt .
