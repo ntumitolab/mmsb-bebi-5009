@@ -4,6 +4,9 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '0 0 * * 1' # Every week
+  push:
+    paths:
+      - '.github/workflows/**'
 
 jobs:
   update-notebook:
