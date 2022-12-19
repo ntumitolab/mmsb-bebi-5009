@@ -1,1 +1,1 @@
-nbconvert==7.2.6
+nbconvert==7.2.7
