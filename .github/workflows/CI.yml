@@ -100,13 +100,11 @@ jobs:
       - name: Set output flag
         id: setoutput
         run: echo "success=true" >> $GITHUB_OUTPUT
-      - name: Deploy
+      - name: Upload pages artifact
         if: github.ref == 'refs/heads/main'
-        uses: peaceiris/actions-gh-pages@v3
+        uses: actions/upload-pages-artifact@v1
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: docs/_build/html
-          force_orphan: true
+          path: docs/_build/html
 
   # This job is for GitHub status check
   # https://brunoscheufler.com/blog/2022-04-09-the-required-github-status-check-that-wasnt
@@ -127,3 +125,20 @@ jobs:
             echo "Tests failed"
             exit 1
           fi
+
+# Deployment to GH pages
+  deploy:
+    needs: jupyter-book
+    if: github.ref == 'refs/heads/main'
+    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
+    permissions:
+      pages: write # to deploy to Pages
+      id-token: write # to verify the deployment originates from an appropriate source
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v1
