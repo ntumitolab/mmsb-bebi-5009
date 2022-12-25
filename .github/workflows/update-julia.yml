@@ -10,15 +10,16 @@ on:
     paths:
       - '.github/workflows/**'
 
+env:
+  JULIA_PKG_PRECOMPILE_AUTO: '0'
+
 jobs:
   update-notebook:
     runs-on: ubuntu-latest
     container:
       image: julia:1.8.3
-      env:
-        JULIA_PKG_PRECOMPILE_AUTO: '0'
     steps:
-      - run: apt-get update && apt-get install -y git
+      - run: apt-get update && apt-get install -y --no-install-recommends git
       - name: Checkout
         uses: actions/checkout@v3
       - name: Update Julia dependencies

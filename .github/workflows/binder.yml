@@ -26,7 +26,7 @@ jobs:
     - run: rm -rf .binder/ || true
     - uses: actions/setup-python@v4
       with:
-        python-version: '3.11'
+        python-version: '3.x'
     - run: pip install --no-cache-dir jupyter-repo2docker
     - name: Build Binder image
       run: >

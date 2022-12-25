@@ -13,27 +13,29 @@ concurrency:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  TIMEOUT: 600
 
 jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
       - uses: docker/setup-buildx-action@v2
       - name: Build and cache Docker Image
         uses: docker/build-push-action@v3
         with:
-          context: .
           file: .ci/Dockerfile
           tags: ${{ env.IMAGE_NAME }}:test
-          outputs: type=cacheonly
+          outputs: type=docker,dest=/tmp/myimage.tar
           cache-from: type=gha
           cache-to: type=gha,mode=max
+      - name: Cache Docker image
+        uses: actions/cache@v3
+        with:
+          path: /tmp/myimage.tar
+          key: ${{ runner.os }}-${{ github.sha }}
 
   execute:
     needs: docker
-    env:
-      TIMEOUT: 600
     strategy:
       fail-fast: false
       matrix:
@@ -51,15 +53,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: docker/setup-buildx-action@v2
-      - name: Load Docker Image
-        uses: docker/build-push-action@v3
+      - name: Restore Docker image
+        uses: actions/cache@v3
         with:
-          context: .
-          file: .ci/Dockerfile
-          tags: ${{ env.IMAGE_NAME }}:test
-          load: true
-          cache-from: type=gha
+          path: /tmp/myimage.tar
+          key: ${{ runner.os }}-${{ github.sha }}
+      - name: Load Docker Image
+        run: docker load --input /tmp/myimage.tar
       - name: Execute Notebook
         run: >
           docker run
@@ -85,10 +85,8 @@ jobs:
         uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
-          cache: 'pip'
-          cache-dependency-path: '.github/requirements.txt'
-      - run: pip install -r .github/requirements.txt
+          python-version: '3.x'
+      - run: pip install jupyter-book
       - name: Download notebooks
         uses: actions/download-artifact@v3
         with:
