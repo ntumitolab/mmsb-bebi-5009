@@ -8,12 +8,9 @@ on:
 jobs:
   linkcheck:
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/sosiristseng/docker-jupyterbook:latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'
-      - name: Install dependencies
-        run: pip install jupyter-book
       - name: Check Links
         run: jupyter-book build docs/ --builder linkcheck

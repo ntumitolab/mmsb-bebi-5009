@@ -77,16 +77,14 @@ jobs:
   jupyter-book:
     needs: execute
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/sosiristseng/docker-jupyterbook:latest
     # store success output flag for ci job
     outputs:
       success: ${{ steps.setoutput.outputs.success }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'
-      - run: pip install jupyter-book
       - name: Download notebooks
         uses: actions/download-artifact@v3
         with:
