@@ -14,7 +14,7 @@ jobs:
   update-notebook:
     runs-on: ubuntu-latest
     container:
-      image: julia:1.8.4
+      image: julia:1.8.5
       env:
         JULIA_PKG_PRECOMPILE_AUTO: '0'
     steps:
