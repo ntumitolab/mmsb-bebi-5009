@@ -6,9 +6,9 @@ on:
       - main
     paths:
       - '.github/workflows/**'
-      - 'src/**'
       - Project.toml
       - Manifest.toml
+      - requirements.txt
       - runtime.txt
 
 concurrency:
