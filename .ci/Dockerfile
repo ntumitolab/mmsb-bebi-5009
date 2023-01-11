@@ -3,7 +3,7 @@ FROM python:3.11.1-slim
 # Julia
 ENV JULIA_PATH /usr/local/julia/
 ENV PATH $JULIA_PATH/bin:$PATH
-COPY --from=julia:1.8.4 ${JULIA_PATH} /usr/local/
+COPY --from=julia:1.8.5 ${JULIA_PATH} /usr/local/
 
 # Python dependencies
 # e.g. matplotlib
