@@ -11,21 +11,23 @@ on:
       - '.github/workflows/**'
 
 jobs:
-  update-notebook:
+  update-manifest:
     runs-on: ubuntu-latest
     container:
       image: julia:1.8.5
       env:
         JULIA_PKG_PRECOMPILE_AUTO: '0'
     steps:
-      - run: apt-get update && apt-get install -y --no-install-recommends git
+      - name: Install Git
+        run: apt-get update && apt-get install -y --no-install-recommends git
       - name: Checkout
         uses: actions/checkout@v3
       - name: Update Julia dependencies
         run: julia --color=yes --project=@. --threads=auto -e 'import Pkg; Pkg.update()'
       # Authenticate using a custom GitHub APP
       # https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#authenticating-with-github-app-generated-tokens
-      - uses: tibdex/github-app-token@v1
+      - name: Generate token
+        uses: tibdex/github-app-token@v1
         id: generate-token
         with:
           app_id: ${{ secrets.APP_ID }}
