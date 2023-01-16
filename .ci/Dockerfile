@@ -1,15 +1,16 @@
 FROM python:3.11.1-slim
 
 # Julia
+ENV JULIA_NUM_THREADS "auto"
 ENV JULIA_PATH /usr/local/julia/
 ENV PATH $JULIA_PATH/bin:$PATH
-COPY --from=julia:1.8.5 ${JULIA_PATH} /usr/local/
+COPY --from=julia:1.8.5 ${JULIA_PATH} ${JULIA_PATH}
 
 # Python dependencies
 # e.g. matplotlib
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt && \
-    pip install --no-cache-dir nbconvert
+    pip install --no-cache-dir -U nbconvert
 
 # Julia environment
 COPY Project.toml Manifest.toml ./
