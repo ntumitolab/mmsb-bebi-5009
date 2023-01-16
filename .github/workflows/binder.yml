@@ -4,56 +4,26 @@ on:
   push:
     branches:
       - main
-    paths:
-      - '.github/workflows/**'
-      - Project.toml
-      - Manifest.toml
-      - requirements.txt
-      - runtime.txt
-  pull_request:
-    branches:
-      - main
-    paths:
-      - '.github/workflows/**'
-      - Project.toml
-      - Manifest.toml
-      - requirements.txt
-      - runtime.txt
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  IMG_NAME: ghcr.io/${{ github.repository }}:binder
-
 jobs:
-  build:
+  binder:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - run: rm -rf .binder/ || true
-    - uses: actions/setup-python@v4
+    - name: Checkout Code
+      uses: actions/checkout@v3
+    - name: Remove binder folder if present
+      run: rm -rf .binder/ || true
+    - name: update jupyter dependencies with repo2docker
+      uses: jupyterhub/repo2docker-action@master
       with:
-        python-version: '3.10'
-    - run: pip install --no-cache-dir jupyter-repo2docker
-    - name: Build Binder image
-      run: >
-        jupyter-repo2docker
-        --no-run
-        --user-id 1000
-        --user-name jovyan
-        --target-repo-dir "/home/jovyan"
-        --cache-from ${{ env.IMG_NAME }}
-        --image-name ${{ env.IMG_NAME }}
-        .
-    - name: Login to ghcr.io
-      uses: docker/login-action@v2
-      if: github.ref == 'refs/heads/main'
-      with:
-        registry: ghcr.io
-        username: ${{ github.repository_owner }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-    - name: Push image to ghcr.io
-      if: github.ref == 'refs/heads/main'
-      run: docker push ${{ env.IMG_NAME }}
+        DOCKER_REGISTRY: ghcr.io
+        IMAGE_NAME: ${{ github.repository }}
+        DOCKER_USERNAME: ${{ github.repository_owner }}
+        DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        ADDITIONAL_TAG: binder
+        LATEST_TAG_OFF: true
+        PUBLIC_REGISTRY_CHECK: true
