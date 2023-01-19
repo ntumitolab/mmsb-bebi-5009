@@ -1,4 +1,4 @@
-name: Build Docker Image and Jupyter Notebooks
+name: Build Jupyter Notebooks
 
 on:
   push:
@@ -11,64 +11,58 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  IMAGE_NAME: ${{ github.repository }}
+  JULIA_NUM_THREADS: 2
   TIMEOUT: 600
+  PYTHON_VER: '3.11'
+  JOBS: '8'
 
 jobs:
-  docker:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: docker/setup-buildx-action@v2
-      - name: Build and cache Docker Image
-        uses: docker/build-push-action@v3
-        with:
-          file: .ci/Dockerfile
-          tags: ${{ env.IMAGE_NAME }}:test
-          outputs: type=cacheonly
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
   execute:
-    needs: docker
-    strategy:
-      fail-fast: false
-      matrix:
-        # Notebooks need to be executed
-        notebook:
-          - intro-01-first-steps
-          - intro-02-plotting
-          - intro-03-diffeq
-          - intro-04-gillespie
-          - mmsb-ch01
-          - mmsb-ch02
-          - mmsb-ch03
-          - mmsb-ch04
-          - hw-01
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v3
-      - uses: docker/setup-buildx-action@v2
-      - name: Restore Docker image
-        uses: docker/build-push-action@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup Python ${{ env.PYTHON_VER }}
+        uses: actions/setup-python@v4
+        id: python
         with:
-          context: .
-          file: .ci/Dockerfile
-          tags: ${{ env.IMAGE_NAME }}:test
-          load: true
-          cache-from: type=gha
-      - name: Execute Notebook
-        run: >
-          docker run
-          -v ${{ github.workspace }}:/work
-          -e JULIA_NUM_THREADS=auto
-          ${{ env.IMAGE_NAME }}:test
-          jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=${{ env.TIMEOUT }} --execute --inplace
-          /work/docs/${{ matrix.notebook }}.ipynb
-      - name: Upload a Notebook
+          python-version: ${{ env.PYTHON_VER }}
+      - name: Install Python dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install -U nbconvert
+      - name: Read Julia vesion
+        uses: SebRollen/toml-action@v1.0.2
+        id: read_toml
+        with:
+          file: 'Manifest.toml'
+          field: 'julia_version'
+      - name: Setup Julia ${{ steps.read_toml.outputs.value }}
+        uses: julia-actions/setup-julia@v1
+        with:
+          version: ${{ steps.read_toml.outputs.value }}
+      - name: Cache Julia deps
+        uses: actions/cache@v3
+        with:
+          path: ~/.julia
+          key: ${{ runner.os }}-julia-${{ steps.read_toml.outputs.value }}-${{ hashFiles('**/Manifest.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-julia-${{ steps.read_toml.outputs.value}}-
+      - name: Install Julia deps
+        env:
+          PYTHON: ${{ steps.python.outputs.python-path }}
+        run: |
+          julia --project="" -e 'import Pkg; Pkg.add("IJulia"); Pkg.build("IJulia")'
+          julia --project=@. -e 'import Pkg; Pkg.instantiate()'
+      - name: Build Notebooks
+        run: |
+          parallel --joblog /tmp/log -j${JOBS} jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=${{ env.TIMEOUT }} --execute --inplace {} ::: docs/*.ipynb
+          cat /tmp/log
+      - name: Upload Notebooks
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.notebook }}
-          path: docs/${{ matrix.notebook }}.ipynb
+          name: notebook
+          path: docs/*.ipynb
 
   jupyter-book:
     needs: execute
