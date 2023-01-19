@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  JULIA_NUM_THREADS: 2
+  JULIA_NUM_THREADS: "auto"
   TIMEOUT: 600
   PYTHON_VER: '3.11'
   JOBS: '8'
