@@ -6,7 +6,7 @@ root: index
 parts:
   - caption: Introduction to Julia
     chapters:
-      - file: intro-01-first-steps.ipynb
+      - file: intro-01-first-steps
       - file: intro-02-plotting
       - file: intro-03-diffeq
       - file: intro-04-gillespie
