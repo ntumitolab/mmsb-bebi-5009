@@ -17,13 +17,38 @@ jobs:
       uses: actions/checkout@v3
     - name: Remove binder folder if present
       run: rm -rf .binder/ || true
-    - name: update jupyter dependencies with repo2docker
-      uses: jupyterhub/repo2docker-action@master
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      id: python
       with:
-        DOCKER_REGISTRY: ghcr.io
-        IMAGE_NAME: ${{ github.repository }}
-        DOCKER_USERNAME: ${{ github.repository_owner }}
-        DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
-        ADDITIONAL_TAG: binder
-        LATEST_TAG_OFF: true
-        PUBLIC_REGISTRY_CHECK: true
+        python-version: '3.x'
+    - name: Install repo2docker
+      run: pip install jupyter-repo2docker
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Pull docker image
+      run: docker pull ghcr.io/${{ github.repository }}:binder || true
+    - name: Build binder image with repo2docker
+      run: >
+        jupyter-repo2docker
+        --image-name ghcr.io/${{ github.repository }}:binder
+        --cache-from ghcr.io/${{ github.repository }}:binder
+        --push
+        --no-run
+        --user-id 1000 --user-name jovyan
+        .
+    - name: Add back binder folder
+      run: |
+        mkdir -p .binder
+        echo "FROM ghcr.io/${{ github.repository }}:binder" >> .binder/Dockerfile
+    - name: Create Pull Request if binder Dockerfile changes
+      id: cpr
+      uses: peter-evans/create-pull-request@v4
+      with:
+        title: Binder Dockerfile
+        add-paths: .binder/Dockerfile
+        branch: binder-dockerfile

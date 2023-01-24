@@ -8,23 +8,36 @@ on:
     branches:
       - main
     paths:
-      - '.github/workflows/**'
+      - '**/**Dockerfile'
+
+env:
+  JULIA_PKG_PRECOMPILE_AUTO: '0'
+  JULIA_NUM_THREADS: 'auto'
 
 jobs:
   update-manifest:
     runs-on: ubuntu-latest
-    container:
-      image: julia:1.8.5
-      env:
-        JULIA_PKG_PRECOMPILE_AUTO: '0'
     steps:
-      - name: Install Git
-        run: apt-get update && apt-get install -y --no-install-recommends git
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Setup Julia Docker image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: .ci/Dockerfile
+          tags: julia:current
+          load: true
+          target: base
       - name: Update Julia dependencies
-        run: julia --color=yes --project=@. --threads=auto -e 'import Pkg; Pkg.update()'
-      # Authenticate using a custom GitHub APP
+        run: >
+          docker run --rm
+          --workdir="/work"
+          -v ${{ github.workspace }}:/work
+          -e JULIA_PKG_PRECOMPILE_AUTO
+          -e JULIA_NUM_THREADS
+          julia:current
+          julia --color=yes --project=@. -e "import Pkg; Pkg.instantiate()"
+      # Authenticate with a custom GitHub APP
       # https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#authenticating-with-github-app-generated-tokens
       - name: Generate token
         uses: tibdex/github-app-token@v1

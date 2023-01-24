@@ -1,4 +1,4 @@
-FROM python:3.11.1-slim
+FROM python:3.11.1-slim AS base
 
 # Julia
 ENV JULIA_NUM_THREADS "auto"
@@ -6,6 +6,7 @@ ENV JULIA_PATH /usr/local/julia/
 ENV PATH $JULIA_PATH/bin:$PATH
 COPY --from=julia:1.8.5 ${JULIA_PATH} ${JULIA_PATH}
 
+FROM base
 # Python dependencies
 # e.g. matplotlib
 COPY requirements.txt .
@@ -14,7 +15,7 @@ RUN pip install --no-cache-dir -r requirements.txt && \
 
 # Julia environment
 COPY Project.toml Manifest.toml ./
-# COPY src/ src # If you have this
+COPY src/ src
 RUN julia --threads=auto --color=yes --project="" -e 'import Pkg; Pkg.add("IJulia"); Pkg.build("IJulia")' && \
     julia --threads=auto --color=yes --project=@. -e 'import Pkg; Pkg.instantiate()'
 
