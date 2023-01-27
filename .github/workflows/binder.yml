@@ -30,8 +30,6 @@ jobs:
         registry: ghcr.io
         username: ${{ github.repository_owner }}
         password: ${{ secrets.GITHUB_TOKEN }}
-    - name: Pull docker image
-      run: docker pull ghcr.io/${{ github.repository }}:binder || true
     - name: Build binder image with repo2docker
       run: >
         jupyter-repo2docker

@@ -1,7 +1,7 @@
 version: 2
 updates:
   - package-ecosystem: 'docker'
-    directory: '/.ci'
+    directory: '/'
     schedule:
       interval: 'daily'
     labels:
