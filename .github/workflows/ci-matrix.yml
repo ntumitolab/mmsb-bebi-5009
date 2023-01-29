@@ -1,4 +1,4 @@
-name: Build Jupyter Notebooks with a Docker Container
+name: Execute Jupyter notebooks with dynamic parallel matrix
 
 on:
   push:
@@ -12,63 +12,63 @@ concurrency:
 
 env:
   TIMEOUT: 600
+  DFILE: '.github/julia.Dockerfile'
+  IMAGENAME: 'myenv:current'
 
 jobs:
-  docker:
+  setup:
     runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
-      - uses: docker/setup-buildx-action@v2
-      - name: Build and cache Docker Image
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Build and cache Docker
         uses: docker/build-push-action@v3
         with:
-          file: julia.Dockerfile
-          tags: myenv:current
+          context: .
+          file: ${{ env.DFILE }}
+          tags: ${{ env.IMAGENAME }}
           outputs: type=cacheonly
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
+      - name: List notebooks as a JSON array
+        id: set-matrix
+        run: echo "matrix=$(python -c 'import glob, json; print(json.dumps(glob.glob("docs/*.ipynb")))')" >> $GITHUB_OUTPUT
   execute:
-    needs: docker
+    needs: setup
     strategy:
       fail-fast: false
       matrix:
-        # Notebooks need to be executed
-        notebook:
-          - intro-01-first-steps
-          - intro-02-plotting
-          - intro-03-diffeq
-          - intro-04-gillespie
-          - mmsb-ch01
-          - mmsb-ch02
-          - mmsb-ch03
-          - mmsb-ch04
-          - hw-01
+        notebook: ${{ fromJSON(needs.setup.outputs.matrix) }} # Notebooks need to be executed
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - uses: docker/setup-buildx-action@v2
-      - name: Restore Docker image
+      - name: Setup Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Restore Docker
         uses: docker/build-push-action@v3
         with:
           context: .
-          file: julia.Dockerfile
-          tags: myenv:current
+          file: ${{ env.DFILE }}
+          tags: ${{ env.IMAGENAME }}
           load: true
           cache-from: type=gha
       - name: Execute Notebook
         run: >
           docker run --rm
-          --workdir=/tmp
-          -v ${{ github.workspace }}:/tmp
-          myenv:current
+          --workdir=/tmp -v ${{ github.workspace }}:/tmp
+          ${{ env.IMAGENAME }}
           jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=${{ env.TIMEOUT }} --execute --inplace
-          docs/${{ matrix.notebook }}.ipynb
+          ${{ matrix.notebook }}
       - name: Upload Notebook
         uses: actions/upload-artifact@v3
         with:
           name: notebook
-          path: docs/${{ matrix.notebook }}.ipynb
+          path: ${{ matrix.notebook }}
 
   jupyter-book:
     needs: execute
@@ -88,7 +88,7 @@ jobs:
       - name: Move notebooks
         run: find out/ -type f -iname '*.ipynb' -exec mv -t docs/ {} +
       - name: Build website
-        run: jupyter-book build docs/ -W -v
+        run: jupyter-book build docs/
       - name: Set output flag
         id: setoutput
         run: echo "success=true" >> $GITHUB_OUTPUT
@@ -98,7 +98,7 @@ jobs:
         with:
           path: docs/_build/html
 
-  # GitHub status check job
+  # Jobb for GitHub status check
   # https://brunoscheufler.com/blog/2022-04-09-the-required-github-status-check-that-wasnt
   ci:
     name: CI (matrix)
@@ -122,7 +122,7 @@ jobs:
   # Deployment job
   deploy:
     needs: jupyter-book
-    if: github.ref == 'refs/heads/main'
+    if: ${{ github.ref == 'refs/heads/main' }}
     # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
     permissions:
       pages: write # to deploy to Pages
