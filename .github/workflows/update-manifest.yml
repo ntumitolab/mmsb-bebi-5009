@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  DFILE: '.github/julia.Dockerfile'
+  DFILE: '.github/update.Dockerfile'
   IMAGENAME: 'myenv:current'
 
 jobs:
@@ -31,7 +31,6 @@ jobs:
           file: ${{ env.DFILE }}
           tags: ${{ env.IMAGENAME }}
           load: true
-          target: julia
       - name: Update Julia dependencies
         run: >
           docker run --rm
