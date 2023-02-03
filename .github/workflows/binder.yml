@@ -9,6 +9,14 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  packages: write
+  contents: write
+  pull-requests: write
+
+env:
+  IMAGE_NAME: ghcr.io/${{ github.repository }}:binder
+
 jobs:
   binder:
     runs-on: ubuntu-latest
@@ -33,17 +41,15 @@ jobs:
     - name: Build binder image with repo2docker
       run: >
         jupyter-repo2docker
-        --image-name ghcr.io/${{ github.repository }}:binder
-        --cache-from ghcr.io/${{ github.repository }}:binder
-        --push
-        --no-run
-        --user-id 1000 --user-name jovyan
+        --image-name ${{ env.IMAGE_NAME }}
+        --cache-from ${{ env.IMAGE_NAME }}
+        --push --no-run --user-id 1000 --user-name jovyan
         .
-    - name: Add back binder folder
+    - name: Add back binder folder and Dockerfile
       run: |
         mkdir -p .binder
-        echo "FROM ghcr.io/${{ github.repository }}:binder" >> .binder/Dockerfile
-    - name: Create Pull Request if binder Dockerfile changes
+        echo "FROM ${{ env.IMAGE_NAME }}" >> .binder/Dockerfile
+    - name: Create Pull Request if binder Dockerfile has changed
       id: cpr
       uses: peter-evans/create-pull-request@v4
       with:
