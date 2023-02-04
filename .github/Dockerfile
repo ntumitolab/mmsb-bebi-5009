@@ -1,4 +1,4 @@
-FROM python:3.11.1-slim
+FROM python:3.11.1-slim as base
 
 WORKDIR /work
 
@@ -9,6 +9,8 @@ ENV JULIA_PATH /usr/local/julia/
 ENV JULIA_DEPOT_PATH /srv/juliapkg/
 ENV PATH ${JULIA_PATH}/bin:${PATH}
 COPY --from=julia:1.8.5 ${JULIA_PATH} ${JULIA_PATH}
+
+FROM base
 
 # Python dependencies. e.g. matplotlib
 COPY requirements.txt ./

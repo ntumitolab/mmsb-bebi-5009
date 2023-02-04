@@ -17,12 +17,11 @@ concurrency:
 
 permissions:
   contents: write
-  packages: write
   pull-requests: write
 
 env:
-  DFILE: '.github/update.Dockerfile'
-  IMAGENAME: 'myimg:test'
+  DFILE: '.github/Dockerfile'
+  IMAGENAME: 'app:test'
 
 jobs:
   update-manifest:
@@ -37,10 +36,12 @@ jobs:
           file: ${{ env.DFILE }}
           tags: ${{ env.IMAGENAME }}
           load: true
+          target: base
       - name: Update Julia dependencies
         run: >
           docker run --rm
           --workdir=/tmp -v ${{ github.workspace }}:/tmp
+          -e JULIA_PKG_PRECOMPILE_AUTO=0
           ${{ env.IMAGENAME }}
           julia --color=yes --threads=auto --project=@. -e "import Pkg; Pkg.update()"
       # Authenticate with a custom GitHub APP
