@@ -94,7 +94,7 @@ jobs:
           myimage:test
           jupyter nbconvert --to notebook --execute --inplace
           --ExecutePreprocessor.timeout=${{ env.TIMEOUT }}
-          --ExecutePreprocessor.kernel_name=julia
+          --ExecutePreprocessor.kernel_name=julia-$(julia -e 'print(VERSION.major,".",VERSION.minor)')
           ${{ matrix.notebook }}
       - name: Upload Notebook
         uses: actions/upload-artifact@v3
