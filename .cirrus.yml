@@ -1,0 +1,29 @@
+jupyter_book_task:
+  execution_lock: $CIRRUS_BRANCH
+  env:
+    JOBS: 8
+    TIMEOUT: 600
+    GH_TOKEN: ENCRYPTED[!ac1e4efe841c89f98fdf2aaaa852c7d4d3341f07b8d61d6e3fc5b9ebb12c3560ecc6f298bbd4f04c901e958aa14d5779!]
+  auto_cancellation: true
+  container:
+    dockerfile: cirrus.Dockerfile
+    cpu: 4
+    memory: 16G
+    greedy: true
+  notebook_script: >
+    parallel --joblog /tmp/log -j${JOBS}
+    jupyter nbconvert --to notebook
+    --ExecutePreprocessor.timeout=${TIMEOUT}
+    --ExecutePreprocessor.kernel_name="julia-$(julia -e 'print(VERSION.major, ".", VERSION.minor)')"
+    --execute --inplace
+    {} ::: docs/*.ipynb
+  execution_results_script: |
+    cat /tmp/log
+  build_script: |
+    jupyter-book build docs/ --keep-going
+  ## Requires a repo scope access GitHub PAT encrypted to `GH_TOKEN` to push to its GitHub repo
+  pages_script: |
+    if [[ $CIRRUS_BRANCH == $CIRRUS_DEFAULT_BRANCH ]]; then
+      git remote set-url origin https://${GH_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git
+      ghp-import -n -p -f docs/_build/html
+    fi
