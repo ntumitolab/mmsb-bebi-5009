@@ -4,7 +4,11 @@
 title: BEBI-5009
 author: Wen-Wei Tseng
 copyright: "2022" # Copyright year to be placed in the footer
-logo: ""
+logo: "" # A path to the book logo
+# Patterns to skip when building the book. Can be glob-style (e.g. "*skip.ipynb")
+exclude_patterns            : [_build, Thumbs.db, .DS_Store, "**.ipynb_checkpoints"]
+# Auto-exclude files not in the toc
+only_build_toc_files        : false
 
 # See https://jupyterbook.org/content/execute.html
 execute:
@@ -33,6 +37,8 @@ parse:
     # - smartquotes
     - substitution
   myst_url_schemes: [mailto, http, https] # URI schemes that will be recognised as external URLs in Markdown links
+  myst_dmath_double_inline: true  # Allow display math ($$) within an inline context
+
 
 # Define the name of the latex output file for PDF builds
 latex:
@@ -73,10 +79,17 @@ html:
   google_analytics_id: "" # A GA id that can be used to track book views.
   home_page_in_navbar: true # Whether to include your home page in the left Navigation Bar
   baseurl: "" # The base URL where your book will be hosted. Used for creating image previews and social links. e.g.: https://mypage.com/mybook/
+  analytics:
   comments:
     hypothesis: false
     utterances: false
+  announcement              : "" # A banner announcement at the top of the site.
 
+
+#######################################################################################
+# Advanced and power-user settings
 sphinx:
-  extra_extensions:
-    - sphinx_jupyterbook_latex
+  extra_extensions          :   # A list of extra extensions to load by Sphinx (added to those already used by JB).
+  local_extensions          :   # A list of local extensions to load by sphinx specified by "name: path" items
+  recursive_update          : false # A boolean indicating whether to overwrite the Sphinx config (true) or recursively update (false)
+  config                    :   # key-value pairs to directly over-ride the Sphinx configuration
