@@ -14,7 +14,7 @@ WORKDIR /work
 
 # Python dependencies. e.g. matplotlib
 COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt && pip install --no-cache-dir nbconvert
+RUN pip install --no-cache-dir -U pip && pip install --no-cache-dir -r requirements.txt
 
 # Julia environment
 COPY Project.toml Manifest.toml ./
