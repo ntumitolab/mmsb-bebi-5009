@@ -1,4 +1,4 @@
-name: Execute Jupyter notebooks with dynamic parallel matrix
+name: Build Jupyter Notebooks
 
 on:
   push:
@@ -11,79 +11,78 @@ concurrency:
   cancel-in-progress: true
 
 env:
+  JULIA_NUM_THREADS: 'auto'
   TIMEOUT: 600
-  DFILE: '.github/Dockerfile'
-  IMAGE_NAME: app:test
+  JOBS: '8'
+  PYTHON_VER: '3.11'
 
 jobs:
-  setup:
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Build and cache Docker container
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: ${{ env.DFILE }}
-          tags: ${{ env.IMAGE_NAME }}
-          outputs: type=cacheonly
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-      - name: List notebooks as a JSON array
-        id: set-matrix
-        run: echo "matrix=$(python -c 'import glob, json; print(json.dumps(glob.glob("docs/*.ipynb")))')" >> $GITHUB_OUTPUT
   execute:
-    needs: setup
-    strategy:
-      max-parallel: 20
-      fail-fast: false
-      matrix:
-        notebook: ${{ fromJSON(needs.setup.outputs.matrix) }} # Notebooks need to be executed
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Restore Docker container
-        uses: docker/build-push-action@v4
+      - name: Setup Python ${{ env.PYTHON_VER }}
+        uses: actions/setup-python@v4
+        id: python
         with:
-          context: .
-          file: ${{ env.DFILE }}
-          load: true
-          tags: ${{ env.IMAGE_NAME }}
-          cache-from: type=gha
-      - name: Execute Notebook
+          python-version: ${{ env.PYTHON_VER }}
+          cache: 'pip'
+      - name: Install Python dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install -U nbconvert
+      - name: Read Julia version
+        uses: SebRollen/toml-action@v1.0.2
+        id: read_toml
+        with:
+          file: 'Manifest.toml'
+          field: 'julia_version'
+      - name: Write Julia version to env
+        run: echo "jlver=${{ steps.read_toml.outputs.value }}" >> $GITHUB_ENV
+      - name: Setup Julia ${{ env.jlver }}
+        uses: julia-actions/setup-julia@v1
+        with:
+          version: ${{ env.jlver }}
+      - name: Install Julia dependencies
+        env:
+          PYTHON: ${{ steps.python.outputs.python-path }}
+        run: |
+          julia --color=yes --project="" -e 'import Pkg; Pkg.add("IJulia"); using IJulia; installkernel("Julia", "--project=@.")'
+          julia --color=yes --project=@. -e 'import Pkg; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()'
+      - name: Build notebooks
         run: >
-          docker run --rm
-          --workdir=/tmp -v ${{ github.workspace }}:/tmp
-          ${{ env.IMAGE_NAME }}
-          jupyter nbconvert --to notebook --execute --inplace
+          parallel --joblog /tmp/log -j${JOBS}
+          jupyter nbconvert --to notebook
           --ExecutePreprocessor.timeout=${{ env.TIMEOUT }}
-          --ExecutePreprocessor.kernel_name=julia-$(julia -e 'print(VERSION.major,".",VERSION.minor)')
-          ${{ matrix.notebook }}
+          --ExecutePreprocessor.kernel_name="julia-$(julia -e 'print(VERSION.major, ".", VERSION.minor)')"
+          --execute --inplace
+          {} ::: docs/*.ipynb
+      - name: Show execution results
+        run: cat /tmp/log
       - name: Upload Notebook
         uses: actions/upload-artifact@v3
         with:
           name: notebook
-          path: ${{ matrix.notebook }}
+          path: docs/**.ipynb
           retention-days: 1
 
   jupyter-book:
     needs: execute
     runs-on: ubuntu-latest
-    container: ghcr.io/sosiristseng/docker-jupyterbook:0.14.0
     # store success output flag for the ci job
     outputs:
       success: ${{ steps.setoutput.outputs.success }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        id: python
+        with:
+          python-version: ${{ env.PYTHON_VER }}
+      - name: Install Jupyter Book
+        run: pip install jupyter-book
       - name: Download notebooks
         uses: actions/download-artifact@v3
         with:
@@ -108,7 +107,7 @@ jobs:
   # GitHub status check
   # https://brunoscheufler.com/blog/2022-04-09-the-required-github-status-check-that-wasnt
   ci:
-    name: CI (matrix)
+    name: CI (parallel)
     needs: jupyter-book
     runs-on: ubuntu-latest
     if: always() # always run, so we never skip the check
