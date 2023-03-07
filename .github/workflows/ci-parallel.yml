@@ -17,7 +17,7 @@ env:
   PYTHON_VER: '3.11'
 
 jobs:
-  execute:
+  jupyter-book:
     runs-on: self-hosted
     steps:
       - name: Checkout repository
@@ -28,8 +28,7 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VER }}
       - name: Install Python dependencies
-        run: |
-          pip install -r requirements.txt
+        run: pip install -r requirements.txt
       - name: Read Julia version
         uses: SebRollen/toml-action@v1.0.2
         id: read_toml
@@ -56,41 +55,8 @@ jobs:
           --ExecutePreprocessor.kernel_name="julia-$(julia -e 'print(VERSION.major, ".", VERSION.minor)')"
           --execute --inplace
           {} ::: docs/*.ipynb
-      - name: Show execution results
+      - name: Show execution stats
         run: cat /tmp/log
-      - name: Upload Notebook
-        uses: actions/upload-artifact@v3
-        with:
-          name: notebook
-          path: docs/**.ipynb
-          retention-days: 1
-
-  jupyter-book:
-    needs: execute
-    runs-on: ubuntu-latest
-    # store success output flag for the ci job
-    outputs:
-      success: ${{ steps.setoutput.outputs.success }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        id: python
-        with:
-          python-version: ${{ env.PYTHON_VER }}
-      - name: Install Jupyter Book
-        run: pip install jupyter-book
-      - name: Download notebooks
-        uses: actions/download-artifact@v3
-        with:
-          name: notebook
-          path: out/
-      - name: Display structure of downloaded files
-        run: ls -R
-        working-directory: out
-      - name: Move notebooks
-        run: find out/ -type f -iname '*.ipynb' -exec mv -t docs/ {} +
       - name: Build website
         run: jupyter-book build docs/
       - name: Upload pages artifact
@@ -98,30 +64,6 @@ jobs:
         uses: actions/upload-pages-artifact@v1
         with:
           path: docs/_build/html
-      - name: Set output flag
-        id: setoutput
-        run: echo "success=true" >> $GITHUB_OUTPUT
-
-  # GitHub status check
-  # https://brunoscheufler.com/blog/2022-04-09-the-required-github-status-check-that-wasnt
-  ci:
-    name: CI (parallel)
-    needs: jupyter-book
-    runs-on: ubuntu-latest
-    if: always() # always run, so we never skip the check
-    steps:
-      # pass step only when output of previous jupyter-book job is set
-      # in case at least one of the execution fails, jupyter-book is skipped
-      # and the output will not be set, which will then cause the ci job to fail
-      - run: |
-          passed="${{ needs.jupyter-book.outputs.success }}"
-          if [[ $passed == "true" ]]; then
-            echo "Tests passed"
-            exit 0
-          else
-            echo "Tests failed"
-            exit 1
-          fi
 
   # Deployment job
   deploy:
