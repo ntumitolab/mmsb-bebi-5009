@@ -10,7 +10,7 @@ COPY --from=julia:1.8.5 ${JULIA_PATH} ${JULIA_PATH}
 
 FROM base
 
-WORKDIR /work
+WORKDIR /app
 
 # Python dependencies. e.g. matplotlib
 COPY requirements.txt ./
