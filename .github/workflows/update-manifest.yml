@@ -20,7 +20,7 @@ permissions:
   pull-requests: write
 
 env:
-  DFILE: '.github/update.Dockerfile'
+  DFILE: '.github/Dockerfile'
   IMAGENAME: 'app:test'
 
 jobs:
@@ -36,16 +36,17 @@ jobs:
           file: ${{ env.DFILE }}
           tags: ${{ env.IMAGENAME }}
           load: true
+          target: base
       - name: Update Julia dependencies
         run: >
           docker run --rm
           --workdir=/tmp -v ${{ github.workspace }}:/tmp
           -e JULIA_PKG_PRECOMPILE_AUTO=0
           ${{ env.IMAGENAME }}
-          julia --color=yes --threads=auto --project=@. -e "import Pkg; Pkg.update()"
+          julia --color=yes --project=@. -e "import Pkg; Pkg.update()"
       # Authenticate with a custom GitHub APP
       # https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#authenticating-with-github-app-generated-tokens
-      - name: Generate token
+      - name: Generate token for PR
         uses: tibdex/github-app-token@v1
         id: generate-token
         with:
