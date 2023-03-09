@@ -32,7 +32,7 @@ jobs:
           context: .
           file: ${{ env.DFILE }}
           tags: ${{ env.IMAGE_NAME }}
-          output: type=cacheonly
+          outputs: type=cacheonly
           cache-from: type=gha
           cache-to: type=gha,mode=max
       - name: List notebooks as a JSON array
