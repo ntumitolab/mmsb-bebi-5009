@@ -16,6 +16,7 @@ permissions:
 
 env:
   IMAGE_NAME: ghcr.io/${{ github.repository }}:binder
+  PYTHON_VER: '3.11'
 
 jobs:
   binder:
