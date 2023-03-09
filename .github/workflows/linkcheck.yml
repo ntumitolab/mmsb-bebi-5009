@@ -25,17 +25,9 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VER }}
       - name: Disable code cell execution
-        working-directory: docs/
-        shell: python {0}
-        run: |
-          import yaml
-          with open('_config.yml') as f:
-              data = yaml.safe_load(f)
-
-          data['execute']['execute_notebooks'] = 'off'
-
-          with open('_config.yml', 'w') as f:
-              yaml.dump(data, f)
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq -i '.execute.execute_notebooks = "off"' 'docs/_config.yml'
       - name: Install Python dependencies
         run: pip install -r requirements-jb.txt
       - name: Check Links
