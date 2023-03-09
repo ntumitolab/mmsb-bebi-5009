@@ -24,7 +24,6 @@ jobs:
         id: python
         with:
           python-version: ${{ env.PYTHON_VER }}
-          cache: 'pip'
       - name: Install Python dependencies
         run: pip install -r requirements-jb.txt
       - name: Check Links

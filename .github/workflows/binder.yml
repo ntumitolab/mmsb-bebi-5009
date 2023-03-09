@@ -26,11 +26,11 @@ jobs:
       uses: actions/checkout@v3
     - name: Remove binder folder if present
       run: rm -rf .binder/ || true
-    - name: Setup Python
+    - name: Setup Python ${{ env.PYTHON_VER }}
       uses: actions/setup-python@v4
       id: python
       with:
-        python-version: '3.x'
+        python-version: ${{ env.PYTHON_VER }}
     - name: Install repo2docker
       run: pip install jupyter-repo2docker
     - name: Login to GitHub Container Registry
