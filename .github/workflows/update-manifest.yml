@@ -36,6 +36,7 @@ jobs:
           file: ${{ env.DFILE }}
           tags: ${{ env.IMAGENAME }}
           load: true
+          targets: base
       - name: Update Julia dependencies
         run: >
           docker run --rm
