@@ -100,7 +100,7 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VER }}
       - name: Install Python dependencies
-        run: pip install -r requirements-jb.txt
+        run: pip install -r .github/requirements.txt
       - name: Build website
         run: jupyter-book build docs/
       - name: Upload pages artifact

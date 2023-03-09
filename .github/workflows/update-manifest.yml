@@ -8,7 +8,7 @@ on:
     branches:
       - main
     paths:
-      - '.github/Dockerfile'
+      - '.github/**Dockerfile'
       - '.github/workflows/update-manifest.yml'
 
 concurrency:
@@ -20,7 +20,7 @@ permissions:
   pull-requests: write
 
 env:
-  DFILE: '.github/Dockerfile'
+  DFILE: '.github/update.Dockerfile'
   IMAGENAME: 'app:test'
 
 jobs:
@@ -36,7 +36,6 @@ jobs:
           file: ${{ env.DFILE }}
           tags: ${{ env.IMAGENAME }}
           load: true
-          targets: base
       - name: Update Julia dependencies
         run: >
           docker run --rm

@@ -1,2 +1,1 @@
-# matplotlib==3.6.3
 jupyter-book==0.15.0

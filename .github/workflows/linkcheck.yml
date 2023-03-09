@@ -29,6 +29,6 @@ jobs:
         with:
           cmd: yq -i '.execute.execute_notebooks = "off"' 'docs/_config.yml'
       - name: Install Python dependencies
-        run: pip install -r requirements-jb.txt
+        run: pip install -r .github/requirements.txt
       - name: Check Links
         run: jupyter-book build docs/ --builder linkcheck
