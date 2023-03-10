@@ -15,6 +15,7 @@ Chapter 5 and beyond are applications in specific biological domain(s).
 - Gene regulatory networks.
 - Electrophysiology and action potentials in exitable cells.
 
+## Table of contents
 
 ```{tableofcontents}
 ```
