@@ -18,10 +18,7 @@ parts:
           - file: lecture-ch2
       - file: mmsb-README
         sections:
-          - file: mmsb-ch01
-          - file: mmsb-ch02
-          - file: mmsb-ch03
-          - file: mmsb-ch04
+          - file: mmsb-ch01-04
   - caption: Homework
     chapters:
       - file: hw-00
