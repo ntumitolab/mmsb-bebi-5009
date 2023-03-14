@@ -78,6 +78,7 @@ jobs:
   jupyter-book:
     needs: execute
     runs-on: ubuntu-latest
+    container: ghcr.io/sosiristseng/docker-jupyterbook:0.15.1
     # store success output flag for the ci job
     outputs:
       success: ${{ steps.setoutput.outputs.success }}
@@ -94,13 +95,6 @@ jobs:
         working-directory: out
       - name: Move notebooks
         run: find out/ -type f -iname '*.ipynb' -exec mv -t docs/ {} +
-      - name: Setup Python ${{ env.PYTHON_VER }}
-        uses: actions/setup-python@v4
-        id: python
-        with:
-          python-version: ${{ env.PYTHON_VER }}
-      - name: Install Python dependencies
-        run: pip install -r .github/requirements.txt
       - name: Build website
         run: jupyter-book build docs/
       - name: Upload pages artifact
