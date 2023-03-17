@@ -4,67 +4,13 @@ using Catalyst
 using Plots
 using LabelledArrays
 
-@parameters k0 k1 km1 k2
-
-function make_212(;name)
-    @parameters k0 k1 km1 k2
-    @variables t
-    @variables A(t) B(t) AB(t)
-    D = Differential(t)
-    eqs = [
-        AB ~ A + B
-        B ~ AB * k1 / (km1 + k1)
-        D(AB) ~ k0 - k2 * B
-    ]
-    sys = ODESystem(eqs; name)
-    structural_simplify(sys)
-end
-
-@named model212 = make_212()
-@unpack k0, k1, km1, k2, AB, A, B = model212
-ps1 = [k0=>0., k1=>9., km1=>12., k2=>2.]
-u0 = [AB=>0.]
-tend = 3.0
-prob = ODEProblem(model212, u0, tend, ps1)
-sol212 = solve(prob)
-
-pl212 = plot(sol211, line=(:dash, 1),label=["A (full solution)" "B (full solution)"])
-
-function make_214(;name)
-    @parameters k0 k1 km1 k2
-    @variables t
-    @variables A(t) B(t)
-    D = Differential(t)
-    eqs = [
-        A ~ (k0 + km1 * B) / k1
-        D(B) ~ k0 - k2 * B
-    ]
-    sys = ODESystem(eqs; name)
-    structural_simplify(sys)
-end
-
-rn303 = @reaction_network begin
-    @species
-    (k1, km1), S + E --> ES
-    k2, ES --> P
-end
-
-u0 = [:S=>5., :ES=>0., :E=>1., :P=>0.]
-ps = [:k1 => 30., :km1 => 1., :k2 => 10.]
-
-tend = 1.0
-
-prob = ODEProblem(rn303, u0, tend, ps)
-sol = solve(prob)
-
-plot(sol, xlabel="Time (AU)", ylabel="Concentration (AU)", legend=:right)
-
-
 rn41 = @reaction_network begin
     (hillr(B, k1, 1, n), k3), 0 <--> A
     k5, A --> B
     (k2, k4), B <--> 0
 end
+
+fieldnames(typeof(rn41))
 
 ps1 = [:k1=>20., :k2=>5., :k3=>5., :k4=>5., :k5=>2., :n=>4.]
 ps1_slv = let
