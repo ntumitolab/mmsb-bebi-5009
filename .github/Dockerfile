@@ -1,4 +1,4 @@
-FROM ghcr.io/sosiristseng/docker-jupyterbook:0.15.1 as base
+FROM python:3.11.2-slim as base
 
 # Julia
 ENV JULIA_CI true
@@ -14,12 +14,12 @@ WORKDIR /app
 
 # Python dependencies. e.g. matplotlib
 COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+RUN  pip install --no-cache-dir -U pip nbconvert && pip install --no-cache-dir -r requirements.txt
 
 # Julia environment
 COPY Project.toml Manifest.toml ./
 COPY src/ src
-RUN julia --color=yes --project="" -e 'import Pkg; Pkg.add("IJulia"); using IJulia; installkernel("Julia", "--project=@.")' && \
-    julia --color=yes --project=@. -e 'import Pkg; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()'
+RUN julia --color=yes --project=@. -e 'import Pkg; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()' && \
+    julia --color=yes --project="" -e 'import Pkg; Pkg.add("IJulia"); using IJulia; installkernel("Julia", "--project=@.")'
 
-CMD ["jupyter-book"]
+CMD ["julia"]
