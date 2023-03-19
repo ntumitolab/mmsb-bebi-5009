@@ -1,4 +1,4 @@
-FROM ghcr.io/sosiristseng/docker-jupyterbook:0.15.1 as base
+FROM python:3.11.2-slim as base
 
 # Julia
 ENV JULIA_CI true
@@ -22,4 +22,4 @@ COPY src/ src
 RUN julia --color=yes --project="" -e 'import Pkg; Pkg.add("IJulia"); using IJulia; installkernel("Julia", "--project=@.")' && \
     julia --color=yes --project=@. -e 'import Pkg; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()'
 
-CMD ["jupyter-book"]
+CMD ["julia"]
