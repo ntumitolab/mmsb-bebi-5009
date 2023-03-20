@@ -22,6 +22,7 @@ parts:
           - file: mmsb-2
           - file: mmsb-3
           - file: mmsb-4
+          - file: mmsb-5
   - caption: Homework
     chapters:
       - file: hw-00
