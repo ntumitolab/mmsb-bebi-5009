@@ -27,6 +27,8 @@ jobs:
   jupyter-book:
     runs-on: ubuntu-latest
     steps:
+      - name: Clean up workspace
+        uses: colpal/actions-clean@v1
       - name: Checkout repository
         uses: actions/checkout@v3
       - name: Setup Python ${{ env.PYTHON_VER }}
@@ -78,9 +80,6 @@ jobs:
         uses: actions/upload-pages-artifact@v1
         with:
           path: docs/_build/html
-      - name: Clean up workspace
-        uses: colpal/actions-clean@v1
-        if: ${{ always() }}
 
   # Deployment to GH pages
   deploy:
