@@ -6,6 +6,7 @@ root: index
 parts:
   - caption: Introduction to Julia
     chapters:
+      - file: intro-00-start
       - file: intro-01-first-steps
       - file: intro-02-plotting
       - file: intro-03-diffeq
