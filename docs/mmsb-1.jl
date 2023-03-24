@@ -3,7 +3,7 @@
 using DifferentialEquations
 using LabelledArrays
 using UnPack
-import DisplayAs
+import DisplayAs.PNG
 using Plots
 Plots.default(linewidth=2)
 
@@ -91,7 +91,7 @@ sol = solve(prob, tstops=[20., 60.])
 p1 = plot(sol, idxs=[:v], ylabel="Membrane potential (mV)", xlabel="", legend=false)
 p2 = plot(sol, idxs = [:m, :h, :n], xlabel="")
 p3 = plot(_istim, sol.t, xlabel="Time (ms)", ylabel="Current", labels="Stimulation current")
-plot(p1, p2, p3, layout=(3, 1), size=(600, 900), title="Figure 1.9 Hodgkin-Huxley model", leftmargin=5*Plots.mm) |> DisplayAs.PN
+plot(p1, p2, p3, layout=(3, 1), size=(600, 900), title="Figure 1.9 Hodgkin-Huxley model", leftmargin=5*Plots.mm) |> PNG
 
 # ## Runtime information
 
