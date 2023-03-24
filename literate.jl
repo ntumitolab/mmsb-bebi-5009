@@ -1,7 +1,12 @@
-# For all workers
+using Distributed
+
+# For all processes
 @everywhere begin
     import Pkg
     Pkg.activate(@__DIR__)
+end
+
+@everywhere begin
     using Literate
     config = Dict("mdstrings" => true)
 end
