@@ -18,14 +18,14 @@ permissions:
 env:
   JULIA_DEPOT_PATH: '~/.julia'
   JULIA_NUM_THREADS: 'auto'
-  JULIA_CACHE: '1'
+  JULIA_CACHE: '0'
   PYTHON_VER: '3.11'
   GKSwstype: 100
   IMAGE_NAME: ghcr.io/${{ github.repository }}:binder
 
 jobs:
   jupyter-book:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Clean up workspace
         uses: colpal/actions-clean@v1
@@ -36,9 +36,11 @@ jobs:
         id: python
         with:
           python-version: ${{ env.PYTHON_VER }}
-          cache: 'pip'
+          # cache: 'pip'
       - name: Install Python dependencies
-        run: pip install -r requirements.txt
+        run: |
+          pip install -U pip wheel setuptools
+          pip install -r requirements.txt
       - name: Read Julia version
         uses: SebRollen/toml-action@v1.0.2
         id: read_toml
@@ -62,7 +64,6 @@ jobs:
           PYTHON: ${{ steps.python.outputs.python-path }}
         run: |
           julia --color=yes --project=@. -e 'import Pkg; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()'
-          julia --color=yes --project="" -e 'import Pkg; Pkg.add("Literate")'
       - name: Build notebooks
         run: julia --color=yes --project=@. literate.jl
       - name: Deploy Notebooks
@@ -113,7 +114,9 @@ jobs:
       with:
         python-version: ${{ env.PYTHON_VER }}
     - name: Install repo2docker
-      run: python3 -m pip install https://github.com/jupyterhub/repo2docker/archive/main.zip
+      run: |
+        pip install -U pip wheel setuptools
+        pip install https://github.com/jupyterhub/repo2docker/archive/main.zip
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v2
       with:
