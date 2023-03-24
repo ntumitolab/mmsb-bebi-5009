@@ -16,16 +16,17 @@ permissions:
   pull-requests: write
 
 env:
+  PYTHON_VER: '3.11'
   JULIA_DEPOT_PATH: '~/.julia'
   JULIA_NUM_THREADS: 'auto'
-  JULIA_CACHE: '0'
-  PYTHON_VER: '3.11'
+  JULIA_CACHE: '1'
   GKSwstype: 100
+  NPROC: '2'
   IMAGE_NAME: ghcr.io/${{ github.repository }}:binder
 
 jobs:
   jupyter-book:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Clean up workspace
         uses: colpal/actions-clean@v1
@@ -65,7 +66,7 @@ jobs:
         run: |
           julia --color=yes --project=@. -e 'import Pkg; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()'
       - name: Build notebooks
-        run: julia --color=yes --project=@. literate.jl
+        run: julia --color=yes --project=@. -p ${{ env.NPROC }} literate.jl
       - name: Deploy Notebooks
         if: ${{ github.ref == 'refs/heads/main' }}
         uses: peaceiris/actions-gh-pages@v3
