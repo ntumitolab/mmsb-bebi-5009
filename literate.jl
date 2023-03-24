@@ -1,3 +1,7 @@
+using Distributed
+
+addprocs(Int(ARGS[1]))
+
 @everywhere using Literate
 @everywhere config = Dict("mdstrings" => true)
 
