@@ -1,6 +1,6 @@
 using Distributed
 
-addprocs(parse(Int64, ARGS[1]))
+addprocs(parse(Int64, ARGS[1]), exeflags="--project=$(Base.active_project())")
 
 @everywhere using Literate
 @everywhere config = Dict("mdstrings" => true)
