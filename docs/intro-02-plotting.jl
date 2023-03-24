@@ -7,6 +7,7 @@ md"""
 """
 
 using Plots
+import DisplayAs.PNG ## To save some memory for the notebooks
 
 f(x) = sin(sin(x) + 1)
 
@@ -15,52 +16,58 @@ xs = 0.0:0.1:4pi
 ys = f.(xs)
 
 # Line plots connect the data points
-plot(xs, ys)
+plot(xs, ys) |> PNG
 
 # scatter plots show the data points only
-scatter(xs, ys)
+scatter(xs, ys) |> PNG
 
 # you can trace functions directly
-plot(f, xs)
+plot(f, xs) |> PNG
 
 # Trace a function within a range
-plot(f, 0.0, 4pi)
+plot(f, 0.0, 4pi) |> PNG
 
 # Customization example
-plot(f, xs,
-     label="My line", legend=:bottom,
-     title="My Title",  line=(:red, 3),
-     xlim = (0.0, 5.0), ylim = (-1.0, 1.5),
-     xlabel="Time", ylabel="My Mood", border=:box)
+fig = plot(f, xs,
+    label="My line", legend=:bottom,
+    title="My Title",  line=(:red, 3),
+    xlim = (0.0, 5.0), ylim = (-1.0, 1.5),
+    xlabel="Time", ylabel="My Mood", border=:box)
+
+fig |> PNG
 
 # Multiple series: each row is one observation; each column is a variable.
 f2(x) = cos(cos(x) + 1)
 y2 = f2.(xs)
-plot(xs, [ys y2])
+fig = plot(xs, [ys y2])
+fig |> PNG
 
 # Plotting two functions with customizations
-plot(xs, [f, f2], label=["f1" "f2"], linecolor=[:black :green], title="Two time series")
+fig = plot(xs, [f, f2], label=["f1" "f2"], linecolor=[:black :green], title="Two time series")
+fig |> PNG
 
 # Building the plot in multiple steps in the object-oriented way
 xMin = 0.0
 xMax = 4.0π
-p1 = plot(f, xMin, xMax, label="f1", lc=:black)
-plot!(p1 , f2, xMin, xMax, label="f2", lc=:lightsalmon)
-plot!(p1, title = "My title", legend=:outertop)
+fig = plot(f, xMin, xMax, label="f1", lc=:black)
+plot!(fig , f2, xMin, xMax, label="f2", lc=:lightsalmon)
+plot!(fig, title = "My title", legend=:outertop)
+fig |> PNG
 
 # Parametric plot
 xₜ(t) = sin(t)
 yₜ(t) = sin(2t)
 
-plot(xₜ, yₜ, 0, 2π, leg=false, fill=(0,:orange))
+plot(xₜ, yₜ, 0, 2π, leg=false, fill=(0,:orange)) |> PNG
 
 # Subplots
-p1 = plot(f, xs)
-p2 = plot(f2, xs)
-plot(p1, p2)
+ax1 = plot(f, xs)
+ax2 = plot(f2, xs)
+plot(ax1, ax2) |> PNG
 
 # Subplot layout
-psub = plot(p1, p2, layout=(2, 1))
+fig = plot(p1, p2, layout=(2, 1))
+fig |> PNG
 
 md"""
 ## Vector field
@@ -96,7 +103,7 @@ r = -1.0:0.2:1.0
 xx = [x for y in r, x in r]
 yy = [y for y in r, x in r]
 
-quiver(xx, yy, quiver=∇f, aspect_ratio=:equal, line=(:black), arrow=(:closed))
+quiver(xx, yy, quiver=∇f, aspect_ratio=:equal, line=(:black), arrow=(:closed)) |> PNG
 
 #===
 ## Save figure

@@ -6,10 +6,11 @@ and friends!
 ===#
 
 using StatsBase ## Weights() and sample()
-using Random    ## randexp()
 using Plots
 using Interpolations
+import DisplayAs
 using Statistics ## mean()
+using Random    ## randexp()
 Random.seed!(2022)
 
 #=
@@ -78,17 +79,17 @@ solfirst = ssa_first(model, u0, tend, parameters, stoich)
 #---
 plot(soldirect.t, soldirect.u,
     xlabel="time", ylabel="# of molecules",
-    title = "SSA (direct method)", label=["A" "B"])
+    title = "SSA (direct method)", label=["A" "B"]) |> DisplayAs.PNG
 
 #---
 plot(solfirst.t, solfirst.u,
     xlabel="time", ylabel="# of molecules",
-    title = "SSA (1st reaction method)", label=["A" "B"])
+    title = "SSA (1st reaction method)", label=["A" "B"]) |> DisplayAs.PNG
 
 # Running an ensemble of simulations
 numRuns = 50
 
-## TODO: multi-threading
+## 50 simulations
 sols = map(1:numRuns) do i
     ssa_direct(model, u0, tend, parameters, stoich)
 end;
@@ -116,6 +117,8 @@ end
 ## Plot averages
 plot!(fig1, a_avg, 0.0, tend, linecolor=:black, linewidth=3, linestyle = :solid, label="Avarage [A]")
 plot!(fig1, b_avg, 0.0, tend, linecolor=:black, linewidth=3, linestyle = :dash, label="Avarage [B]")
+
+fig1 |> DisplayAs.PNG
 
 #===
 ## Using Catalyst
@@ -147,17 +150,17 @@ jumpProb = JumpProblem(rn, dprob, Direct())
 sol = solve(jumpProb, SSAStepper())
 
 using Plots
-plot(sol)
+plot(sol) |> DisplayAs.PNG
 
 # Parallel ensemble simulation
 
 ensprob = EnsembleProblem(jumpProb)
 sim = solve(ensprob, SSAStepper(), EnsembleThreads(); trajectories=50)
-plot(sim, alpha=0.5, color=[:blue :red])
+plot(sim, alpha=0.5, color=[:blue :red]) |> DisplayAs.PNG
 
 #--
 summ = EnsembleSummary(sim, 0:0.1:10)
-plot(summ,fillalpha=0.5)
+plot(summ,fillalpha=0.5) |> DisplayAs.PNG
 
 #===
 **See also** the [JumpProcesses.jl docs](https://docs.sciml.ai/JumpProcesses/stable/api/#JumpProcesses.ConstantRateJump) about discrete stochastic examples.

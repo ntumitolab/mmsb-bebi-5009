@@ -1,5 +1,6 @@
 # # Chapter 5
 
+import DisplayAs.PNG
 using DifferentialEquations
 using LabelledArrays
 using UnPack
@@ -58,7 +59,9 @@ sol = solve(prob)
 
 # ## Figure  5.10
 
-plot(sol, title="Figure 5.10", xlabel="Time (hr)", ylabel="Concentration (μM)", xlims=(0, 1), legend=:right)
+fig510 = plot(sol, title="Figure 5.10", xlabel="Time (hr)", ylabel="Concentration (μM)", xlims=(0, 1), legend=:right)
+
+fig510 |> PNG
 
 # ## Figure 5.11A
 
@@ -68,11 +71,11 @@ ry = range(0, 6, 101)
 ∂A = (x, y) -> metmodel((x, y), ps, 0)[1]
 ∂B = (x, y) -> metmodel((x, y), ps, 0)[2]
 
-plot(title="Figure 5.11A")
-contour!(rx, ry, ∂A, levels=[0], cbar=false, line=(:black))
-plot!(identity, 0, 0, line=(:black), label="AdoMet nullcline")
-contour!(rx, ry, ∂B, levels=[0], cbar=false, line=(:black, :dash))
-plot!(identity, 0, 0, line=(:black, :dash), label="AdoHcy nullcline")
+fig511a = plot(title="Figure 5.11A")
+contour!(fig511a, rx, ry, ∂A, levels=[0], cbar=false, line=(:black))
+plot!(fig511a, identity, 0, 0, line=(:black), label="AdoMet nullcline")
+contour!(fig511a, rx, ry, ∂B, levels=[0], cbar=false, line=(:black, :dash))
+plot!(fig511a, identity, 0, 0, line=(:black, :dash), label="AdoHcy nullcline")
 
 tend = 15.
 u0s = (
@@ -89,10 +92,14 @@ u0s = (
 )
 
 for u0 in u0s
-    plot!(ODEProblem(metmodel!, u0, tend, ps) |> solve, idxs=(1, 2), label=false, alpha=0.5)
+    local prob = ODEProblem(metmodel!, u0, tend, ps)
+    local sol = solve(prob)
+    plot!(fig511a, sol, idxs=(1, 2), label=false, alpha=0.5)
 end
 
-plot!(xlims=(0, 1200), ylims=(0, 6), xlabel="AdoMet (μM)", ylabel="AdoHcy (μM)", legend=:bottomright)
+plot!(fig511a, xlims=(0, 1200), ylims=(0, 6), xlabel="AdoMet (μM)", ylabel="AdoHcy (μM)", legend=:bottomright)
+
+fig511a |> PNG
 
 # ## Figure 5.11B
 
@@ -106,11 +113,11 @@ ry = range(0, 6, 101)
 ∂A = (x, y) -> metmodel((x, y), ps2, 0)[1]
 ∂B = (x, y) -> metmodel((x, y), ps2, 0)[2]
 
-plot(title="Figure 5.11B")
-contour!(rx, ry, ∂A, levels=[0], cbar=false, line=(:black))
-plot!(identity, 0, 0, line=(:black), label="AdoMet nullcline")
-contour!(rx, ry, ∂B, levels=[0], cbar=false, line=(:black, :dash))
-plot!(identity, 0, 0, line=(:black, :dash), label="AdoHcy nullcline")
+fig511b = plot(title="Figure 5.11B")
+contour!(fig511b, rx, ry, ∂A, levels=[0], cbar=false, line=(:black))
+plot!(fig511b, identity, 0, 0, line=(:black), label="AdoMet nullcline")
+contour!(fig511b, rx, ry, ∂B, levels=[0], cbar=false, line=(:black, :dash))
+plot!(fig511b, identity, 0, 0, line=(:black, :dash), label="AdoHcy nullcline")
 
 tend = 15.
 u0s = (
@@ -124,7 +131,9 @@ u0s = (
 )
 
 for u0 in u0s
-    plot!(ODEProblem(metmodel!, u0, tend, ps) |> solve, idxs=(1, 2), label=false, alpha=0.5)
+    plot!(fig511b, ODEProblem(metmodel!, u0, tend, ps) |> solve, idxs=(1, 2), label=false, alpha=0.5)
 end
 
-plot!(xlims=(0, 1200), ylims=(0, 6), xlabel="AdoMet (μM)", ylabel="AdoHcy (μM)", legend=:bottomright)
+plot!(fig511b, xlims=(0, 1200), ylims=(0, 6), xlabel="AdoMet (μM)", ylabel="AdoHcy (μM)", legend=:bottomright)
+
+fig511b |> PNG

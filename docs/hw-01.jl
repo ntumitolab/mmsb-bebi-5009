@@ -64,10 +64,12 @@ analytical(t) = 1 - exp(-t)
 
 # Visualization
 using Plots
+import DisplayAs.PNG
 Plots.default(linewidth=2)
 
 fig = plot(sol.t, sol.u, label="FE method")
 fig = plot!(fig, analytical, sol.t[begin], sol.t[end], label = "Analytical solution", linestyle=:dash)
+fig |> PNG
 
 md"""
 ## Part 3: The RK4 method

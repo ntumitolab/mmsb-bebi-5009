@@ -1,15 +1,18 @@
 # # Chapter 2
 # ## Fig 2.04 Exponential decay
 
+import DisplayAs.PNG
 using Plots
 Plots.default(linewidth=2)
 
-plot(title= "Figure 2.4 Exponential decay")
+fig = plot(title= "Figure 2.4 Exponential decay")
 for k in 1:3
-    plot!(t -> 3 * exp(-k*t), 0., 5., label = "exp(-$(k)t)")
+    plot!(fig, t -> 3 * exp(-k*t), 0., 5., label = "exp(-$(k)t)")
 end
 
-plot!(xlim = (0, 5), ylim=(0, 3.2), xlabel="Time", ylabel="Concentration")
+plot!(fig, xlim = (0, 5), ylim=(0, 3.2), xlabel="Time", ylabel="Concentration")
+
+fig |> PNG
 
 #===
 ## Fig 2.09 Metabolic network simulation
@@ -45,7 +48,7 @@ sol = solve(ODEProblem(rn, u0, tend, ps))
 
 plot(sol, legend=:bottomright, title="Figure 2.09 Metabolic network",
     xlims=(0., 4.), ylims=(0., 1.),
-    xlabel="Time (sec)", ylabel="Concentration (mM)")
+    xlabel="Time (sec)", ylabel="Concentration (mM)") |> PNG
 
 # ## Figure 2.11
 # Model reduction of ODE metabolic networks.
@@ -75,7 +78,7 @@ plot(
     xlabel="Time (AU)",
     ylabel="Concentration (AU)",
     title="Fig. 2.11 (Full model)"
-)
+) |> PNG
 
 # ## Figure 2.12 : Rapid equilibrium assumption
 
@@ -117,13 +120,14 @@ prob = ODEProblem(model212, u0, tend, ps1)
 sol212 = solve(prob)
 
 #--
-plot(sol211, line=(:dash, 1), label=["A (full solution)" "B (full solution)"])
-plot!(sol212, idxs=[A, B], label=["A (rapid equilibrium)" "B (rapid equilibrium)"])
-plot!(
+fig = plot(sol211, line=(:dash, 1), label=["A (full solution)" "B (full solution)"])
+plot!(fig, sol212, idxs=[A, B], label=["A (rapid equilibrium)" "B (rapid equilibrium)"])
+plot!(fig,
     title="Fig. 2.12 (Rapid equilibrium model)",
     xlabel="Time (AU)",
     ylabel="Concentration (AU)"
 )
+fig |> PNG
 
 #===
 ## Figure 2.13: Rapid equilibrium (take 2)
@@ -138,13 +142,14 @@ tend = 3.0
 sol213full = solve(ODEProblem(rn211, u0, tend, ps2))
 sol213re = solve(ODEProblem(model212, [C => sum(last.(u0))], tend, ps2))
 
-plot(sol213full, line=(:dash, 1), label=["A (full solution)" "B (full solution)"])
-plot!(sol213re, idxs=[A, B], label=["A (rapid equilibrium)" "B (rapid equilibrium)"])
-plot!(
+fig = plot(sol213full, line=(:dash, 1), label=["A (full solution)" "B (full solution)"])
+plot!(fig, sol213re, idxs=[A, B], label=["A (rapid equilibrium)" "B (rapid equilibrium)"])
+plot!(fig,
     title="Fig. 2.13 (Rapid equilibrium model)",
     xlabel="Time (AU)",
     ylabel="Concentration (AU)"
 )
+fig |> PNG
 
 #===
 ## Figure 2.14 : QSSA
@@ -170,14 +175,15 @@ end
 
 sol214 = solve(ODEProblem(model214, [B => (k1 * sum(last.(u0)) - k0) / (k1 + km1)], tend, ps2))
 
-plot(sol213full, line=(:dash))
-plot!(sol214, idxs=[A, B], label=["A (QSSA)" "B (QSSA)"])
-plot!(
+fig = plot(sol213full, line=(:dash))
+plot!(fig, sol214, idxs=[A, B], label=["A (QSSA)" "B (QSSA)"])
+plot!(fig,
     xlabel="Time (AU)",
     ylabel="Concentration (AU)",
     title="Figure 2.14: Ref vs QSSA",
     xlims=(0.0, tend)
 )
+fig |> PNG
 
 # ## Problem 2.4.6
 
@@ -186,7 +192,7 @@ using Plots
 Plots.default(linewidth=2)
 
 # Using pipe operator |>
-ODEProblem((u, p, t) -> p * (1. - u), 0., 10., 1.) |> solve |> plot
+ODEProblem((u, p, t) -> p * (1. - u), 0., 10., 1.) |> solve |> plot |> PNG
 
 # ## Runtime information
 

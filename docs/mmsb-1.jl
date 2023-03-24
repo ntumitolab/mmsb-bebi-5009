@@ -3,8 +3,8 @@
 using DifferentialEquations
 using LabelledArrays
 using UnPack
+import DisplayAs
 using Plots
-
 Plots.default(linewidth=2)
 
 # Convenience functions
@@ -45,7 +45,7 @@ tend = 50.0
 prob = ODEProblem(collins!, u0, tend, ps)
 sol = solve(prob, callback=events)
 
-plot(sol, legend=:right, xlabel = "Time", ylabel="Concentration", title="Figure 1.7 Collins toggle switch")
+plot(sol, legend=:right, xlabel = "Time", ylabel="Concentration", title="Figure 1.7 Collins toggle switch") |> DisplayAs.PNG
 
 # ## Fig 1.09 Hodgkin-Huxley model
 
@@ -91,7 +91,7 @@ sol = solve(prob, tstops=[20., 60.])
 p1 = plot(sol, idxs=[:v], ylabel="Membrane potential (mV)", xlabel="", legend=false)
 p2 = plot(sol, idxs = [:m, :h, :n], xlabel="")
 p3 = plot(_istim, sol.t, xlabel="Time (ms)", ylabel="Current", labels="Stimulation current")
-plot(p1, p2, p3, layout=(3, 1), size=(600, 900), title="Figure 1.9 Hodgkin-Huxley model", leftmargin=5*Plots.mm)
+plot(p1, p2, p3, layout=(3, 1), size=(600, 900), title="Figure 1.9 Hodgkin-Huxley model", leftmargin=5*Plots.mm) |> DisplayAs.PN
 
 # ## Runtime information
 
