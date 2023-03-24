@@ -1,6 +1,6 @@
 using Distributed
 
-addprocs(Int(ARGS[1]))
+addprocs(parse(Int64, ARGS[1]))
 
 @everywhere using Literate
 @everywhere config = Dict("mdstrings" => true)
