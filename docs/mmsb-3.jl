@@ -1,6 +1,6 @@
 # # Chapter 3
 # ## Figure 3.03 Michaelis-Menten kinetics
-import DisplayAs.PNG
+import DisplayAs.SVG
 using DifferentialEquations
 using Catalyst
 using Plots
@@ -19,8 +19,8 @@ tend = 1.0
 prob = ODEProblem(rn303, u0, tend, ps)
 sol = solve(prob)
 fig = plot(sol, xlabel="Time (AU)", ylabel="Concentration (AU)", legend=:right)
-fig |> PNG
 
+fig |> SVG
 #---
 
 rn303mm = @reaction_network begin
@@ -35,15 +35,12 @@ solmm = solve(probmm)
 
 @unpack S, P = rn303
 fig = plot(sol, idxs=[S, P], line=(:dash), label=["S (full)" "P (full)"])
-fig = plot!(solmm, idxs=[S, P], label=["S (MM)" "P (MM)"])
-fig = plot!(
-    title="Fig. 3.03",
-    xlabel="Time (AU)",
-    ylabel="Concentration (AU)",
-    xlims=(0., tend),
-    ylims=(0., 5.),
-    legend=:right)
-fig |> PNG
+plot!(fig, solmm, idxs=[S, P], label=["S (MM)" "P (MM)"])
+plot!(fig, title="Fig. 3.03",
+    xlabel="Time (AU)", ylabel="Concentration (AU)",
+    xlims=(0., tend), ylims=(0., 5.), legend=:right)
+
+fig |> SVG
 
 # ## Fig 3.13 GMA and Michaelis-Menten rate laws
 
@@ -56,7 +53,8 @@ fig = plot(
     xlabel= "Substrate concentration (AU)",
     ylabel="Reaction rate (AU)"
 )
-fig |> PNG
+
+fig |> SVG
 
 # ## Runtime information
 
