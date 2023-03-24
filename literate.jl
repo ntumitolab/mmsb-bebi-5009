@@ -1,9 +1,10 @@
-using Distributed
-
-addprocs(parse(Int64, ARGS[1]), exeflags="--project=$(Base.active_project())")
-
-@everywhere using Literate
-@everywhere config = Dict("mdstrings" => true)
+# For all workers
+@everywhere begin
+    import Pkg
+    Pkg.activate(@__DIR__)
+    using Literate
+    config = Dict("mdstrings" => true)
+end
 
 folder = "docs"
 
