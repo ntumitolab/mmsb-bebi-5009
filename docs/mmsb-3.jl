@@ -3,6 +3,7 @@
 import DisplayAs.SVG
 using DifferentialEquations
 using Catalyst
+using Latexify
 using Plots
 Plots.default(linewidth=2)
 
@@ -10,6 +11,8 @@ rn303 = @reaction_network begin
     (k1, km1), S + E <--> ES
     k2, ES --> E + P
 end
+
+latexify(rn303)
 
 #---
 u0 = [:S=>5., :ES=>0., :E=>1., :P=>0.]
