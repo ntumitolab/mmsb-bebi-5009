@@ -39,7 +39,7 @@ jobs:
           # cache: 'pip'
       - name: Install Python dependencies
         run: |
-          pip install -U pip wheel setuptools
+          pip install -U pip wheel setuptools pipx
           pip install -r requirements.txt
       - name: Read Julia version
         uses: SebRollen/toml-action@v1.0.2
