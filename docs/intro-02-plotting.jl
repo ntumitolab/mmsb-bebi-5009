@@ -112,7 +112,7 @@ quiver(xx, yy, quiver=∇f, aspect_ratio=:equal, line=(:black), arrow=(:closed))
 ===#
 
 savefig("vfield.png")
-savefig(psub, "subplots.png")
+savefig(fig, "subplots.png")
 
 # ## Runtime information
 
