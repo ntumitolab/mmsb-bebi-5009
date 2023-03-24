@@ -4,14 +4,12 @@ using Distributed
 @everywhere begin
     import Pkg
     Pkg.activate(@__DIR__)
-end
 
-@everywhere begin
     using Literate
     config = Dict("mdstrings" => true)
 end
 
-folder = "docs"
+folder = joinpath(@__DIR__, "docs")
 
 nbs = (
     "hw-01.jl",
@@ -31,7 +29,7 @@ ts = pmap(nbs; on_error=identity) do nb
 end
 
 for (nb, t) in zip(nbs, ts)
-    println("Notebook ", nb, " execution time: ", t, "second(s).")
+    println(nb, " elapsed/error: ", t)
 end
 
 # using Literate
