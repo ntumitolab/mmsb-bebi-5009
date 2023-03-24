@@ -36,6 +36,9 @@ docs/build/
 docs/site/
 figures/
 
+# VSCode thing
+.vscode/
+
 # Generated files
 *.mp4
 *.csv
