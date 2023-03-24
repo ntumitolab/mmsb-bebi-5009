@@ -17,7 +17,6 @@ Documentation: <https://diffeq.sciml.ai/dev/index.html>
 """
 
 using DifferentialEquations
-import DisplayAs.PNG
 using Plots
 Plots.default(linewidth=2)
 
@@ -51,7 +50,7 @@ prob = ODEProblem(expdecay, u0, tspan, p)
 sol = solve(prob)
 
 # Visualize the solution
-plot(sol, legend=:right) |> PNG
+plot(sol, legend=:right)
 
 # Solution at time t=1.0 (with interpolation)
 sol(1.0)
@@ -88,7 +87,6 @@ $$
 """
 
 using DifferentialEquations
-import DisplayAs.PNG
 using Plots
 Plots.default(linewidth=2)
 
@@ -116,7 +114,7 @@ prob = ODEProblem(sir!, u0, tspan, p)
 sol = solve(prob)
 
 # Visualize the solution
-plot(sol, label=["S" "I" "R"], legend=:right) |> PNG
+plot(sol, label=["S" "I" "R"], legend=:right)
 
 md"""
 ### Lorenz system
@@ -136,7 +134,6 @@ In this example, we will use [LabelledArrays.jl](https://github.com/SciML/Labell
 
 using LabelledArrays
 using DifferentialEquations
-import DisplayAs.PNG
 using Plots
 Plots.default(linewidth=2)
 
@@ -153,15 +150,15 @@ prob = ODEProblem(lorenz!,u0,tspan,p)
 sol = solve(prob)
 
 # x-y-z time-series.
-plot(sol) |> PNG
+plot(sol)
 
 # `idxs=(1, 2, 3)` makes a phase plot with 1st, 2nd, and the 3rd state variable. With `LabelledArrays`, you can use symbols instead of index numbers.
 
-plot(sol, idxs=(:x, :y, :z)) |> PNG
+plot(sol, idxs=(:x, :y, :z))
 
 # The zeroth variable in `idxs` is the independent variable (usually time). The below command plots the time series of the second state variable (`y`).
 
-plot(sol, idxs=(0, 2)) |> PNG
+plot(sol, idxs=(0, 2))
 
 # ## Saving simulation results
 
@@ -179,7 +176,6 @@ CSV.write("lorenz.csv", df)
 
 using DifferentialEquations
 using ModelingToolkit
-import DisplayAs.PNG
 using Plots
 Plots.default(linewidth=2)
 
@@ -204,7 +200,7 @@ tspan = (0.0, 2.0)
 prob = ODEProblem(expdecaySys, u0, tspan, p)
 sol = solve(prob)
 
-plot(sol) |> PNG
+plot(sol)
 
 # ### SIR model
 
@@ -227,7 +223,7 @@ tspan = (0.0, 20.0)
 prob = ODEProblem(sirSys, u0, tspan, p)
 sol = solve(prob)
 
-plot(sol) |> PNG
+plot(sol)
 
 #===
 ## Using Catalyst.jl for chemical reaction networks
@@ -237,9 +233,8 @@ plot(sol) |> PNG
 
 using Catalyst
 using DifferentialEquations
-import DisplayAs.PNG
 using Plots
-Plots.gr(linewidth=2)
+Plots.default(linewidth=2)
 
 # ### Exponential decay model
 
@@ -254,7 +249,7 @@ tspan = (0., 2.)
 prob = ODEProblem(decay_rn, u0, tspan, p)
 sol = solve(prob)
 
-plot(sol, title="Exponential Decay") |> PNG
+plot(sol, title="Exponential Decay")
 
 # ### SIR model
 
@@ -270,7 +265,7 @@ tspan = (0., 20.)
 prob = ODEProblem(sir_rn, u0, tspan, p)
 sol = solve(prob)
 
-plot(sol, legend=:right, title = "SIR Model") |> PNG
+plot(sol, legend=:right, title = "SIR Model")
 
 # ## Runtime information
 

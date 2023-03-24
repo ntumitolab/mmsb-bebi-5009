@@ -45,7 +45,7 @@ tend = 50.0
 prob = ODEProblem(collins!, u0, tend, ps)
 sol = solve(prob, callback=events)
 
-plot(sol, legend=:right, xlabel = "Time", ylabel="Concentration", title="Figure 1.7 Collins toggle switch") |> DisplayAs.PNG
+plot(sol, legend=:right, xlabel = "Time", ylabel="Concentration", title="Figure 1.7 Collins toggle switch") |> PNG
 
 # ## Fig 1.09 Hodgkin-Huxley model
 
