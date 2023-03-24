@@ -1,4 +1,4 @@
-#===
+md"""
 # Solving differential equations in Julia
 
 ## Standard procedures
@@ -10,19 +10,17 @@
 - (Optional) define parameter(s) `p`.
 - Define a problem (e.g. `ODEProblem`) using the modeling function (`f`), initial conditions (`u0`), simulation time span (`tspan == (tstart, tend)`), and parameter(s) `p`.
 - Solve the problem by calling `solve(prob)`.
-===#
 
-#===
 ## Solve ODEs using DifferentialEquations.jl
 
 Documentation: <https://diffeq.sciml.ai/dev/index.html>
-===#
+"""
 
 using DifferentialEquations
 using Plots
 Plots.default(linewidth=2)
 
-#===
+md"""
 ### Exponential decay model
 
 The concentration of a decaying nuclear isotope could be described as an exponential decay:
@@ -36,7 +34,7 @@ $$
 
 **Parameter**
 - $\lambda$: The rate constant of decay. The half-life $t_{\frac{1}{2}} = \frac{ln2}{\lambda}$
-===#
+"""
 
 # Model function, in the out-of-place form f(u, p, t)
 expdecay(u, p, t) = p * u
@@ -63,7 +61,7 @@ sol.t
 # Solutions at respective time points
 sol.u
 
-#===
+md"""
 ### SIR model
 
 This 3-variable model describes the spreading of an contagious disease can be described by the [SIR model](https://www.maa.org/press/periodicals/loci/joma/the-sir-model-for-spread-of-disease-the-differential-equation-model):
@@ -86,7 +84,7 @@ $$
 
 - $\beta$ : the rate of infection when susceptible and infectious people meet
 - $\gamma$ : the rate of recovery of infectious people
-===#
+"""
 
 using DifferentialEquations
 using Plots
@@ -117,7 +115,7 @@ sol = solve(prob)
 # Visualize the solution
 plot(sol, label=["S" "I" "R"], legend=:right)
 
-#===
+md"""
 ### Lorenz system
 
 The Lorenz system is a system of ordinary differential equations having chaotic solutions for certain parameter values and initial conditions. ([Wikipedia](https://en.wikipedia.org/wiki/Lorenz_system))
@@ -131,7 +129,7 @@ $$
 $$
 
 In this example, we will use [LabelledArrays.jl](https://github.com/SciML/LabelledArrays.jl) to get DSL-like syntax.
-===#
+"""
 
 using LabelledArrays
 using DifferentialEquations

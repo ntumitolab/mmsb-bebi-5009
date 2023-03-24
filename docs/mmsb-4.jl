@@ -34,7 +34,7 @@ function model41!(D, u, p, t)
     return nothing
 end
 
-#---
+# ## Figure 4.2 and 4.3
 
 ps1 = (k1=20., k2=5., k3=5., k4=5., k5=2., n=4.)
 u0s = [
@@ -47,18 +47,15 @@ u0s = [
 
 tend = 1.5
 
-sols = map(u0s) do u0
-    prob = ODEProblem(model41!, u0, tend, ps1)
-    sol = solve(prob)
-end
+sols = [solve(ODEProblem(model41!, u0, tend, ps1)) for u0 in u0s]
 
 plot(sols[1], xlabel="Time", ylabel="Concentration", title="Fig. 4.2 A (Time series)", labels=["[A]" "[B]"])
 
-#---
+# Fig. 4.2 B (Phase plot)
 plot(sols[1], idxs=(:a, :b), xlabel="[A]", ylabel="[B]", aspect_ratio=:equal,
      title="Fig. 4.2 B (Phase plot)", ylims=(0.0, 2.0), xlims=(0.0, 2.0), legend=nothing)
 
-#---
+# "Fig. 4.3A (Multiple time series)
 p43a = plot(title="Fig. 4.3A (Multiple time series)")
 
 for sol in sols
@@ -67,7 +64,7 @@ end
 
 plot!(p43a, xlabel="Time", ylabel="Concentration")
 
-#---
+# Fig. 4.3 B (Phase plot)
 p43b = plot(title="Fig. 4.3 B (Phase plot)")
 
 for sol in sols
@@ -83,12 +80,6 @@ Vector fields in phase plots.
 ===#
 
 # In this form we can reuse function name
-∂F44 = function (x, y; scale=20)
-    da = ∂A41((x, y), ps1, 0.0)
-    db = ∂B41((x, y), ps1, 0.0)
-    s = sqrt(hypot(da, db)) * scale
-    return (da / s, db / s)
-end
 
 ∂A = function (x, y)
     ∂A41((x, y), ps1, 0.0)
@@ -96,6 +87,13 @@ end
 
 ∂B = function (x, y)
     ∂B41((x, y), ps1, 0.0)
+end
+
+∂F44 = function (x, y; scale=20)
+    da = ∂A(x, y)
+    db = ∂B(x, y)
+    s = sqrt(hypot(da, db)) * scale
+    return (da / s, db / s)
 end
 
 # Grid points

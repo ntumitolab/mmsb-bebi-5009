@@ -1,4 +1,4 @@
-#===
+md"""
 # Homework 1: Solving an ODE
 
 Given an ordinary differential equation:
@@ -8,15 +8,12 @@ $$
 $$
 
 with initial condition $x(t=0)=0.0$
-===#
 
-#===
+
 ## Part 1: Julia's ODE solver
 
 Please **solve** the ODE using `DifferentialEquations.jl` for $t \in [0.0, 5]$ and **plot** the time series. **Compare** it to the analytical solution *in one plot*.
-===#
 
-#===
 ## Part 2: The forward Euler method
 
 Please **try** a range of time steps (e.g. from 0.1 to 1.5) to **solve** the ODE using the (home-made) forward Euler method for $t \in [0.0, 5.0]$, **plot** the time series, and **compare** them to the analytical solution *in one plot*. In which way are dts related to accuracy?
@@ -28,7 +25,7 @@ We plot the trajectory as a straight line locally. In each step, the next state 
 $$
 \vec{u}_{n+1} = \vec{u}_{n} + dt \cdot f(\vec{u}_{n}, t_{n})
 $$
-===#
+"""
 
 ## The ODE model. Exponential decay in this example
 function model(u, p, t)
@@ -68,10 +65,11 @@ analytical(t) = 1 - exp(-t)
 # Visualization
 using Plots
 Plots.default(linewidth=2)
-plot(sol.t, sol.u, label="FE method")
-plot!(analytical, sol.t[begin], sol.t[end], label = "Analytical solution", linestyle=:dash)
 
-#====
+fig = plot(sol.t, sol.u, label="FE method")
+fig = plot!(fig, analytical, sol.t[begin], sol.t[end], label = "Analytical solution", linestyle=:dash)
+
+md"""
 ## Part 3: The RK4 method
 
 1. Please **try** a range of dts to **solve** the ODE using the (home-made) fourth order Runge-Kutta ([RK4](https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods)) method for $t \in [0.0, 5.0]$, **plot** the time series, and **compare** them to the analytical solution *in one plot*. In which way are dts related to accuracy?
@@ -98,15 +96,14 @@ Hint: you can replace the Euler method with the RK4 one to reuse the `mysolve()`
 euler(model, u, p, t, dt) = u .+ dt .* model(u, p, t)
 # Your RK4 stepper
 function rk4(model, u, p, t, dt)
-    """TODO"""
-    # u(t + dt)
+    # calculate k1, k2, k3, and k4
     next = u .+ (k1 .+ 2k2 .+ 2k3 .+ k4) ./ 6
     return next
 end
 
 sol = mysolve(model, u0, tspan, p, dt=1.0, method=rk4)
 ```
-====#
+"""
 
 # ## Runtime information
 

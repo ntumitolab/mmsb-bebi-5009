@@ -26,13 +26,12 @@ function ssa_direct(model, u0::AbstractArray, tend, p, stoich; tstart=zero(tend)
         a = model(u, p, t)               ## propensities
         dt = randexp() / sum(a)          ## Time step for the direct method
         du = sample(stoich, Weights(a))  ## Choose the stoichiometry for the next reaction
-        u .+= du  ## Update state
-        t += dt   ## Update time
-
+        u .+= du   ## Update time
+        t += dt    ## Update time
         us = [us u]  ## Append state
         push!(ts, t) ## Append time point
     end
-    ## Trasnpose to make columns as variables, rows as observations
+    ## Transpose to make columns as state variables, rows as observations
     us = collect(us')
     return (t = ts, u = us)
 end
@@ -53,9 +52,8 @@ function ssa_first(model, u0, tend, p, stoich; tstart=zero(tend))
         i = argmin(dts)
         dt = dts[i]
         du = stoich[i]
-        ## Update state and time
-        u .+= du
-        t += dt
+        u .+= du  ## Update state
+        t += dt   ## Update time
         us = [us u]  ## Append state variable to record
         push!(ts, t) ## Append time point to record
     end
@@ -69,12 +67,13 @@ end
 # Reaction of A <-> B with rate constants k1 & k2
 model(u, p, t) = [p.k1 * u[1],  p.k2 * u[2]]
 
-parameters = (k1=1.0, k2=0.5, stoich=[[-1, 1], [1, -1]])
+parameters = (k1=1.0, k2=0.5)
+stoich=[[-1, 1], [1, -1]]
 u0 = [200, 0]
 tend = 10.0
 
-soldirect = ssa_direct(model, u0, tend, parameters, parameters.stoich)
-solfirst = ssa_first(model, u0, tend, parameters, parameters.stoich)
+soldirect = ssa_direct(model, u0, tend, parameters, stoich)
+solfirst = ssa_first(model, u0, tend, parameters, stoich)
 
 #---
 plot(soldirect.t, soldirect.u,
@@ -91,7 +90,7 @@ numRuns = 50
 
 ## TODO: multi-threading
 sols = map(1:numRuns) do i
-    ssa_direct(model, u0, tend, parameters, parameters.stoich)
+    ssa_direct(model, u0, tend, parameters, stoich)
 end;
 
 # Build interpolation functions
@@ -108,15 +107,15 @@ a_avg(t) = mean(i->i(t), itpsA)
 b_avg(t) = mean(i->i(t), itpsB)
 
 #---
-pl1 = plot(xlabel="Time", ylabel="# of molecules", title = "SSA (direct method) ensemble")
+fig1 = plot(xlabel="Time", ylabel="# of molecules", title = "SSA (direct method) ensemble")
 
 for sol in sols
-    plot!(pl1, sol.t, sol.u, linecolor=[:blue :red], linealpha=0.05, label=false)
+    plot!(fig1, sol.t, sol.u, linecolor=[:blue :red], linealpha=0.05, label=false)
 end
 
 ## Plot averages
-plot!(pl1, a_avg, 0.0, tend, linecolor=:black, linewidth=3, linestyle = :solid, label="Avarage [A]")
-plot!(pl1, b_avg, 0.0, tend, linecolor=:black, linewidth=3, linestyle = :dash, label="Avarage [B]")
+plot!(fig1, a_avg, 0.0, tend, linecolor=:black, linewidth=3, linestyle = :solid, label="Avarage [A]")
+plot!(fig1, b_avg, 0.0, tend, linecolor=:black, linewidth=3, linestyle = :dash, label="Avarage [B]")
 
 #===
 ## Using Catalyst
@@ -127,7 +126,7 @@ plot!(pl1, b_avg, 0.0, tend, linecolor=:black, linewidth=3, linestyle = :dash, l
 
 using Catalyst
 
-ab_rn = @reaction_network begin
+rn = @reaction_network begin
     k1, A --> B
     k2, B --> A
 end
@@ -140,15 +139,25 @@ params = [:k1 => 1.0, :k2 => 0.5]
 u0 = [:A => 200, :B => 0]
 tend = 10.0
 
-dprob = DiscreteProblem(ab_rn, u0, (0.0, tend), params)
+dprob = DiscreteProblem(rn, u0, (0.0, tend), params)
 
 # In this case, we would like to solve a `JumpProblem` using [Gillespie's Direct stochastic simulation algorithm (SSA)](https://doi.org/10.1016/0021-9991(76)90041-3).
 
-jumpProb = JumpProblem(ab_rn, dprob, Direct())
+jumpProb = JumpProblem(rn, dprob, Direct())
 sol = solve(jumpProb, SSAStepper())
 
 using Plots
 plot(sol)
+
+# Parallel ensemble simulation
+
+ensprob = EnsembleProblem(jumpProb)
+sim = solve(ensprob, SSAStepper(), EnsembleThreads(); trajectories=50)
+plot(sim, alpha=0.5, color=[:blue :red])
+
+#--
+summ = EnsembleSummary(sim, 0:0.1:10)
+plot(summ,fillalpha=0.5)
 
 #===
 **See also** the [JumpProcesses.jl docs](https://docs.sciml.ai/JumpProcesses/stable/api/#JumpProcesses.ConstantRateJump) about discrete stochastic examples.
@@ -157,4 +166,3 @@ plot(sol)
 - `RegularJumps` using a more efficient tau-leaping method.
 - [More solvers](https://docs.sciml.ai/JumpProcesses/stable/jump_types/) for discrete stochastic simulations.
 ===#
-

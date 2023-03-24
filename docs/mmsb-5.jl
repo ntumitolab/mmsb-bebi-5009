@@ -89,9 +89,7 @@ u0s = (
 )
 
 for u0 in u0s
-    prob = ODEProblem(metmodel!, u0, tend, ps)
-    sol = solve(prob)
-    plot!(sol, idxs=(1, 2), label=false, alpha=0.5)
+    plot!(ODEProblem(metmodel!, u0, tend, ps) |> solve, idxs=(1, 2), label=false, alpha=0.5)
 end
 
 plot!(xlims=(0, 1200), ylims=(0, 6), xlabel="AdoMet (μM)", ylabel="AdoHcy (μM)", legend=:bottomright)
@@ -126,9 +124,7 @@ u0s = (
 )
 
 for u0 in u0s
-    prob = ODEProblem(metmodel!, u0, tend, ps2)
-    sol = solve(prob)
-    plot!(sol, idxs=(1, 2), label=false, alpha=0.5)
+    plot!(ODEProblem(metmodel!, u0, tend, ps) |> solve, idxs=(1, 2), label=false, alpha=0.5)
 end
 
 plot!(xlims=(0, 1200), ylims=(0, 6), xlabel="AdoMet (μM)", ylabel="AdoHcy (μM)", legend=:bottomright)

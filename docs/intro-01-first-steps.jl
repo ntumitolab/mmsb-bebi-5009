@@ -1,11 +1,20 @@
-#===
+md"""
+# First steps
 ## Comments
 
 Comments are non-coding part in the source code. Although the compiler does not read comments, comments are important notes for humans, making the code more readable (hopefully).
 
-===#
+```julia
+# One line comments
 
-#===
+#=
+Multiline comments
+=#
+```
+
+"""
+
+md"""
 ## Variables and expressions
 
 The assignment operator `=` binds a name to a piece of data.
@@ -16,7 +25,7 @@ To see the data content:
 - [`println(data)`](https://docs.julialang.org/en/v1/base/io-network/#Base.println): good old print function.
 - [`@printf`](https://docs.julialang.org/en/v1/stdlib/Printf/): C-like formatted output.
 - Inline display: content of the last expression. A semicolon `;` at the end will suppress inline output.
-===#
+"""
 
 # Integer, 64 bit
 x = 1
@@ -69,12 +78,12 @@ typeof(Float64(x))
 # Or this convenience function
 typeof(float(x))
 
-#====
+md"""
 ## Compound expressions
 
 - A [begin block](https://docs.julialang.org/en/v1/base/base/#begin) `begin` ... `end` squashes multiple expressions into one.
 - A [let block](https://docs.julialang.org/en/v1/manual/variables-and-scoping/#Let-Blocks) `let` ... `end` is similar to a begin block but variables inside will be discarded outside.
-====#
+"""
 
 # a1 and a2 are available after begin block
 begin
@@ -188,7 +197,7 @@ exp(-5)
 # expm1(x) is more accurate that exp(x) - 1 when x is very small
 exp(1e-12) - 1, expm1(1e-12)
 
-#===
+md"""
 ## Strings
 
 - [Think Julia ch8](https://benlauwens.github.io/ThinkJulia.jl/latest/book.html#chap08)
@@ -197,7 +206,7 @@ exp(1e-12) - 1, expm1(1e-12)
 A `string` is a sequence of characters.
 
 - `" ... "` for one line strings.
-- Three double quotes to surround multiline string.
+- Three double quotes surround multiline string.
 - `str1*str2*...` to concatenate strings
 - `string(str1, str2, ...)` to convert the data (if neede) and make a string.
 - `^` to repeat a string: `str^3` to repeat `str` three times.
@@ -206,7 +215,7 @@ A `string` is a sequence of characters.
 
 
 Although `string(x, y)` looks less streamlined, it is generally faster than interpolation `$` or concatenation `*` and is most recommended.
-===#
+"""
 
 "I am a string."
 
@@ -231,7 +240,7 @@ str2^5
 # concat string using `*`
 str1*"-"*str2
 
-#===
+md"""
 ## Control flow
 
 - [control flow](https://docs.julialang.org/en/v1/manual/control-flow/)
@@ -261,7 +270,7 @@ https://en.wikipedia.org › wiki › Short-circuit_evaluation).
 - In the expression `a && b`, the subexpression `b` is only evaluated if `a` evaluates to true.
 - In the expression `a || b`, the subexpression `b` is only evaluated if `a` evaluates to false.
 
-===#
+"""
 
 # && evaluates and returns the second argument if the first is true
 true && 1
@@ -285,7 +294,7 @@ end
 
 1 > 2 ? "True" : "False"
 
-#===
+md"""
 ### Loops
 
 Loops are repeated evaluations of a code block.
@@ -296,7 +305,7 @@ Loops are repeated evaluations of a code block.
 
 - `break`: exit the loop immediately.
 - `continue`: move on to the next item / evaluation immediately.
-===#
+"""
 
 # Hailstone sequence (3n+1 problem) in a while loop
 steps = let n = 1025489
@@ -342,7 +351,7 @@ for i = 'x':'z', j = '1':'3'
     println(i, j)
 end
 
-#===
+md"""
 ## Functions
 
 > In Julia, a function is an object that maps a tuple of argument values to a return value.
@@ -358,7 +367,7 @@ Functions facilitate:
 - Functions that will update the arguments are named with a bang `!` by convention. (e.g. sort(arr) vs sort!(arr))
 - Often only the scalar version of a function is required; for vector element-wise operations, there are broadcast (dot) syntax.
 - You can write multiple function with the same name provided they have different parameter lists. Julia will choose the most apporpriate one for you.
-===#
+"""
 
 # ### Standard form
 
@@ -397,7 +406,7 @@ map(val) do x
     end
 end
 
-#===
+md"""
 ### Optional arguments
 
 [Optional (positional) arguments](https://docs.julialang.org/en/v1/manual/functions/#Optional-Arguments) are listed after mandatory ones.
@@ -421,20 +430,20 @@ end
 ```
 
 And they are called with `plot(x, y, width=2)` or `plot(x, y; width=2)`
-===#
+"""
 
 args_kwargs(args...; kwargs...) = (args, kwargs)  ## mind the semicolon ;
 
-#===
+md"""
 ### See also
 
 - [Compositing functions and pipes](https://docs.julialang.org/en/v1/manual/functions/#Function-composition-and-piping)
 - [Variable argument (vararg) functions](https://docs.julialang.org/en/v1/manual/functions/#Varargs-Functions)
 - [Argument destructuring](https://docs.julialang.org/en/v1/manual/functions/#Argument-destructuring)
 - [Scope of variables](https://docs.julialang.org/en/v1/manual/variables-and-scoping/)
-===#
+"""
 
-#===
+md"""
 ## Collections, broadcasting, and Methods
 Using built-in collections is the simplest way to group and organize data.
 
@@ -460,7 +469,7 @@ General rules for sequential collections:
 - Sequencial
 - Eheap
 - Evenly-spaced numerical sequences
-===#
+"""
 
 # A simple range
 1:2:10
@@ -480,14 +489,14 @@ LinRange(1, 10, 10)
 # Pick elements by a range of indices
 (1:10)[3:end]
 
-#===
+md"""
 #### Tuples
 
 - immutable
 - sequential collections
 - efficient for heterogenous data of various types
 - stack-allocated
-===#
+"""
 
 tuple(1, 'a', 3.14)
 
@@ -523,7 +532,7 @@ neighbors(x) = x+1, x-1
 #---
 neighbors(0)
 
-#===
+md"""
 #### Arrays
 
 [Arrays in Julia docs](https://docs.julialang.org/en/v1/manual/arrays/)
@@ -542,7 +551,7 @@ Some useful functions for arrays:
 - `size(A)` a tuple containing the dimensions of A
 - `size(A,n)` the size of A along dimension n
 - `eachindex(A)` an efficient iterator for visiting each position in A
-===#
+"""
 
 # 1D array (column vector)
 x = [5, 6, 7]
@@ -630,7 +639,7 @@ vec(A)
 A[1, 1] = 0
 A
 
-#===
+md"""
 ### Associative collections
 
 - `d[key]` accesses values by keys
@@ -641,13 +650,11 @@ A
 - `pairs(d)` returns a series of (key => value) pairs
 - `merge(d1, d2, ...)` return combinations of several dicts. `merge!(d1, d2, ...)` combine several dicts and update the first one.
 - `get(d, key, default)` returns the value stored for the given key, or the given default value if no mapping for the key is present.
-===#
 
-#===
 #### Named tuples
 
 `Namedtuples` are tuples with key-value pairs.
-===#
+"""
 
 nt = (a=1, b=2, c=4)
 
@@ -664,11 +671,11 @@ c = 3
 
 nt = (; a, b, c)
 
-#===
+md"""
 #### Dictionaries
 
 [Dictionaries](https://docs.julialang.org/en/v1/base/collections/#Dictionaries) are mutable mappings of `key => value`.
-===#
+"""
 
 eng2sp = Dict("one" => "uno", "two" => "dos", "three" => "tres")
 
@@ -704,11 +711,11 @@ Dict(i => i^2 for i = 1:10)
 #---
 Dict(zip("abc", 1:3))
 
-#===
+md"""
 ## Broadcasting (Dot) syntax
 
 [Broadcasting](https://docs.julialang.org/en/v1/manual/arrays/#Broadcasting) turns scalar operations into vector ones.
-===#
+"""
 
 [1, 2, 3] .+ [4, 5, 6]
 
@@ -726,11 +733,11 @@ exp10.(LinRange(-3.0, 3.0, 50))
 # Make a 9*9 multiplication table
 collect(1:9) .* transpose(collect(1:9))
 
-#===
+md"""
 ## Custom data structures
 
 https://docs.julialang.org/en/v1/manual/types/#Composite-Types
-===#
+"""
 
 # struct or mutable struct
 struct Point
@@ -751,13 +758,13 @@ add(a::Point, b::Point) = Point(a.x + b.x, a.y + b.y)
 #---
 add(p1, p2)
 
-#===
+md"""
 ## Methods
 
 [Methods in Julia docs](https://docs.julialang.org/en/v1/manual/methods/#Methods)
 
 You can overload the same function with different argument types/numbers. Julia will try to find the right function for the argument type(s).
-===#
+"""
 
 func(a::Int) = a + 2
 func(a::AbstractFloat) = a/2
