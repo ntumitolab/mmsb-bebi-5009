@@ -66,7 +66,7 @@ ax2 = plot(f2, xs)
 plot(ax1, ax2) |> PNG
 
 # Subplot layout
-fig = plot(p1, p2, layout=(2, 1))
+fig = plot(ax1, ax2, layout=(2, 1))
 fig |> PNG
 
 md"""
