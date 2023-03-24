@@ -308,7 +308,7 @@ Loops are repeated evaluations of a code block.
 """
 
 # Hailstone sequence (3n+1 problem) in a while loop
-steps = let n = 1025489
+s = let n = 1025489
     step = 0
     while n > 1
         if iseven(n)
@@ -322,12 +322,12 @@ steps = let n = 1025489
 end
 
 # Summation
-sum = let n = 100
-    sum = 0
+s = let n = 100
+    s = 0
     for i in 1:n
-        sum += i
+        s += i
     end
-    sum
+    s
 end
 
 # For loop
