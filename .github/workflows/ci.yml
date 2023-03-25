@@ -16,7 +16,7 @@ permissions:
   pull-requests: write
 
 env:
-  NPROC: '2'
+  NPROC: '4'
   JULIA_DEPOT_PATH: '~/.julia'
   JULIA_NUM_THREADS: 'auto'
   JULIA_CACHE: '1'
@@ -26,7 +26,7 @@ env:
 
 jobs:
   jupyter-book:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Clean up workspace
         uses: colpal/actions-clean@v1
