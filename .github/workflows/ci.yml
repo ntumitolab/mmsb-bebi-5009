@@ -19,7 +19,7 @@ env:
   NPROC: '4'
   JULIA_DEPOT_PATH: '~/.julia'
   JULIA_NUM_THREADS: 'auto'
-  JULIA_CACHE: '1'
+  JULIA_CACHE: '0'
   PYTHON_VER: '3.11'
   GKSwstype: 100
   IMAGE_NAME: ghcr.io/${{ github.repository }}:binder
