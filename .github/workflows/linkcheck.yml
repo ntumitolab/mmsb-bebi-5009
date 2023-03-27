@@ -10,12 +10,11 @@ on:
     paths:
       - '.github/workflows/linkcheck.yml'
 
-env:
-  PY_VER: '3.11'
-
 jobs:
   linkcheck:
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/sosiristseng/docker-jupyterbook:0.15.1.1
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -25,9 +24,5 @@ jobs:
         uses: mikefarah/yq@master
         with:
           cmd: yq -i '.execute.execute_notebooks = "off"' 'docs/_config.yml'
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ env.PY_VER }}
       - name: Install Jupyter book and check links
-        run: pipx run jupyter-book build docs/ --builder linkcheck
+        run: jupyter-book build docs/ --builder linkcheck

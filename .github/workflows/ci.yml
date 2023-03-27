@@ -16,17 +16,16 @@ permissions:
   pull-requests: write
 
 env:
-  NPROC: '2'
+  NPROC: '4'
   JULIA_DEPOT_PATH: '~/.julia'
   JULIA_NUM_THREADS: 'auto'
-  JULIA_CACHE: '3'
+  JULIA_CACHE: '0'
   PYTHON_VER: '3.11'
-  GKSwstype: 100
   IMAGE_NAME: ghcr.io/${{ github.repository }}:binder
 
 jobs:
   jupyter-book:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Clean up workspace
         uses: colpal/actions-clean@v1
@@ -67,6 +66,8 @@ jobs:
           julia --color=yes --project=@. -e 'import Pkg; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()'
           julia --color=yes --project="" -e 'import Pkg; Pkg.add("Literate")'
       - name: Build notebooks
+        env:
+          GKSwstype: 100
         run: julia --color=yes -p ${{ env.NPROC }} literate.jl
       - name: Deploy Notebooks
         if: ${{ github.ref == 'refs/heads/main' }}
@@ -105,6 +106,8 @@ jobs:
     needs: jupyter-book
     if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: ghcr.io/${{ github.repository }}:binder
     steps:
     - name: Checkout
       uses: actions/checkout@v3
