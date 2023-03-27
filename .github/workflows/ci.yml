@@ -107,7 +107,7 @@ jobs:
         uses: actions/deploy-pages@v2
 
   binder:
-    needs: jupyter-book
+    needs: literate
     if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     env:
