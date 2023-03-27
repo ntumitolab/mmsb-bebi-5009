@@ -10,24 +10,14 @@ using Distributed
 end
 
 folder = joinpath(@__DIR__, "docs")
+nbs = [nb for nb in readdir(folder) if splitext(nb)[end] == ".jl"]
 
-nbs = (
-    "hw-01.jl",
-    "intro-01-first-steps.jl",
-    "intro-02-plotting.jl",
-    "intro-03-diffeq.jl",
-    "intro-04-gillespie.jl",
-    "mmsb-1.jl",
-    "mmsb-2.jl",
-    "mmsb-3.jl",
-    "mmsb-4.jl",
-    "mmsb-5.jl",
-)
-
-ts = pmap(nbs; on_error=identity) do nb
+ts = pmap(nbs; on_error=ex->0) do nb
     @elapsed Literate.notebook(joinpath(folder, nb), folder; config)
 end
 
 for (nb, t) in zip(nbs, ts)
-    println(nb, " elapsed/error: ", t)
+    println(nb, " took ", t, " second(s). (0 means error occured)")
 end
+
+any(isequal(0.), ts) && error("Error(s) occured!")
