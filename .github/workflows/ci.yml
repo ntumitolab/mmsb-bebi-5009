@@ -21,26 +21,15 @@ env:
   JULIA_NUM_THREADS: 'auto'
   JULIA_CACHE: '0'
   PYTHON_VER: '3.11'
-  IMAGE_NAME: ghcr.io/${{ github.repository }}:binder
 
 jobs:
-  jupyter-book:
+  literate:
     runs-on: self-hosted
     steps:
       - name: Clean up workspace
         uses: colpal/actions-clean@v1
       - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Setup Python ${{ env.PYTHON_VER }}
-        uses: actions/setup-python@v4
-        id: python
-        with:
-          python-version: ${{ env.PYTHON_VER }}
-          # cache: 'pip'
-      - name: Install Python dependencies
-        run: |
-          pip install -U pip wheel setuptools pipx
-          pip install -r requirements.txt
       - name: Read Julia version
         uses: SebRollen/toml-action@v1.0.2
         id: read_toml
@@ -61,13 +50,11 @@ jobs:
             ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-
       - name: Install Julia dependencies
         env:
-          PYTHON: ${{ steps.python.outputs.python-path }}
+          PYTHON: ""
         run: |
           julia --color=yes --project=@. -e 'import Pkg; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()'
-          julia --color=yes --project="" -e 'import Pkg; Pkg.add("Literate")'
+          julia --color=yes --project="" -e 'import Pkg; Pkg.add(["Literate", "PrettyTables"])'
       - name: Build notebooks
-        env:
-          GKSwstype: 100
         run: julia --color=yes -p ${{ env.NPROC }} literate.jl
       - name: Deploy Notebooks
         if: ${{ github.ref == 'refs/heads/main' }}
@@ -77,6 +64,23 @@ jobs:
           publish_dir: .
           publish_branch: out
           force_orphan: true
+
+  jupyter-book:
+    needs: literate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          ref: out
+      - name: Setup Python ${{ env.PYTHON_VER }}
+        uses: actions/setup-python@v4
+        id: python
+        with:
+          python-version: ${{ env.PYTHON_VER }}
+          # cache: 'pip'
+      - name: Install pipx
+        run: pip install -U pip wheel setuptools pipx
       - name: Build website
         run: pipx run jupyter-book build docs/
       - name: Upload pages artifact
