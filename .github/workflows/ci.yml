@@ -19,12 +19,12 @@ env:
   NPROC: '4'
   JULIA_DEPOT_PATH: '~/.julia'
   JULIA_NUM_THREADS: 'auto'
-  JULIA_CACHE: '0'
+  JULIA_CACHE: '1'
   PYTHON_VER: '3.11'
 
 jobs:
   jupyter-book:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Clean up workspace
         uses: colpal/actions-clean@v1
@@ -56,8 +56,8 @@ jobs:
         with:
           path: ${{ env.JULIA_DEPOT_PATH }}
           key: ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-${{ hashFiles('**/Manifest.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-
+          # restore-keys: |
+          #   ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-
       - name: Install Julia dependencies
         env:
           PYTHON: ""
