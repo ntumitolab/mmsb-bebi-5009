@@ -26,7 +26,7 @@ jobs:
       - name: Setup Julia
         uses: julia-actions/setup-julia@v1
         with:
-          version: '1'
+          version: '^1.9.0-rc1'
       - name: Update Julia dependencies
         env:
           JULIA_PKG_PRECOMPILE_AUTO: 0
