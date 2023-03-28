@@ -20,16 +20,16 @@ jobs:
       contents: write
       pull-requests: write
     runs-on: ubuntu-latest
-    container:
-      image: julia:1.8.5
     steps:
-      - name: Install Git
-        run: apt-get update -q && apt-get install -y git --no-install-recommends
       - name: Checkout
         uses: actions/checkout@v3
-      # workaround: https://github.com/peter-evans/create-pull-request/issues/1170
-      - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Setup Julia
+        uses: julia-actions/setup-julia@v1
+        with:
+          version: '1'
       - name: Update Julia dependencies
+        env:
+          JULIA_PKG_PRECOMPILE_AUTO: 0
         run: julia --color=yes --project=@. -e "import Pkg; Pkg.update()"
       # Authenticate with a custom GitHub APP
       # https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#authenticating-with-github-app-generated-tokens

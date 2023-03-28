@@ -23,13 +23,23 @@ env:
   PYTHON_VER: '3.11'
 
 jobs:
-  literate:
+  jupyter-book:
     runs-on: self-hosted
     steps:
       - name: Clean up workspace
         uses: colpal/actions-clean@v1
       - name: Checkout repository
         uses: actions/checkout@v3
+      - name: Setup Python ${{ env.PYTHON_VER }}
+        uses: actions/setup-python@v4
+        id: python
+        with:
+          python-version: ${{ env.PYTHON_VER }}
+          cache: 'pip'
+      - name: Install Python dependencies
+        run: |
+          pip install -U jupyter-book
+          pip install -r requirements.txt
       - name: Read Julia version
         uses: SebRollen/toml-action@v1.0.2
         id: read_toml
@@ -64,25 +74,8 @@ jobs:
           publish_dir: .
           publish_branch: out
           force_orphan: true
-
-  jupyter-book:
-    needs: literate
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          ref: out
-      - name: Setup Python ${{ env.PYTHON_VER }}
-        uses: actions/setup-python@v4
-        id: python
-        with:
-          python-version: ${{ env.PYTHON_VER }}
-          # cache: 'pip'
-      - name: Install pipx
-        run: pip install -U pip wheel setuptools pipx
       - name: Build website
-        run: pipx run jupyter-book build docs/
+        run: jupyter-book build docs/
       - name: Upload pages artifact
         if: ${{ github.ref == 'refs/heads/main' }}
         uses: actions/upload-pages-artifact@v1
@@ -107,46 +100,22 @@ jobs:
         uses: actions/deploy-pages@v2
 
   binder:
-    needs: literate
+    needs: jupyter-book
     if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
-    env:
-      IMAGE_NAME: ghcr.io/${{ github.repository }}:binder
     steps:
-    - name: Checkout
+    - name: Checkout jupyter notebook branch
       uses: actions/checkout@v3
       with:
         ref: out
-    - name: Setup Python ${{ env.PYTHON_VER }}
-      uses: actions/setup-python@v4
-      id: python
+    - name: repo2docker
+      uses: jupyterhub/repo2docker-action@master
       with:
-        python-version: ${{ env.PYTHON_VER }}
-    - name: Install repo2docker
-      run: |
-        pip install -U pip wheel setuptools
-        pip install https://github.com/jupyterhub/repo2docker/archive/main.zip
-    - name: Login to GitHub Container Registry
-      uses: docker/login-action@v2
-      with:
-        registry: ghcr.io
-        username: ${{ github.repository_owner }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-    - name: Pull Image
-      run: docker pull ${{ env.IMAGE_NAME }} || true
-    - name: Build binder image with repo2docker
-      run: >
-        jupyter-repo2docker --ref out
-        --image-name ${{ env.IMAGE_NAME }}
-        --cache-from ${{ env.IMAGE_NAME }}
-        --push --no-run --user-id 1000 --user-name jovyan
-        .
-    - name: Add back binder folder and Dockerfile
-      run: |
-        mkdir -p .binder
-        echo "FROM ${{ env.IMAGE_NAME }}" >> .binder/Dockerfile
-        git config user.name github-actions
-        git config user.email github-actions@github.com
-        git add .binder/Dockerfile
-        git commit -m "Generate binder dockerfile"
-        git push
+        DOCKER_REGISTRY: ghcr.io
+        DOCKER_USERNAME: ${{ github.repository_owner }}
+        DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        IMAGE_NAME: ${{ github.repository }}
+        BINDER_CACHE: true
+        PUBLIC_REGISTRY_CHECK: true
+        ADDITIONAL_TAG: "binder"
+        LATEST_TAG_OFF: true
