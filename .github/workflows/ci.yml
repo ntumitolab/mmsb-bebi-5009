@@ -59,7 +59,7 @@ jobs:
           #   ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-
       - name: Install Julia dependencies
         env:
-          PYTHON: ""
+          PYTHON: ${{ steps.python.outputs.python-path }}
         run: |
           julia --color=yes --project="" -e 'import Pkg; Pkg.add(["Literate", "PrettyTables"])'
           julia --color=yes --project=@. -e 'import Pkg; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()'
