@@ -16,15 +16,15 @@ permissions:
   pull-requests: write
 
 env:
-  NPROC: '2'
+  NPROC: '4'
   JULIA_DEPOT_PATH: '~/.julia'
   JULIA_NUM_THREADS: 'auto'
-  JULIA_CACHE: '1'
+  JULIA_CACHE: '0'
   PYTHON_VER: '3.11'
 
 jobs:
   jupyter-book:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Clean up workspace
         uses: colpal/actions-clean@v1
@@ -62,8 +62,8 @@ jobs:
         env:
           PYTHON: ""
         run: |
-          julia --color=yes --project=@. -e 'import Pkg; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()'
           julia --color=yes --project="" -e 'import Pkg; Pkg.add(["Literate", "PrettyTables"])'
+          julia --color=yes --project=@. -e 'import Pkg; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()'
       - name: Build notebooks
         run: julia --color=yes -p ${{ env.NPROC }} literate.jl
       - name: Deploy Notebooks
