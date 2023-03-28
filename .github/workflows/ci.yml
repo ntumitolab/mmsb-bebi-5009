@@ -35,7 +35,6 @@ jobs:
         id: python
         with:
           python-version: ${{ env.PYTHON_VER }}
-          cache: 'pip'
       - name: Install Python dependencies
         run: |
           pip install -U jupyter-book
