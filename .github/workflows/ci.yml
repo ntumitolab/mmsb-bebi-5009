@@ -18,6 +18,7 @@ permissions:
 env:
   NPROC: '2'
   JULIA_DEPOT_PATH: '/srv/juliapkgs'
+  JULIA_NUM_THREADS: 'auto'
   JULIA_CACHE: '2'
   PYTHON_VER: '3.11'
 
@@ -26,11 +27,6 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: julia:1.8.5
-      env:
-        JULIA_NUM_THREADS: 'auto'
-        PYTHON: ""
-        JULIA_PROJECT: ${{ github.workspace }}
-        GKSwstype: 100
     steps:
       - name: Install git
         run: apt-get update -q && apt-get install git -y --no-install-recommends
@@ -43,8 +39,14 @@ jobs:
           path: ${{ env.JULIA_DEPOT_PATH }}
           key: ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-${{ hashFiles('**/Manifest.toml') }}
       - name: Install Julia dependencies
+        env:
+          PYTHON: ""
+          JULIA_PROJECT: ${{ github.workspace }}
         run: julia --color=yes -e 'import Pkg; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()'
       - name: Build notebooks with ${{ env.NPROC }} processes
+        env:
+          GKSwstype: 100
+          JULIA_PROJECT: ${{ github.workspace }}
         run: julia --color=yes -p ${{ env.NPROC }} literate.jl
       - name: Deploy Notebooks
         if: ${{ github.ref == 'refs/heads/main' }}
