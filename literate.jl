@@ -15,7 +15,7 @@ end
 
 pretty_table([nbs ts], header=["Notebook", "Elapsed (s)"])
 
-for (i, t) in ts
+for (i, t) in enumerate(ts)
     if isnan(t)
         println("Debugging notebook: ", nb[i])
         withenv("JULIA_DEBUG" => "Literate") do
