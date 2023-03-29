@@ -27,6 +27,8 @@ jobs:
         run: apt-get update -q && apt-get install git -y --no-install-recommends
       - name: Checkout
         uses: actions/checkout@v3
+      # https://github.com/peter-evans/create-pull-request/issues/1170#issuecomment-1100101372
+      - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: Update Julia dependencies
         env:
           JULIA_PKG_PRECOMPILE_AUTO: 0
