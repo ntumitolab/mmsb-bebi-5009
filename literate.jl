@@ -1,3 +1,5 @@
+import Pkg
+Pkg.activate(@__DIR__)
 using Distributed
 using Literate
 using PrettyTables
