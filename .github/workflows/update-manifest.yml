@@ -20,13 +20,13 @@ jobs:
       contents: write
       pull-requests: write
     runs-on: ubuntu-latest
+    container:
+      image: julia:1.8.5
     steps:
+      - name: Install git
+        run: apt-get update -q && apt-get install git -y --no-install-recommends
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup Julia
-        uses: julia-actions/setup-julia@v1
-        with:
-          version: '1'
       - name: Update Julia dependencies
         env:
           JULIA_PKG_PRECOMPILE_AUTO: 0
