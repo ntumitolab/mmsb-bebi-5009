@@ -48,7 +48,6 @@ jobs:
           #   ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-
       - name: Install Julia dependencies
         env:
-          PYTHON: ""
           JULIA_PROJECT: ${{ github.workspace }}
         run: julia --color=yes -e 'import Pkg; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()'
       - name: Build notebooks with ${{ env.NPROC }} processes
@@ -115,8 +114,5 @@ jobs:
         DOCKER_REGISTRY: ghcr.io
         DOCKER_USERNAME: ${{ github.repository_owner }}
         DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
-        IMAGE_NAME: ${{ github.repository }}
         BINDER_CACHE: true
         PUBLIC_REGISTRY_CHECK: true
-        ADDITIONAL_TAG: "binder"
-        LATEST_TAG_OFF: true
