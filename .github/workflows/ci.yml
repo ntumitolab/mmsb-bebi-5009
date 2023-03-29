@@ -17,8 +17,6 @@ permissions:
 
 env:
   NPROC: '2'
-  JULIA_DEPOT_PATH: '/srv/juliapkgs'
-  JULIA_NUM_THREADS: 'auto'
   JULIA_CACHE: '2'
   PYTHON_VER: '3.11'
 
@@ -27,6 +25,12 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: julia:1.8.5
+      volumes:
+        - /srv/juliapkgs
+      env:
+        JULIA_DEPOT_PATH: /srv/juliapkgs
+        JULIA_NUM_THREADS: auto
+
     steps:
       - name: Install git
         run: apt-get update -q && apt-get install git -y --no-install-recommends
@@ -36,8 +40,12 @@ jobs:
         uses: actions/cache@v3
         if: ${{ env.JULIA_CACHE != '0'}}
         with:
-          path: ${{ env.JULIA_DEPOT_PATH }}
+          path: |
+            /srv/juliapkgs
+          # ${{ github.workspace }}/.CondaPkg
           key: ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-${{ hashFiles('**/Manifest.toml') }}
+          # restore-keys: |
+          #   ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-
       - name: Install Julia dependencies
         env:
           PYTHON: ""
@@ -61,18 +69,14 @@ jobs:
     needs: literate
     if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
+    container: ghcr.io/sosiristseng/docker-jupyterbook:0.15.1.1
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
           ref: out
-      - name: Setup Python ${{ env.PYTHON_VER }}
-        uses: actions/setup-python@v4
-        id: python
-        with:
-          python-version: ${{ env.PYTHON_VER }}
       - name: Build website
-        run: pipx run jupyter-book build docs/
+        run: jupyter-book build docs/
       - name: Upload pages artifact
         if: ${{ github.ref == 'refs/heads/main' }}
         uses: actions/upload-pages-artifact@v1
