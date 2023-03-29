@@ -101,7 +101,7 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout jupyter notebook branch
+    - name: Checkout notebook branch
       uses: actions/checkout@v3
       with:
         ref: out
