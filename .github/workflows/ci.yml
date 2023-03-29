@@ -26,8 +26,6 @@ jobs:
   jupyter-book:
     runs-on: ubuntu-latest
     steps:
-      - name: Clean up workspace
-        uses: colpal/actions-clean@v1
       - name: Checkout repository
         uses: actions/checkout@v3
       - name: Setup Python ${{ env.PYTHON_VER }}
@@ -55,14 +53,14 @@ jobs:
         with:
           path: ${{ env.JULIA_DEPOT_PATH }}
           key: ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-${{ hashFiles('**/Manifest.toml') }}
-          # restore-keys: |
-          #   ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-
+      - name: Install Literate
+        env:
+          PYTHON: ${{ steps.python.outputs.python-path }}
+        run: julia --color=yes --project="" -e 'import Pkg; Pkg.add(["Literate", "PrettyTables"])'
       - name: Install Julia dependencies
         env:
           PYTHON: ${{ steps.python.outputs.python-path }}
-        run: |
-          julia --color=yes --project="" -e 'import Pkg; Pkg.add(["Literate", "PrettyTables"])'
-          julia --color=yes --project=@. -e 'import Pkg; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()'
+        run: julia --color=yes --project=@. -e 'import Pkg; Pkg.UPDATED_REGISTRY_THIS_SESSION[] = true; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()'
       - name: Build notebooks with ${{ env.NPROC }} processes
         run: julia --color=yes -p ${{ env.NPROC }} literate.jl
       - name: Deploy Notebooks
