@@ -43,7 +43,7 @@ jobs:
           path: ${{ env.JULIA_DEPOT_PATH }}
           key: ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-${{ hashFiles('**/Manifest.toml') }}
       - name: Install Julia dependencies
-        run: julia --color=yes -e 'import Pkg; Pkg.UPDATED_REGISTRY_THIS_SESSION[] = true; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()'
+        run: julia --color=yes -e 'import Pkg; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()'
       - name: Build notebooks with ${{ env.NPROC }} processes
         run: julia --color=yes -p ${{ env.NPROC }} literate.jl
       - name: Deploy Notebooks
