@@ -1,7 +1,7 @@
 using Distributed
 using PrettyTables
 
-addprocs(parse(Int, get(ENV, "NPROC", "1")), env=["GKSwstype" => 100])
+addprocs(parse(Int, get(ENV, "NPROC", "1")), env=["GKSwstype" => "100"])
 
 # For worker processes
 @everywhere begin
