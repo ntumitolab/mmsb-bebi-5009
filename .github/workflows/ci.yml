@@ -53,16 +53,12 @@ jobs:
         with:
           path: ${{ env.JULIA_DEPOT_PATH }}
           key: ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-${{ hashFiles('**/Manifest.toml') }}
-      - name: Install Literate
-        env:
-          PYTHON: ${{ steps.python.outputs.python-path }}
-        run: julia --color=yes --project="" -e 'import Pkg; Pkg.add(["Literate", "PrettyTables"])'
       - name: Install Julia dependencies
         env:
           PYTHON: ${{ steps.python.outputs.python-path }}
         run: julia --color=yes --project=@. -e 'import Pkg; Pkg.UPDATED_REGISTRY_THIS_SESSION[] = true; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()'
       - name: Build notebooks with ${{ env.NPROC }} processes
-        run: julia --color=yes -p ${{ env.NPROC }} literate.jl
+        run: julia --color=yes --project=@. -p ${{ env.NPROC }} literate.jl
       - name: Deploy Notebooks
         if: ${{ github.ref == 'refs/heads/main' }}
         uses: peaceiris/actions-gh-pages@v3
