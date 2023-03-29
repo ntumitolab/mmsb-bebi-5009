@@ -1,14 +1,13 @@
-import Pkg
-Pkg.activate(@__DIR__)
 using Distributed
-using Literate
 using PrettyTables
 
-# For all processes
+addprocs(parse(Int, get(ENV, "NPROC", "1")), env=["GKSwstype" => 100])
+
+# For worker processes
 @everywhere begin
-    ENV["GKSwstype"] = 100
     import Pkg
     Pkg.activate(@__DIR__)
+    using Literate
 end
 
 folder = joinpath(@__DIR__, "docs")
