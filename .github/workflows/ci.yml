@@ -57,10 +57,9 @@ jobs:
         env:
           PYTHON: ${{ steps.python.outputs.python-path }}
           JULIA_PROJECT: ${{ github.workspace }}
-        run: julia --color=yes -e 'import Pkg; Pkg.UPDATED_REGISTRY_THIS_SESSION[] = true; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()'
+        run: julia --color=yes -e 'import Pkg; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()'
       - name: Build notebooks with ${{ env.NPROC }} processes
         env:
-          PYTHON: ${{ steps.python.outputs.python-path }}
           JULIA_PROJECT: ${{ github.workspace }}
           GKSwstype: 100
         run: julia --color=yes -p ${{ env.NPROC }} literate.jl
