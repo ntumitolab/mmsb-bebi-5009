@@ -15,13 +15,18 @@ end
 
 pretty_table([nbs ts], header=["Notebook", "Elapsed (s)"])
 
+# Retry and locate errors
 for (nb, t) in zip(nbs, ts)
     if isnan(t)
         println("Debugging notebook: ", nb)
-        withenv("JULIA_DEBUG" => "Literate") do
-            Literate.notebook(joinpath(folder, nb), folder; config)
+        try
+            withenv("JULIA_DEBUG" => "Literate") do
+                Literate.notebook(joinpath(folder, nb), folder; config)
+            end
+        catch e
+            println("Error occured in the cell above")
         end
     end
 end
 
-any(isnan, ts) && error("Error(s) occured!")
+any(isnan, ts) && error("Please checkout errors.")

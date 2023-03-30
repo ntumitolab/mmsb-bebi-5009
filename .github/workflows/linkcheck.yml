@@ -10,36 +10,27 @@ on:
     paths:
       - '.github/workflows/linkcheck.yml'
 
-env:
-  PYTHON_VER: '3.11'
-  JULIA_NUM_THREADS: 'auto'
-
 jobs:
   linkcheck:
     runs-on: ubuntu-latest
+    container: ghcr.io/sosiristseng/docker-jupyterbook:0.15.1.1
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup Python ${{ env.PYTHON_VER }}
-        uses: actions/setup-python@v4
-        id: python
-        with:
-          python-version: ${{ env.PYTHON_VER }}
       - name: Setup Julia
         uses: julia-actions/setup-julia@v1
         with:
           version: '1'
       - name: Convert literate notebooks to Markdown
         shell: julia --color=yes {0}
+        working-directory: docs/
         run: |
           import Pkg
           Pkg.add("Literate")
           using Literate
-          config = Dict("mdstrings" => true)
-          folder = joinpath(pwd(), "docs")
-          for nb in readdir(folder)
+          for nb in readdir(pwd())
               if endswith(nb, ".jl")
-                Literate.markdown(joinpath(folder, nb), folder; config, flavor = Literate.CommonMarkFlavor())
+                Literate.markdown(nb; mdstrings=true, flavor = Literate.CommonMarkFlavor())
               end
           end
       - name: Disable code cell execution
