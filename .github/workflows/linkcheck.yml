@@ -38,4 +38,4 @@ jobs:
         with:
           cmd: yq -i '.execute.execute_notebooks = "off"' 'docs/_config.yml'
       - name: Check links
-        run: pipx run jupyter-book build docs/ --builder linkcheck
+        run: jupyter-book build docs/ --builder linkcheck
