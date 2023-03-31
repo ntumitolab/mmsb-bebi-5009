@@ -21,7 +21,7 @@ jobs:
       pull-requests: write
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/sosiristseng/juliabook:1.8.5.2
+      image: ghcr.io/sosiristseng/juliabook:1.8.5.3
     steps:
       - name: Checkout
         uses: actions/checkout@v3
