@@ -13,14 +13,10 @@ on:
 jobs:
   linkcheck:
     runs-on: ubuntu-latest
-    container: ghcr.io/sosiristseng/docker-jupyterbook:0.15.1.1
+    container: ghcr.io/sosiristseng/juliabook:1.8.5.2
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup Julia
-        uses: julia-actions/setup-julia@v1
-        with:
-          version: '1'
       - name: Convert literate notebooks to Markdown
         shell: julia --color=yes {0}
         working-directory: docs/

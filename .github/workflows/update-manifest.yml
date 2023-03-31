@@ -21,10 +21,8 @@ jobs:
       pull-requests: write
     runs-on: ubuntu-latest
     container:
-      image: julia:1.8.5
+      image: ghcr.io/sosiristseng/juliabook:1.8.5.2
     steps:
-      - name: Install git
-        run: apt-get update -q && apt-get install git -y --no-install-recommends
       - name: Checkout
         uses: actions/checkout@v3
       # https://github.com/peter-evans/create-pull-request/issues/1170#issuecomment-1100101372

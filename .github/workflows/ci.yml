@@ -15,25 +15,19 @@ permissions:
   contents: write
   pull-requests: write
 
-env:
-  NPROC: '2'
-  JULIA_CACHE: '2'
-  PYTHON_VER: '3.11'
-
 jobs:
-  literate:
+  jupyter-book:
     runs-on: ubuntu-latest
+    env:
+      NPROC: '2'
+      JULIA_CACHE: '1'
     container:
-      image: julia:1.8.5
-      volumes:
-        - /srv/juliapkgs
+      image: ghcr.io/sosiristseng/juliabook:1.8.5.2
       env:
         JULIA_DEPOT_PATH: /srv/juliapkgs
-        JULIA_NUM_THREADS: auto
-
+        JULIA_NUM_THREADS: 'auto'
+        JULIA_CONDAPKG_BACKEND: 'Null' # Let PythonCall use built-in python
     steps:
-      - name: Install git
-        run: apt-get update -q && apt-get install git -y --no-install-recommends
       - name: Checkout repository
         uses: actions/checkout@v3
       - name: Cache Julia dependencies
@@ -55,64 +49,65 @@ jobs:
           GKSwstype: 100
           JULIA_PROJECT: ${{ github.workspace }}
         run: julia --color=yes -p ${{ env.NPROC }} literate.jl
+      - name: Build website
+        run: jupyter-book build docs/
+      - name: Copy binder environments
+        run: |
+          cp *.toml *.txt docs/_build/html/_sources
+          cp -R src docs/_build/html/_sources
       - name: Deploy Notebooks
         if: ${{ github.ref == 'refs/heads/main' }}
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: .
-          publish_branch: out
+          publish_dir: docs/_build/html/
           force_orphan: true
 
-  jupyter-book:
-    needs: literate
-    if: ${{ github.ref == 'refs/heads/main' }}
-    runs-on: ubuntu-latest
-    container: ghcr.io/sosiristseng/docker-jupyterbook:0.15.1.1
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          ref: out
-      - name: Build website
-        run: jupyter-book build docs/
-      - name: Upload pages artifact
-        if: ${{ github.ref == 'refs/heads/main' }}
-        uses: actions/upload-pages-artifact@v1
-        with:
-          path: docs/_build/html
-
-  # Deployment to GH pages
-  deploy:
+  binder:
     needs: jupyter-book
     if: ${{ github.ref == 'refs/heads/main' }}
-    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
-    permissions:
-      pages: write # to deploy to Pages
-      id-token: write # to verify the deployment originates from an appropriate source
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: ghcr.io/${{ github.repository }}:binder
+      PYTHON_VER: '3.11'
     steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v2
-
-  binder:
-    needs: literate
-    if: ${{ github.ref == 'refs/heads/main' }}
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout notebook branch
-      uses: actions/checkout@v3
-      with:
-        ref: out
-    - name: repo2docker
-      uses: jupyterhub/repo2docker-action@master
-      with:
-        DOCKER_REGISTRY: ghcr.io
-        DOCKER_USERNAME: ${{ github.repository_owner }}
-        DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
-        BINDER_CACHE: true
-        PUBLIC_REGISTRY_CHECK: true
+      - name: Checkout notebook branch
+        uses: actions/checkout@v3
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+      - name: Setup Python ${{ env.PYTHON_VER }}
+        uses: actions/setup-python@v4
+        id: python
+        with:
+          python-version: ${{ env.PYTHON_VER }}
+      - name: Install repo2docker
+        run:
+          pip install -U pip setuptools wheel
+          pip install https://github.com/jupyterhub/repo2docker/archive/main.zip
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Pull Image
+        run: docker pull ${{ env.IMAGE_NAME }} || true
+      - name: Build binder image with repo2docker
+        run: >
+          jupyter-repo2docker
+          --image-name ${{ env.IMAGE_NAME }}
+          --cache-from ${{ env.IMAGE_NAME }}
+          --push --no-run --user-id 1000 --user-name jovyan
+          _sources
+      - name: Add binder Dockerfile
+        run: |
+          mkdir -p .binder
+          echo "FROM ${{ env.IMAGE_NAME }}" >> .binder/Dockerfile
+      - name: Git push
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git commit -m "Add Dockerfile"
+          git push
