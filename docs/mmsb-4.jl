@@ -175,7 +175,7 @@ end
 function ∂B47(u, p, t)
     a, b = u
     @unpack k1, k2, k3, k4, n1, n2 = p
-    return db = k2 * hil(1, a, n2) - k3 * b
+    return db = k2 * hil(1, a, n2) - k4 * b
 end
 
 function model47!(D, u, p, t)
