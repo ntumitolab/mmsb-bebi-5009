@@ -23,6 +23,8 @@ jobs:
       JULIA_CACHE: '1'
     container:
       image: ghcr.io/sosiristseng/juliabook:1.8.5.3
+      volumes:
+        - /srv/juliapkgs
       env:
         JULIA_DEPOT_PATH: /srv/juliapkgs
         JULIA_NUM_THREADS: 'auto'
@@ -36,7 +38,6 @@ jobs:
         with:
           path: |
             /srv/juliapkgs
-          # ${{ github.workspace }}/.CondaPkg
           key: ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-${{ hashFiles('**/Manifest.toml') }}
           # restore-keys: |
           #   ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-

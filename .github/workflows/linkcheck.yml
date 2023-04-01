@@ -13,10 +13,11 @@ on:
 jobs:
   linkcheck:
     runs-on: ubuntu-latest
-    container: ghcr.io/sosiristseng/juliabook:1.8.5.3
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Setup Julia
+        uses: julia-actions/setup-julia@v1
       - name: Convert literate notebooks to Markdown
         shell: julia --color=yes {0}
         working-directory: docs/
@@ -29,9 +30,23 @@ jobs:
                 Literate.markdown(nb; mdstrings=true, flavor = Literate.CommonMarkFlavor())
               end
           end
-      - name: Disable code cell execution
-        uses: mikefarah/yq@master
+      - name: Restore lychee cache
+        uses: actions/cache@v3
         with:
-          cmd: yq -i '.execute.execute_notebooks = "off"' 'docs/_config.yml'
-      - name: Check links
-        run: jupyter-book build docs/ --builder linkcheck
+          path: .lycheecache
+          key: cache-lychee-${{ github.sha }}
+          restore-keys: cache-lychee-
+      - name: Link Checker
+        uses: lycheeverse/lychee-action@v1.6.1
+        id: lychee
+        with:
+          args: '--accept 200,204,429 --verbose --no-progress --cache --max-cache-age 1d docs/'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create Issue From File
+        if: ${{ steps.lychee.outputs.exit_code != 0 }}
+        uses: peter-evans/create-issue-from-file@v4
+        with:
+          title: Link Checker Report
+          content-filepath: ./lychee/out.md
+          labels: lychee

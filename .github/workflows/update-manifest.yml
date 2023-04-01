@@ -20,13 +20,11 @@ jobs:
       contents: write
       pull-requests: write
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/sosiristseng/juliabook:1.8.5.3
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      # https://github.com/peter-evans/create-pull-request/issues/1170#issuecomment-1100101372
-      - run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Setup Julia
+        uses: julia-actions/setup-julia@v1
       - name: Update Julia dependencies
         env:
           JULIA_PKG_PRECOMPILE_AUTO: 0
