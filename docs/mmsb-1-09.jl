@@ -8,6 +8,11 @@ import DisplayAs.PNG
 using Plots
 Plots.default(linewidth=2)
 
+# Convenience functions
+hil(x, k) = x / (x + k)
+hil(x, k, n) = hil(x^n, k^n)
+exprel(x) = x / expm1(x)
+
 # Stimulation current
 _istim(t) = ifelse(20 <= t <= 21, -6.6, 0.0) + ifelse(60 <= t <= 61, -6.9, 0.0)
 

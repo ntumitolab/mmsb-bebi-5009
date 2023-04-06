@@ -80,7 +80,6 @@ end
 plot!(fig, xlabel="[A]", ylabel="[B]", xlims=(0., 2.), ylims=(0., 2.), aspect_ratio=:equal)
 fig |> PNG
 
-
 # Let's sketch vector fields in phase plots.
 
 ∂A = function (x, y)
@@ -126,7 +125,7 @@ end
 
 ## nullclines
 contour!(fig, 0:0.01:2, 0:0.01:2, ∂A, levels=[0], cbar=false, line=(:black))
-plot!(fig45a, identity, 0, 0, line=(:black), label="A nullcline")  ## Adding a fake line for the legend of A nullcline
+plot!(fig, identity, 0, 0, line=(:black), label="A nullcline")  ## Adding a fake line for the legend of A nullcline
 contour!(fig, 0:0.01:2, 0:0.01:2, ∂B, levels=[0], cbar=false, line=(:black, :dash))
 plot!(fig, identity, 0, 0, line=(:black, :dash), label="B nullcline") ## Adding a fake line for the legend of B nullcline
 plot!(fig, xlim=(0., 2.), ylim=(0., 2.), legend=:bottomright, size=(600, 600), xlabel="[A]", ylabel="[B]", aspect_ratio=:equal)
@@ -141,7 +140,7 @@ quiver!(fig, xx, yy, quiver=∂F44, line=(:lightgrey), arrow=(:closed), aspect_r
 
 ## Nullclines
 contour!(fig, 0:0.01:2, 0:0.01:2, ∂A, levels=[0], cbar=false, line=(:black))
-plot!(fig45b, identity, 0, 0, line=(:black), label="A nullcline")  ## Adding a fake line for the legend of A nullcline
+plot!(fig, identity, 0, 0, line=(:black), label="A nullcline")  ## Adding a fake line for the legend of A nullcline
 contour!(fig, 0:0.01:2, 0:0.01:2, ∂B, levels=[0], cbar=false, line=(:black, :dash))
 plot!(fig, identity, 0, 0, line=(:black, :dash), label="B nullcline") ## Adding a fake line for the legend of B nullcline
 plot!(fig, xlim=(0., 2.), ylim=(0., 2.), legend=:bottomright, size=(600, 600), xlabel="[A]", ylabel="[B]")

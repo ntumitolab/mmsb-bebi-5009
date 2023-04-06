@@ -118,7 +118,8 @@ plot!(fig, xlim=(0, 5), ylim=(0, 5), legend=:topright, size=(600, 600), xlabel="
 
 fig |> PNG
 
-# Fig 4.8 C (around the unstable steady-state)
+# ## Fig 4.8 C
+# around the unstable steady-state
 
 r2 = range(1.0, 1.5, 16)
 xx2 = [x for y in r2, x in r2]
@@ -133,7 +134,7 @@ contour!(fig, 1:0.01:1.5, 1:0.01:1.5, ∂B, levels=[0], cbar=false, line=(:black
 plot!(fig, identity, 0, 0, line=(:black, :dash), label="B nullcline")
 plot!(fig, xlim=(1, 1.5), ylim=(1, 1.5), legend=:topright, size=(600, 600), xlabel="[A]", ylabel="[B]")
 
-fig48c |> PNG
+fig |> PNG
 
 # Another way to draw nullclines is to find the analytical solution when dA (or dB) is zero.
 # And sketch the nullclines as a parameteric plot
