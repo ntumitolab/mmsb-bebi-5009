@@ -22,7 +22,7 @@ jobs:
       NPROC: '2'
       JULIA_CACHE: '1'
     container:
-      image: ghcr.io/sosiristseng/juliabook:1.8.5.3
+      image: ghcr.io/sosiristseng/juliabook:1.8.5.4
       volumes:
         - /srv/juliapkgs
       env:
