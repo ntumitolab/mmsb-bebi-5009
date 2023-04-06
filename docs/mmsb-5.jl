@@ -1,4 +1,5 @@
 # # Chapter 5
+# Methionine model
 
 import DisplayAs.PNG
 using DifferentialEquations
@@ -8,6 +9,7 @@ using Plots
 Plots.default(linewidth=2)
 
 # Convenience functions
+
 hil(x, k=one(x)) = x / (x + k)
 hil(x, k, n) = hil(x^n, k^n)
 
@@ -57,7 +59,7 @@ u0 = LVector(AdoMet=10., AdoHcy=10.)
 prob = ODEProblem(metmodel!, u0, tend, ps)
 sol = solve(prob)
 
-# ## Figure  5.10
+# ## Figure 5.10
 
 fig510 = plot(sol, title="Figure 5.10", xlabel="Time (hr)", ylabel="Concentration (μM)", xlims=(0, 1), legend=:right)
 
@@ -137,3 +139,13 @@ end
 plot!(fig511b, xlims=(0, 1200), ylims=(0, 6), xlabel="AdoMet (μM)", ylabel="AdoHcy (μM)", legend=:bottomright)
 
 fig511b |> PNG
+
+# ## Runtime information
+
+import InteractiveUtils
+InteractiveUtils.versioninfo()
+
+#---
+
+import Pkg
+Pkg.status()
