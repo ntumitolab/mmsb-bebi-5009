@@ -1,5 +1,5 @@
 #===
-# Figure 4.18
+# Fig 4.18
 
 Continuation diagram
 

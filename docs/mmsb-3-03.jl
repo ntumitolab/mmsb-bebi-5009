@@ -1,4 +1,4 @@
-# # Figure 3.03
+# # Fig 3.03
 # Michaelis-Menten kinetics
 
 import DisplayAs.SVG

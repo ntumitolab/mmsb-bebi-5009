@@ -1,5 +1,5 @@
 #===
-# Figure 4.7, 4.8, 4.9, and 4.19A
+# Fig 4.7, 4.8, 4.9, 4.19A
 
 Symmetric (bistable) biological networks.
 ===#

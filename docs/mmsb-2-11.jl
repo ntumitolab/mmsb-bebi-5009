@@ -1,4 +1,4 @@
-# # Figure 2.11
+# # Fig 2.11
 # Model reduction of ODE metabolic networks.
 
 using DifferentialEquations

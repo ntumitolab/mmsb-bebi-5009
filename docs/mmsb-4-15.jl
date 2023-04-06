@@ -1,4 +1,4 @@
-# # Figure 4.15, 4.16, and 4.17
+# # Fig 4.15, 4.16, 4.17
 # Oscillatory networks.
 
 import DisplayAs.PNG

@@ -1,4 +1,4 @@
-# # Figure 4.11
+# # Fig 4.11
 # Surface plots reference: [surface plots @ PlotsGallery.jl](https://goropikari.github.io/PlotsGallery.jl/src/surface.html)
 
 import DisplayAs.PNG

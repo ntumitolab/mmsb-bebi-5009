@@ -1,6 +1,5 @@
 #===
-# Chapter 4
-## Figure 4.1, 4.2, and 4.3
+# Fig 4.1, 4.2, 4.3
 
 Steady states and phase plots in an assymetric network.
 ===#

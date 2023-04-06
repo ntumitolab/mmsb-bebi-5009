@@ -1,4 +1,4 @@
-# # Figure 4.22
+# # Fig 4.22
 # Tangent line
 import DisplayAs.PNG
 using Plots
