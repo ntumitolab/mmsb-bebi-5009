@@ -8,6 +8,7 @@ See also [BifurcationKit.jl](https://github.com/bifurcationkit/BifurcationKit.jl
 
 import DisplayAs.PNG
 using DifferentialEquations
+using UnPack
 using LabelledArrays
 using Plots
 Plots.default(linewidth=2)
@@ -36,7 +37,7 @@ plot(
     title = "Fig 4.18 Continuation diagram",
     xlabel = "K1" , ylabel= "Steady state [A]",
     legend=nothing, ylim=(0, 4), xlim=(0, 1000)
-) |> PNG
+)
 
 # ## Runtime information
 
