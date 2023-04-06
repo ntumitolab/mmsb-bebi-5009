@@ -11,19 +11,23 @@ parts:
       - file: intro-02-plotting
       - file: intro-03-diffeq
       - file: intro-04-gillespie
-  - caption: Textbook and Lectures
+  - caption: Textbook figures
     chapters:
-      - file: lecture-README
-        sections:
-          - file: lecture-ch1
-          - file: lecture-ch2
-      - file: mmsb-README
-        sections:
-          - file: mmsb-1
-          - file: mmsb-2
-          - file: mmsb-3
-          - file: mmsb-4
-          - file: mmsb-5
+      - file: mmsb-1-07
+      - file: mmsb-1-09
+      - file: mmsb-2-04
+      - file: mmsb-2-09
+      - file: mmsb-2-11
+      - file: mmsb-2-p246
+      - file: mmsb-3-03
+      - file: mmsb-3-13
+      - file: mmsb-4-01
+      - file: mmsb-4-07
+      - file: mmsb-4-11
+      - file: mmsb-4-15
+      - file: mmsb-4-18
+      - file: mmsb-4-22
+      - file: mmsb-5
   - caption: Homework
     chapters:
       - file: hw-00

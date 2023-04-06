@@ -1,56 +1,4 @@
-# # Chapter 2
-# ## Fig 2.04 Exponential decay
-
-import DisplayAs.PNG
-using Plots
-Plots.default(linewidth=2)
-
-fig = plot(title= "Figure 2.4 Exponential decay")
-for k in 1:3
-    plot!(fig, t -> 3 * exp(-k*t), 0., 5., label = "exp(-$(k)t)")
-end
-
-plot!(fig, xlim = (0, 5), ylim=(0, 3.2), xlabel="Time", ylabel="Concentration")
-
-fig |> PNG
-
-#===
-## Fig 2.09 Metabolic network simulation
-
-Using `Catalyst.jl` to simulate a metabolic network.
-===#
-
-using DifferentialEquations
-using Catalyst
-using ModelingToolkit
-using Plots
-Plots.default(linewidth=2)
-
-rn = @reaction_network begin
-    k1, 0 --> A
-    k2, A --> B
-    k3, A + B --> C + D
-    k4, C --> 0
-    k5, D --> 0
-end
-
-#---
-osys = convert(ODESystem, rn)
-for eq in osys.eqs
-    println(eq)
-end
-
-#---
-ps = [:k1 => 3., :k2 => 2., :k3 => 2.5, :k4 => 3., :k5 => 4. ]
-u0 = [:A=>0., :B=>0., :C=>0., :D=>0.]
-tend = 10.
-sol = solve(ODEProblem(rn, u0, tend, ps))
-
-plot(sol, legend=:bottomright, title="Figure 2.09 Metabolic network",
-    xlims=(0., 4.), ylims=(0., 1.),
-    xlabel="Time (sec)", ylabel="Concentration (mM)") |> PNG
-
-# ## Figure 2.11
+# # Figure 2.11
 # Model reduction of ODE metabolic networks.
 
 using DifferentialEquations
@@ -171,7 +119,7 @@ end
 
 @named model214 = make_214()
 
-# Initial condations could also be expressed in ModelingToolkit symbols
+# Initial conditions could also be expressed in ModelingToolkit symbols
 
 sol214 = solve(ODEProblem(model214, [B => (k1 * sum(last.(u0)) - k0) / (k1 + km1)], tend, ps2))
 
@@ -184,15 +132,6 @@ plot!(fig,
     xlims=(0.0, tend)
 )
 fig |> PNG
-
-# ## Problem 2.4.6
-
-using DifferentialEquations
-using Plots
-Plots.default(linewidth=2)
-
-# Using pipe operator |>
-ODEProblem((u, p, t) -> p * (1. - u), 0., 10., 1.) |> solve |> plot |> PNG
 
 # ## Runtime information
 
