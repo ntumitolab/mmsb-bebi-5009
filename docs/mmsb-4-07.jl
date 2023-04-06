@@ -11,6 +11,10 @@ using UnPack
 using Plots
 Plots.default(linewidth=2)
 
+# Convenience functions
+hil(x, k) = x / (x + k)
+hil(x, k, n) = hil(x^n, k^n)
+
 #---
 
 function ∂A47(u, p, t)
