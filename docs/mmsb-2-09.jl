@@ -7,6 +7,7 @@ Using `Catalyst.jl` to simulate a metabolic network.
 using DifferentialEquations
 using Catalyst
 using ModelingToolkit
+import DisplayAs.PNG
 using Plots
 Plots.default(linewidth=2)
 
