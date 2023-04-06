@@ -4,6 +4,7 @@
 using DifferentialEquations
 using Catalyst
 using ModelingToolkit
+import DisplayAs.PNG
 using Plots
 Plots.default(linewidth=2)
 
