@@ -29,3 +29,7 @@ Chapter 5 and beyond are applications in specific biological domain(s).
 - Signal transduction pathways.
 - Gene regulatory networks.
 - Electrophysiology and action potentials in exitable cells.
+
+### Agent-based modeling
+
+See <https://ntumitolab.github.io/jl-abm/>
