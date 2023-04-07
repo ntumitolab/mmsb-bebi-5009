@@ -68,20 +68,22 @@ end
 # Reaction of A <-> B with rate constants k1 & k2
 model(u, p, t) = [p.k1 * u[1],  p.k2 * u[2]]
 
+# problem setup
 parameters = (k1=1.0, k2=0.5)
 stoich=[[-1, 1], [1, -1]]
 u0 = [200, 0]
 tend = 10.0
 
+# Solve the problem using both direct and first reaction method
 soldirect = ssa_direct(model, u0, tend, parameters, stoich)
 solfirst = ssa_first(model, u0, tend, parameters, stoich)
 
-#---
+# Plot the solution by the direct method
 plot(soldirect.t, soldirect.u,
     xlabel="time", ylabel="# of molecules",
     title = "SSA (direct method)", label=["A" "B"]) |> PNG
 
-#---
+# Plot the solution by the first reaction method
 plot(solfirst.t, solfirst.u,
     xlabel="time", ylabel="# of molecules",
     title = "SSA (1st reaction method)", label=["A" "B"]) |> PNG
@@ -89,12 +91,12 @@ plot(solfirst.t, solfirst.u,
 # Running an ensemble of simulations
 numRuns = 50
 
-## 50 simulations
+# Run 50 simulations
 sols = map(1:numRuns) do i
     ssa_direct(model, u0, tend, parameters, stoich)
 end;
 
-# Build interpolation functions
+# A interpolation function for each solution
 itpsA = map(sols) do sol
     linear_interpolation(sol.t, sol.u[:, 1], extrapolation_bc = Line())
 end;
@@ -103,16 +105,18 @@ itpsB = map(sols) do sol
     linear_interpolation(sol.t, sol.u[:, 2], extrapolation_bc = Line())
 end;
 
-# Functions to caculate average A and B concentrations in the ensemble using the for mean(func, itr)
+# Calculate average A and B levels in the ensemble.
 a_avg(t) = mean(i->i(t), itpsA)
 b_avg(t) = mean(i->i(t), itpsB)
 
-#---
+# Plot the soluton
 fig1 = plot(xlabel="Time", ylabel="# of molecules", title = "SSA (direct method) ensemble")
 
 for sol in sols
     plot!(fig1, sol.t, sol.u, linecolor=[:blue :red], linealpha=0.05, label=false)
 end
+
+fig1 |> PNG
 
 ## Plot averages
 plot!(fig1, a_avg, 0.0, tend, linecolor=:black, linewidth=3, linestyle = :solid, label="Avarage [A]")
@@ -156,7 +160,7 @@ plot(sol) |> PNG
 
 ensprob = EnsembleProblem(jumpProb)
 sim = solve(ensprob, SSAStepper(), EnsembleThreads(); trajectories=50)
-plot(sim, alpha=0.5, color=[:blue :red]) |> PNG
+plot(sim, alpha=0.1, color=[:blue :red]) |> PNG
 
 #--
 summ = EnsembleSummary(sim, 0:0.1:10)
