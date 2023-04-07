@@ -12,53 +12,52 @@ Plots.default(linewidth=2)
 
 #---
 
-function init_model63(events=[]; name)
-    @variables t
-    vs = @variables R(t) P(t) RL(t) Ps(t)
-    ps = @parameters Rt=3 Pt=8 k1=5 km1=1 k2=6 k3=2 L=0
-    D = Differential(t)
-    eqs = [
-        Rt ~ R + RL,
-        Pt ~ P + Ps,
-        D(R) ~ -k1 * L * R + km1 * RL,
-        D(P) ~ -k2 * P * RL + k3 * Ps
-    ]
-    sys = ODESystem(eqs, t, vs, ps; name, discrete_events=events)
-    return structural_simplify(sys)
+rn = @reaction_network begin
+    (k1 * L, km1), R <--> RL
+    k2, P + RL --> Ps + RL
+    k3, Ps--> P
 end
-
-# Fig. 6.3 A
-@variables t
-@parameters L
-add_ligand = [1.0] => [L ~ 3.0]
-rm_ligand = [3.0] => [L ~ 0.0]
-
-@named sys = init_model63([add_ligand, rm_ligand])
-@unpack R, Rt, P, Pt = sys
-u0 = [R => Rt, P => Pt]
-tend = 10.
-prob = ODEProblem(sys, u0, tend)
 
 #---
 
-sol = solve(prob)
+setdefaults!(rn, [
+    :R => 3.,
+    :RL => 0.,
+    :P => 8.0,
+    :Ps => 0.,
+    :L => 0.,
+    :k1 => 5.,
+    :km1 => 1.,
+    :k2 => 6.,
+    :k3 => 2.,
+])
 
-@unpack RL, Ps = sys
-fig = plot(
-    sol, idxs=[RL, Ps],
-    labels= ["RL" "P*"],
-    title="Fig. 6.3 (A)",
-    xlabel="Time",
-    ylabel="Concentration"
-)
+osys = convert(ODESystem, rn; remove_conserved = true)
 
+#---
+observed(osys)
+
+#---
+@unpack L = osys
+idx = findfirst(isequal(L), parameters(osys))
+
+# ## Fig. 6.3 A
+cb1 = PresetTimeCallback([1.0], i -> i.p[idx] = 3.)
+cb2 = PresetTimeCallback([3.0], i -> i.p[idx] = 0.)
+cbs = CallbackSet(cb1, cb2)
+prob = ODEProblem(osys, [], (0., 10.))
+
+#---
+sol = solve(prob, callback=cbs)
+@unpack RL, Ps = osys
+
+fig = plot(sol, idxs=[RL, Ps], labels= ["RL" "P*"])
 plot!(fig, t -> 3 * (1<=t<=3), label="Ligand", line=(:black, :dash), linealpha=0.7)
+plot!(fig, title="Fig. 6.3 (A)", xlabel="Time", ylabel="Concentration")
+#--
 
 # Fig 6.3 (B)
 
-@named sys = init_model63()
-@unpack L, Ps, RL = sys
-idx = findfirst(isequal(L), parameters(sys))
 lrange = 0:0.01:1
 
 prob_func = function(prob, i, repeat)
@@ -68,7 +67,7 @@ prob_func = function(prob, i, repeat)
 end
 
 #---
-prob = SteadyStateProblem(sys, u0, [])
+prob = SteadyStateProblem(osys, [])
 #---
 eprob = EnsembleProblem(prob; prob_func)
 #---
