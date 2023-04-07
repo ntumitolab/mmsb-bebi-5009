@@ -56,7 +56,7 @@ plot!(fig, t -> 3 * (1<=t<=3), label="Ligand", line=(:black, :dash), linealpha=0
 plot!(fig, title="Fig. 6.3 (A)", xlabel="Time", ylabel="Concentration")
 #--
 
-# Fig 6.3 (B)
+# ## Fig 6.3 (B)
 
 lrange = 0:0.01:1
 
