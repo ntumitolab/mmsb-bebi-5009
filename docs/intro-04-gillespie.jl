@@ -68,10 +68,16 @@ end
 # Reaction of A <-> B with rate constants k1 & k2
 model(u, p, t) = [p.k1 * u[1],  p.k2 * u[2]]
 
-# problem setup
+# Parameters
 parameters = (k1=1.0, k2=0.5)
+
+# Stoichiometry for each reaction
 stoich=[[-1, 1], [1, -1]]
+
+# Initial conditions
 u0 = [200, 0]
+
+# Simulation time
 tend = 10.0
 
 # Solve the problem using both direct and first reaction method
@@ -92,7 +98,7 @@ plot(solfirst.t, solfirst.u,
 numRuns = 50
 
 # Run 50 simulations
-sols = map(1:numRuns) do i
+sols = map(1:numRuns) do _
     ssa_direct(model, u0, tend, parameters, stoich)
 end;
 
