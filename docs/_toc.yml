@@ -29,6 +29,7 @@ parts:
       - file: mmsb-4-22
       - file: mmsb-5
       - file: mmsb-6-03
+      - file: mmsb-6-05
       - file: mmsb-6-07
   - caption: Homework
     chapters:
