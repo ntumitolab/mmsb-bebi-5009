@@ -11,8 +11,10 @@ parts:
       - file: intro-02-plotting
       - file: intro-03-diffeq
       - file: intro-04-gillespie
-  - caption: Textbook figures
+  - caption: MMSB textbook
     chapters:
+    - file: mmsb-README
+      sections:
       - file: mmsb-1-07
       - file: mmsb-1-09
       - file: mmsb-2-04
