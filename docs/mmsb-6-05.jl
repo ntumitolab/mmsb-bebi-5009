@@ -15,7 +15,7 @@ Plots.default(linewidth=2)
 rn = @reaction_network begin
     (kRL * L, kRLm), R <--> RL
     kGa, G + RL --> Ga + Gbg + RL
-    KGd0, Ga --> Gd
+    kGd0, Ga --> Gd
     kG1, Gd + Gbg --> G
 end
 
@@ -25,7 +25,7 @@ setdefaults!(rn, [
     :kRL => 2e6,
     :kRLm => 0.01,
     :kGa => 1e-5,
-    :KGd0 => 0.11,
+    :kGd0 => 0.11,
     :kG1 => 1,
     :R => 4e3,
     :RL => 0.,
