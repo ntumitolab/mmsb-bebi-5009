@@ -35,6 +35,7 @@ parts:
       - file: mmsb-6-07
       - file: mmsb-6-14
       - file: mmsb-6-16
+      - file: mmsb-6-18
   - caption: Homework
     chapters:
       - file: hw-00
