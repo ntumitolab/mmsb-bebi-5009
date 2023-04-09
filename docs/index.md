@@ -32,4 +32,4 @@ Chapter 5 and beyond are applications in specific biological domain(s).
 
 ### Agent-based modeling
 
-See <https://ntumitolab.github.io/jl-abm/>
+See <https://sosiristseng.github.io/jl-abm/>
