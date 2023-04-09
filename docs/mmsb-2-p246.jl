@@ -1,4 +1,4 @@
-# # Problem 2.4.6
+# # Prob 2.4.6
 
 using DifferentialEquations
 using Plots

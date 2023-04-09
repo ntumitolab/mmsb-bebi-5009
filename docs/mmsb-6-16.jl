@@ -1,5 +1,5 @@
 #===
-# Figure 6.16
+# Fig 6.16
 
 Model of apoptosis signalling pathway
 ===#

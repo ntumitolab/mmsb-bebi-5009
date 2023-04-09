@@ -1,5 +1,5 @@
 #===
-# Figure 6.14
+# Fig 6.14
 
 Model of E. coli chemotaxis signalling pathway
 ===#

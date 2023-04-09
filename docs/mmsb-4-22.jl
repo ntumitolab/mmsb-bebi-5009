@@ -7,7 +7,7 @@ Plots.default(linewidth=2)
 # Curve
 f = x -> 3 / (x-2)
 
-# x = 4
+# slopeand y intercept for x = 4
 slope = ForwardDiff.derivative(f, 4)
 yintercept = f(4)
 # Tangent line
