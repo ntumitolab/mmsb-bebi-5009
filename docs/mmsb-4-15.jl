@@ -41,7 +41,7 @@ u0s = (
 tend = 8.
 sols = map(u0s) do u0
     solve(ODEProblem(model415!, u0, tend, ps1))
-end
+end;
 
 # ## Figure 4.15 A
 fig = plot(sols[1], xlabel="Time", ylabel="Concentration", title ="Fig 4.15 (A)", xlims=(0., 8.)) |> PNG
@@ -94,7 +94,7 @@ u0s = (
 
 sols = map(u0s) do u0
     solve(ODEProblem(model415!, u0, tend, ps2))
-end
+end;
 
 # ## Fig 4.16 A
 fig416a = plot(sols[1], xlabel="Time", ylabel="Concentration", title ="Fig 4.16(A)", xlims=(0., 8.))  |> PNG
