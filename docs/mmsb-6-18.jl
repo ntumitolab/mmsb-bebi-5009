@@ -70,3 +70,13 @@ prob = ODEProblem(osys, [], (0., 120.))
 sol = solve(prob, callback=cbs)
 @unpack C = osys
 plot(sol, idxs=[C], title="Fig 6.18 (B)", xlabel="Time", ylabel="Ca concentration", legend=false, ylim=(0, 2.5))
+
+# ## Runtime information
+
+import InteractiveUtils
+InteractiveUtils.versioninfo()
+
+#---
+
+import Pkg
+Pkg.status()

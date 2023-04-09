@@ -68,3 +68,13 @@ sol = solve(prob, callback=cbs)
 @unpack Am = osys
 
 plot(sol, idxs=[Am], title="Fig 6.14", xlabel="Time", ylabel="Active CheA ([Am])", ylims=(0.01, 0.04), legend=false)
+
+# ## Runtime information
+
+import InteractiveUtils
+InteractiveUtils.versioninfo()
+
+#---
+
+import Pkg
+Pkg.status()

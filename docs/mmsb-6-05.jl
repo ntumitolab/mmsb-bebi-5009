@@ -81,3 +81,13 @@ ga = map(s->s[Ga], sim)
 rl = map(s->s[RL], sim)
 plot(lrange .* 1e9, [ga rl], label=["Ga" "RL"], title="Fig. 6.5 (B)",
 xlabel="Ligand (nM)", ylabel="Steady-state abundance", xlims=(0, 20), ylims=(0, 3500))
+
+# ## Runtime information
+
+import InteractiveUtils
+InteractiveUtils.versioninfo()
+
+#---
+
+import Pkg
+Pkg.status()

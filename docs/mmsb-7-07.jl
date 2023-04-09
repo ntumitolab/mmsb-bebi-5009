@@ -142,4 +142,15 @@ sim_mod = solve(eprob_mod, DynamicSS(Rodas5()); trajectories=length(lerange))
 plot(lerange, [sim sim_mod], label=["Original" "Modified"],
     xlabel="External lactose concentration (μM)",
     ylabel="β-galactosidase",
-    title="Fig 7.7 (B)")
+    title="Fig 7.7 (B)"
+)
+
+# ## Runtime information
+
+import InteractiveUtils
+InteractiveUtils.versioninfo()
+
+#---
+
+import Pkg
+Pkg.status()

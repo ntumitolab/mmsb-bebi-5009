@@ -79,3 +79,13 @@ pstar = map(s->s[Ps], sim)
 rl = map(s->s[RL], sim)
 plot(lrange, [pstar rl], label=["P*" "RL"], title="Fig. 6.3 (B)",
 xlabel="Ligand", ylabel="Steady-state concentration", xlims=(0, 1), ylims=(0, 8))
+
+# ## Runtime information
+
+import InteractiveUtils
+InteractiveUtils.versioninfo()
+
+#---
+
+import Pkg
+Pkg.status()
