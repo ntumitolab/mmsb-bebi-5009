@@ -9,7 +9,7 @@ ENV JULIA_DEPOT_PATH /srv/juliapkg/
 RUN mkdir -p ${JULIA_DEPOT_PATH} && chown ${NB_UID}:${NB_UID} ${JULIA_DEPOT_PATH}
 ENV JULIA_PATH /usr/local/julia/
 ENV PATH ${JULIA_PATH}/bin:${PATH}
-COPY --from=julia:1.9.0-rc2 ${JULIA_PATH} ${JULIA_PATH}
+COPY --from=julia:1.8.5 ${JULIA_PATH} ${JULIA_PATH}
 
 FROM base as runtime
 USER ${NB_UID}
