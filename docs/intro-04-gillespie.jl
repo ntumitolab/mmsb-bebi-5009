@@ -2,8 +2,6 @@
 # Stochastic simulations
 
 ## Gillespie Algorithm
-
-and friends!
 ===#
 
 using StatsBase         ## Weights() and sample()
@@ -13,7 +11,7 @@ using Statistics        ## mean()
 using Random            ## randexp()
 import DisplayAs.PNG    ## Save memory and disk space
 Random.seed!(2022)
-Plots.default(fmt=:png)
+
 
 #===
 Stochastic chemical reaction: Gillespie Algorithm (direct method)
@@ -50,9 +48,8 @@ function ssa_first(model, u0, tend, p, stoich; tstart=zero(tend))
     us = copy(u) ## States over time
     while t < tend
         a = model(u, p, t)              ## propensities
-        dts = randexp(length(a)) ./ a   ## dts from all reactions
-        # Choose the reaction
-        i = argmin(dts)
+        dts = randexp(length(a)) ./ a   ## time scales of all reactions
+        i = argmin(dts) ## Choose which reaction to occur
         dt = dts[i]
         du = stoich[i]
         u .+= du  ## Update state
