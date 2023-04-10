@@ -7,7 +7,7 @@ ENV JULIA_NUM_THREADS "auto"
 ENV JULIA_PATH /usr/local/julia/
 ENV JULIA_DEPOT_PATH /srv/juliapkg/
 ENV PATH ${JULIA_PATH}/bin:${PATH}
-COPY --from=julia:1.8.5 ${JULIA_PATH} ${JULIA_PATH}
+COPY --from=julia:1.9.0-rc2 ${JULIA_PATH} ${JULIA_PATH}
 
 FROM base
 
