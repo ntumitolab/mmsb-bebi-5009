@@ -17,4 +17,4 @@ COPY --chown=${NB_UID}:${NB_UID} src/ src
 RUN julia --color=yes --project="" -e 'import Pkg; Pkg.add("IJulia"); using IJulia; installkernel("Julia", "--project=@.")' &&\
     julia --color=yes --project=@. -e 'import Pkg; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()'
 
-COPY --chown=${NB_UID}:${NB_UID} . ${HOME}
+COPY --chown=${NB_UID}:${NB_UID} docs/ docs
