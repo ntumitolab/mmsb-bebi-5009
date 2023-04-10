@@ -67,7 +67,7 @@ jobs:
           ${{ env.IMAGE_NAME }}
           jupyter nbconvert --to notebook --execute --inplace
           --ExecutePreprocessor.timeout=${{ env.TIMEOUT }}
-          --ExecutePreprocessor.kernel_name=julia-$(julia -e 'print(VERSION.major,".",VERSION.minor)')
+          --ExecutePreprocessor.kernel_name=julia-1.9
           docs/${{ matrix.notebook }}
       - name: Upload Notebook
         uses: actions/upload-artifact@v3
