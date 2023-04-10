@@ -64,7 +64,7 @@ jobs:
           target: runtime
       - name: Execute Notebook
         run: >
-          docker run --rm
+          docker run --rm --user root
           --workdir=/tmp -v ${{ github.workspace }}:/tmp
           ${{ env.IMAGE_NAME }}
           jupyter nbconvert --to notebook --execute --inplace
