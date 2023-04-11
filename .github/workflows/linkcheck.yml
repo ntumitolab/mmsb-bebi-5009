@@ -25,10 +25,12 @@ jobs:
           import Pkg
           Pkg.add("Literate")
           using Literate
-          for nb in readdir(pwd())
-              if endswith(nb, ".jl")
-                Literate.markdown(nb; mdstrings=true, flavor = Literate.CommonMarkFlavor())
+          for (root, dirs, files) in walkdir(pwd())
+            for file in files
+              if endswith(file, ".jl")
+                Literate.markdown(file; mdstrings=true, flavor = Literate.CommonMarkFlavor())
               end
+            end
           end
       - name: Restore lychee cache
         uses: actions/cache@v3
