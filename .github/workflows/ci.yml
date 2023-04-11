@@ -44,7 +44,7 @@ jobs:
       - name: Install Julia dependencies
         env:
           JULIA_PROJECT: ${{ github.workspace }}
-        run: julia --color=yes -e 'import Pkg; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()'
+        run: julia --color=yes -e 'import Pkg; Pkg.Registry.update(); Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()'
       - name: Build notebooks with ${{ env.NPROC }} processes
         env:
           GKSwstype: 100
