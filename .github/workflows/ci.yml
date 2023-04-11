@@ -54,7 +54,7 @@ jobs:
         run: jupyter-book build docs/
       - name: Copy binder environments
         run: |
-          cp *.toml *.txt docs/_build/html/_sources
+          cp *.toml docs/_build/html/_sources
           cp -R src docs/_build/html/_sources
       - name: Deploy Notebooks
         if: ${{ github.ref == 'refs/heads/main' }}
