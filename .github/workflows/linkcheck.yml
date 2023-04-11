@@ -28,7 +28,7 @@ jobs:
           for (root, dirs, files) in walkdir(pwd())
             for file in files
               if endswith(file, ".jl")
-                Literate.markdown(file; mdstrings=true, flavor = Literate.CommonMarkFlavor())
+                Literate.markdown(joinpath(root, file); mdstrings=true, flavor = Literate.CommonMarkFlavor())
               end
             end
           end
