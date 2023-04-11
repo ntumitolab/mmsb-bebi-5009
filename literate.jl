@@ -19,8 +19,7 @@ for (root, dirs, files) in walkdir(basedir)
 end
 
 ts = pmap(nbs; on_error=ex->NaN) do nb
-    outdir = joinpath(basedir, dirname(nb))
-    @elapsed Literate.notebook(nb, outdir; config)
+    @elapsed Literate.notebook(nb, dirname(nb); config)
 end
 
 pretty_table([nbs ts], header=["Notebook", "Elapsed (s)"])
