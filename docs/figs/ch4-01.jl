@@ -49,7 +49,7 @@ u0s = [
 tend = 1.5
 
 #---
-sols = [solve(ODEProblem(model41!, u0, tend, ps1)) for u0 in u0s]
+sols = [solve(ODEProblem(model41!, u0, tend, ps1)) for u0 in u0s];
 
 #---
 plot(sols[1], xlabel="Time", ylabel="Concentration", title="Fig. 4.2 A (Time series)", labels=["[A]" "[B]"])
