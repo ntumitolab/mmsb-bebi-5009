@@ -20,13 +20,10 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NPROC: '2'
-      JULIA_CACHE: '1'
+      JULIA_CACHE: '2'
     container:
-      image: ghcr.io/sosiristseng/juliabook:1.8.5.7
-      volumes:
-        - /srv/juliapkgs
+      image: ghcr.io/sosiristseng/juliabook:1.9.0rc2
       env:
-        JULIA_DEPOT_PATH: /srv/juliapkgs
         JULIA_NUM_THREADS: 'auto'
         JULIA_CONDAPKG_BACKEND: 'Null' # Let PythonCall use built-in python
         GKSwstype: 100
@@ -37,9 +34,8 @@ jobs:
         uses: actions/cache@v3
         if: ${{ env.JULIA_CACHE != '0'}}
         with:
-          path: |
-            /srv/juliapkgs
-          key: ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-${{ hashFiles('**/Manifest.toml') }}
+          path: ~/.julia
+          key: ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-${{ hashFiles('*.toml') }}
           restore-keys: |
             ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-
       - name: Install Julia dependencies
@@ -48,9 +44,9 @@ jobs:
         run: JULIA_PROJECT="@." julia --color=yes -p ${{ env.NPROC }} literate.jl
       - name: Build website
         run: jupyter-book build docs/
-      - name: Copy binder environments
+      - name: Copy binder environment
         run: |
-          cp *.toml docs/_build/html/_sources
+          cp Project.toml *.txt docs/_build/html/_sources
           cp -R src docs/_build/html/_sources
       - name: Deploy Notebooks
         if: ${{ github.ref == 'refs/heads/main' }}
