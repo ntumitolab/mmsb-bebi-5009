@@ -11,6 +11,7 @@ using Catalyst
 using ModelingToolkit
 using Plots
 Plots.default(linewidth=2)
+import DisplayAs.SVG
 
 #---
 rn = @reaction_network begin
@@ -33,9 +34,12 @@ prob = ODEProblem(rn, u0, tend, ps)
 sol = solve(prob)
 
 #---
-plot(sol, legend=:bottomright, title="Figure 2.09 Metabolic network",
+fig = plot(sol, legend=:bottomright, title="Fig 2.9",
     xlims=(0., 4.), ylims=(0., 1.),
-    xlabel="Time (sec)", ylabel="Concentration (mM)")
+    xlabel="Time (sec)", ylabel="Concentration (mM)"
+)
+
+fig |> SVG
 
 # ## Runtime information
 import Pkg

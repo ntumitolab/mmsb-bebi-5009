@@ -11,6 +11,7 @@ using LabelledArrays
 using UnPack
 using Plots
 Plots.default(linewidth=2)
+import DisplayAs.SVG
 
 # Convenience functions
 hil(x, k) = x / (x + k)
@@ -39,17 +40,18 @@ events = CallbackSet(
     PresetTimeCallback(40., on_40!),
 )
 
-#---
+# Prepare
 ps = LVector(a1=3.0, a2=2.5, β=4.0, γ=4.0, i1=0.0, i2=0.0)
 u0 = LVector(s1=0.075, s2=2.5)
 tend = 50.0
 
-#---
+# solve and visualize
 prob = ODEProblem(collins!, u0, tend, ps)
 sol = solve(prob, callback=events)
 
-#---
-plot(sol, legend=:right, xlabel = "Time", ylabel="Concentration", title="Figure 1.7 Collins toggle switch")
+fig = plot(sol, legend=:right, xlabel = "Time", ylabel="Concentration", title="Fig 1.7")
+
+fig |> SVG
 
 # ## Runtime information
 import Pkg

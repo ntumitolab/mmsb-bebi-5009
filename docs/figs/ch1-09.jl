@@ -10,6 +10,7 @@ using LabelledArrays
 using UnPack
 using Plots
 Plots.default(linewidth=2)
+import DisplayAs.SVG
 
 # Convenience functions
 hil(x, k) = x / (x + k)
@@ -60,10 +61,12 @@ prob = ODEProblem(hh!, u0, tend, ps)
 sol = solve(prob, tstops=[20., 60.])
 
 #---
-p1 = plot(sol, idxs=[:v], ylabel="Membrane potential (mV)", xlabel="", legend=false, title="Figure 1.9 Hodgkin-Huxley model")
+p1 = plot(sol, idxs=[:v], ylabel="Membrane potential (mV)", xlabel="", legend=false, title="Fig 1.9")
 p2 = plot(sol, idxs = [:m, :h, :n], xlabel="")
 p3 = plot(_istim, sol.t, xlabel="Time (ms)", ylabel="Current", labels="Stimulation current")
-plot(p1, p2, p3, layout=(3, 1), size=(600, 900), leftmargin=5*Plots.mm)
+fig = plot(p1, p2, p3, layout=(3, 1), size=(600, 900), leftmargin=5*Plots.mm)
+
+fig |> SVG
 
 # ## Runtime information
 import Pkg

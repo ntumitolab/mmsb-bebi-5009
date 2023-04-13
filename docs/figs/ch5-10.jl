@@ -9,6 +9,7 @@ using LabelledArrays
 using UnPack
 using Plots
 Plots.default(linewidth=2)
+import DisplayAs.SVG
 
 #---
 hil(x, k=one(x)) = x / (x + k)
@@ -60,7 +61,9 @@ u0 = LVector(AdoMet=10., AdoHcy=10.)
 prob = ODEProblem(metmodel!, u0, tend, ps)
 sol = solve(prob)
 
-plot(sol, title="Figure 5.10", xlabel="Time (hr)", ylabel="Concentration (μM)", xlims=(0, 1), legend=:right)
+fig = plot(sol, title="Figure 5.10", xlabel="Time (hr)", ylabel="Concentration (μM)", xlims=(0, 1), legend=:right)
+
+fig |> SVG
 
 # ## Figure 5.11 A
 
@@ -70,11 +73,11 @@ ry = range(0, 6, 101)
 ∂A = (x, y) -> metmodel((x, y), ps, 0)[1]
 ∂B = (x, y) -> metmodel((x, y), ps, 0)[2]
 
-fig511a = plot(title="Figure 5.11A")
-contour!(fig511a, rx, ry, ∂A, levels=[0], cbar=false, line=(:black))
-plot!(fig511a, Float64[], Float64[], line=(:black), label="AdoMet nullcline")
-contour!(fig511a, rx, ry, ∂B, levels=[0], cbar=false, line=(:black, :dash))
-plot!(fig511a, Float64[], Float64[], line=(:black, :dash), label="AdoHcy nullcline")
+fig = plot(title="Figure 5.11A")
+contour!(fig, rx, ry, ∂A, levels=[0], cbar=false, line=(:black))
+plot!(fig, Float64[], Float64[], line=(:black), label="AdoMet nullcline")
+contour!(fig, rx, ry, ∂B, levels=[0], cbar=false, line=(:black, :dash))
+plot!(fig, Float64[], Float64[], line=(:black, :dash), label="AdoHcy nullcline")
 
 tend = 15.
 u0s = (
@@ -90,13 +93,18 @@ u0s = (
     [600.,5.25]
 )
 
-for u0 in u0s
-    local prob = ODEProblem(metmodel!, u0, tend, ps)
-    local sol = solve(prob)
-    plot!(fig511a, sol, idxs=(1, 2), label=false, alpha=0.5)
+sols = map(u0s) do u0
+    prob = ODEProblem(metmodel!, u0, tend, ps)
+    sol = solve(prob)
 end
 
-plot!(fig511a, xlims=(0, 1200), ylims=(0, 6), xlabel="AdoMet (μM)", ylabel="AdoHcy (μM)", legend=:bottomright)
+for sol in sols
+    plot!(fig, sol, idxs=(1, 2), label=false, alpha=0.5)
+end
+
+plot!(fig, xlims=(0, 1200), ylims=(0, 6), xlabel="AdoMet (μM)", ylabel="AdoHcy (μM)", legend=:bottomright)
+
+fig |> SVG
 
 # ## Figure 5.11 B
 # Increase methionine level
@@ -109,11 +117,11 @@ ry = range(0, 6, 101)
 ∂A = (x, y) -> metmodel((x, y), ps2, 0)[1]
 ∂B = (x, y) -> metmodel((x, y), ps2, 0)[2]
 
-fig511b = plot(title="Figure 5.11B")
-contour!(fig511b, rx, ry, ∂A, levels=[0], cbar=false, line=(:black))
-plot!(fig511b, Float64[], Float64[], line=(:black), label="AdoMet nullcline")
-contour!(fig511b, rx, ry, ∂B, levels=[0], cbar=false, line=(:black, :dash))
-plot!(fig511b, Float64[], Float64[], line=(:black, :dash), label="AdoHcy nullcline")
+fig = plot(title="Figure 5.11B")
+contour!(fig, rx, ry, ∂A, levels=[0], cbar=false, line=(:black))
+plot!(fig, Float64[], Float64[], line=(:black), label="AdoMet nullcline")
+contour!(fig, rx, ry, ∂B, levels=[0], cbar=false, line=(:black, :dash))
+plot!(fig, Float64[], Float64[], line=(:black, :dash), label="AdoHcy nullcline")
 
 tend = 15.
 u0s = (
@@ -126,11 +134,18 @@ u0s = (
     [720,5.5]
 )
 
-for u0 in u0s
-    plot!(fig511b, ODEProblem(metmodel!, u0, tend, ps) |> solve, idxs=(1, 2), label=false, alpha=0.5)
+sols = map(u0s) do u0
+    prob = ODEProblem(metmodel!, u0, tend, ps)
+    sol = solve(prob)
 end
 
-plot!(fig511b, xlims=(0, 1200), ylims=(0, 6), xlabel="AdoMet (μM)", ylabel="AdoHcy (μM)", legend=:bottomright)
+for sol in sols
+    plot!(fig, sol, idxs=(1, 2), label=false, alpha=0.5)
+end
+
+plot!(fig, xlims=(0, 1200), ylims=(0, 6), xlabel="AdoMet (μM)", ylabel="AdoHcy (μM)", legend=:bottomright)
+
+fig |> SVG
 
 # ## Runtime information
 import Pkg

@@ -11,12 +11,13 @@ using UnPack
 using LabelledArrays
 using Plots
 Plots.default(linewidth=2)
+import DisplayAs.SVG
 
+#---
 hil(x, k) = x / (x + k)
 hil(x, k, n) = hil(x^n, k^n)
 
 #---
-
 function model418!(D, u, p, t)
     @unpack a, b = u
     @unpack k1, k2, k3, k4, k5, n = p
@@ -33,12 +34,14 @@ function ainf(k1)
 end
 
 #---
-plot(
+fig = plot(
     ainf, 0, 1000,
-    title = "Fig 4.18 Continuation diagram",
+    title = "Fig 4.18",
     xlabel = "K1" , ylabel= "Steady state [A]",
     legend=nothing, ylim=(0, 4), xlim=(0, 1000)
 )
+
+fig |> SVG
 
 # ## Runtime information
 import Pkg

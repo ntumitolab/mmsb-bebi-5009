@@ -9,6 +9,7 @@ using ModelingToolkit
 using DifferentialEquations
 using Plots
 Plots.default(linewidth=2)
+import DisplayAs.SVG
 
 #---
 rn = @reaction_network begin
@@ -58,9 +59,8 @@ cbs = CallbackSet(cb1, cb2, cb3, cb4)
 prob = ODEProblem(osys, [], (0., 2500.))
 sol = solve(prob, callback=cbs)
 
-
 @unpack M, Y, L = osys
-plot(sol, idxs=[Y], xlabel="Time (min)", title="Fig 7.7 (A)", label="β-galactosidase monomer")
+fig = plot(sol, idxs=[Y], xlabel="Time (min)", title="Fig 7.7 (A)", label="β-galactosidase monomer")
 
 lac = function (t)
     if 500 < t < 1000
@@ -74,7 +74,9 @@ lac = function (t)
     end
 end
 
-plot!(lac, 0, 2500, label="External lactose (μM)")
+plot!(fig, lac, 0, 2500, label="External lactose (μM)")
+
+fig |> SVG
 
 # ## Fig 7.07 (B)
 # Compare the original model and the modified model
@@ -137,11 +139,13 @@ eprob_mod = EnsembleProblem(prob_mod;
 sim = solve(eprob, DynamicSS(Rodas5()); trajectories=length(lerange))
 sim_mod = solve(eprob_mod, DynamicSS(Rodas5()); trajectories=length(lerange))
 
-plot(lerange, [sim sim_mod], label=["Original" "Modified"],
+fig = plot(lerange, [sim sim_mod], label=["Original" "Modified"],
     xlabel="External lactose concentration (μM)",
     ylabel="β-galactosidase",
     title="Fig 7.7 (B)"
 )
+
+fig |> SVG
 
 # ## Runtime information
 import Pkg

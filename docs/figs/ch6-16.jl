@@ -9,6 +9,7 @@ using ModelingToolkit
 using DifferentialEquations
 using Plots
 Plots.default(linewidth=2)
+import DisplayAs.SVG
 
 #---
 rn = @reaction_network begin
@@ -25,6 +26,8 @@ rn = @reaction_network begin
     k18, C8sBAR --> 0
     k19, C3sIAP --> 0
 end
+
+#---
 
 setdefaults!(rn, [
     :k1 => 507,
@@ -74,7 +77,9 @@ prob = ODEProblem(osys, [], (0., 1800.))
 sol = solve(prob, callback=cbs)
 
 @unpack C8s, C3s = osys
-plot(sol, idxs=[C8s, C3s], title="Fig 6.16", xlabel="Time", ylabel="Concentration", legend=:right, rightmargin=5*Plots.mm)
+fig = plot(sol, idxs=[C8s, C3s], title="Fig 6.16", xlabel="Time", ylabel="Concentration", legend=:right, rightmargin=5*Plots.mm)
+
+fig |> SVG
 
 # ## Runtime information
 import Pkg

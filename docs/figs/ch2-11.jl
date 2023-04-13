@@ -11,6 +11,7 @@ using Catalyst
 using ModelingToolkit
 using Plots
 Plots.default(linewidth=2)
+import DisplayAs.SVG
 
 rn211 = @reaction_network begin
     k0, 0 --> A
@@ -26,12 +27,14 @@ tend = 3.0
 sol211 = solve(ODEProblem(rn211, u0, tend, ps1))
 
 # Fig 2.11
-plot(
+fig = plot(
     sol211,
     xlabel="Time (AU)",
     ylabel="Concentration (AU)",
     title="Fig. 2.11 (Full model)"
 )
+
+fig |> SVG
 
 # ## Figure 2.12 : Rapid equilibrium assumption
 
@@ -81,6 +84,8 @@ plot!(fig,
     ylabel="Concentration (AU)"
 )
 
+fig |> SVG
+
 #===
 ## Figure 2.13: Rapid equilibrium (take 2)
 
@@ -101,6 +106,8 @@ plot!(fig,
     xlabel="Time (AU)",
     ylabel="Concentration (AU)"
 )
+
+fig |> SVG
 
 #===
 ## Figure 2.14 : QSSA
@@ -136,6 +143,8 @@ plot!(fig,
     title="Figure 2.14: Ref vs QSSA",
     xlims=(0.0, tend)
 )
+
+fig |> SVG
 
 # ## Runtime information
 import Pkg

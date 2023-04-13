@@ -9,6 +9,7 @@ using Catalyst
 using DifferentialEquations
 using Plots
 Plots.default(linewidth=2)
+import DisplayAs.SVG
 
 #---
 
@@ -70,7 +71,9 @@ prob = ODEProblem(osys, [], (0., 50.))
 sol = solve(prob, callback=cbs)
 
 @unpack Am = osys
-plot(sol, idxs=[Am], title="Fig 6.14", xlabel="Time", ylabel="Active CheA ([Am])", ylims=(0.01, 0.04), legend=false)
+fig = plot(sol, idxs=[Am], title="Fig 6.14", xlabel="Time", ylabel="Active CheA ([Am])", ylims=(0.01, 0.04), legend=false)
+
+fig |> SVG
 
 # ## Runtime information
 import Pkg

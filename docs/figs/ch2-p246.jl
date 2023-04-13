@@ -3,8 +3,11 @@
 using DifferentialEquations
 using Plots
 Plots.default(linewidth=2)
+import DisplayAs.SVG
 
-ODEProblem((u, p, t) -> p * (1. - u), 0., 10., 1.) |> solve |> plot
+fig = ODEProblem((u, p, t) -> p * (1. - u), 0., 10., 1.) |> solve |> plot
+
+fig |> SVG
 
 # ## Runtime information
 import Pkg

@@ -9,6 +9,7 @@ using ModelingToolkit
 using DifferentialEquations
 using Plots
 Plots.default(linewidth=2)
+import DisplayAs.SVG
 
 #---
 rn = @reaction_network begin
@@ -50,7 +51,9 @@ prob = ODEProblem(osys, [], (0., 25.), [I => 2.0])
 sol = solve(prob)
 
 @unpack C, RIC, RICC = osys
-plot(sol, idxs=[C, RIC, RICC], title="Fig 6.18 (A)", xlabel="Time", ylabel="Abundance", legend=:topright)
+fig = plot(sol, idxs=[C, RIC, RICC], title="Fig 6.18 (A)", xlabel="Time", ylabel="Abundance", legend=:topright)
+
+fig |> SVG
 
 # ## Fig 6.18 (B)
 
@@ -64,7 +67,9 @@ prob = ODEProblem(osys, [], (0., 120.))
 sol = solve(prob, callback=cbs)
 
 @unpack C = osys
-plot(sol, idxs=[C], title="Fig 6.18 (B)", xlabel="Time", ylabel="Ca concentration", legend=false, ylim=(0, 2.5))
+fig = plot(sol, idxs=[C], title="Fig 6.18 (B)", xlabel="Time", ylabel="Ca concentration", legend=false, ylim=(0, 2.5))
+
+fig |> SVG
 
 # ## Runtime information
 import Pkg

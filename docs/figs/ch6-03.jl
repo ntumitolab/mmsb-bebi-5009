@@ -8,6 +8,7 @@ using Catalyst
 using DifferentialEquations
 using Plots
 Plots.default(linewidth=2)
+import DisplayAs.SVG
 
 #---
 rn = @reaction_network begin
@@ -52,6 +53,8 @@ fig = plot(sol, idxs=[RL, Ps], labels= ["RL" "P*"])
 plot!(fig, t -> 3 * (1<=t<=3), label="Ligand", line=(:black, :dash), linealpha=0.7)
 plot!(fig, title="Fig. 6.3 (A)", xlabel="Time", ylabel="Concentration")
 
+fig |> SVG
+
 # ## Fig 6.3 B
 
 lrange = 0:0.01:1
@@ -68,8 +71,10 @@ sim = solve(eprob, DynamicSS(Rodas5()); trajectories=length(lrange))
 
 pstar = map(s->s[Ps], sim)
 rl = map(s->s[RL], sim)
-plot(lrange, [pstar rl], label=["P*" "RL"], title="Fig. 6.3 (B)",
+fig = plot(lrange, [pstar rl], label=["P*" "RL"], title="Fig. 6.3 (B)",
 xlabel="Ligand", ylabel="Steady-state concentration", xlims=(0, 1), ylims=(0, 8))
+
+fig |> SVG
 
 # ## Runtime information
 import Pkg

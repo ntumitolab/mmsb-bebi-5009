@@ -136,6 +136,8 @@ fig1 |> PNG
 ===#
 
 using Catalyst
+using DifferentialEquations
+using Plots
 
 rn = @reaction_network begin
     k1, A --> B
@@ -143,8 +145,6 @@ rn = @reaction_network begin
 end
 
 # The system with *integer* state variables belongs to `DiscreteProblem`. A `DiscreteProblem` could be further dispatched into other types of problems, such as `ODEProblem`, `SDEProblem`, and `JumpProblem`.
-
-using DifferentialEquations
 
 params = [:k1 => 1.0, :k2 => 0.5]
 u0 = [:A => 200, :B => 0]
@@ -156,17 +156,21 @@ dprob = DiscreteProblem(rn, u0, (0.0, tend), params)
 
 jumpProb = JumpProblem(rn, dprob, Direct())
 sol = solve(jumpProb, SSAStepper())
+fig = plot(sol)
 
-using Plots
-plot(sol)
+fig |> PNG
 
 # Parallel ensemble simulation
 ensprob = EnsembleProblem(jumpProb)
 sim = solve(ensprob, SSAStepper(), EnsembleThreads(); trajectories=50)
-plot(sim, alpha=0.1, color=[:blue :red]) |> PNG
+fig = plot(sim, alpha=0.1, color=[:blue :red])
+
+fig |> PNG
+#---
 
 summ = EnsembleSummary(sim, 0:0.1:10)
-plot(summ,fillalpha=0.5) |> PNG
+fig = plot(summ,fillalpha=0.5)
+fig |> PNG
 
 #===
 **See also** the [JumpProcesses.jl docs](https://docs.sciml.ai/JumpProcesses/stable/api/#JumpProcesses.ConstantRateJump) about discrete stochastic examples.
