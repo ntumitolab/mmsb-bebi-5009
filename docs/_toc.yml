@@ -24,6 +24,7 @@ parts:
       - file: figs/ch3-03
       - file: figs/ch3-13
       - file: figs/ch4-01
+      - file: figs/ch4-07
       - file: figs/ch4-11
       - file: figs/ch4-15
       - file: figs/ch4-18
