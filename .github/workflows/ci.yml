@@ -59,43 +59,7 @@ jobs:
   binder:
     needs: jupyter-book
     if: ${{ github.ref == 'refs/heads/main' }}
-    runs-on: ubuntu-latest
-    env:
-      IMAGE_NAME: ghcr.io/${{ github.repository }}:binder
-      PYTHON_VER: '3.11'
-    steps:
-      - name: Checkout notebook branch
-        uses: actions/checkout@v3
-        with:
-          ref: gh-pages
-          fetch-depth: 0
-      - name: Setup Python ${{ env.PYTHON_VER }}
-        uses: actions/setup-python@v4
-        id: python
-        with:
-          python-version: ${{ env.PYTHON_VER }}
-      - name: Install repo2docker
-        run:
-          pip install -U pip setuptools wheel
-          pip install https://github.com/jupyterhub/repo2docker/archive/main.zip
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Pull Image
-        run: docker pull ${{ env.IMAGE_NAME }} || true
-      - name: Build binder image with repo2docker
-        run: >
-          jupyter-repo2docker
-          --image-name ${{ env.IMAGE_NAME }}
-          --cache-from ${{ env.IMAGE_NAME }}
-          --push --no-run --user-id 1000 --user-name jovyan
-          _sources
-      - name: Add binder Dockerfile
-        run: |
-          mkdir -p .binder
-          echo "FROM ${{ env.IMAGE_NAME }}" >> .binder/Dockerfile
-      - name: Push changes
-        uses: stefanzweifel/git-auto-commit-action@v4
+    uses: sosiristseng/jbook-workflows/.github/workflows/binder.yml@main
+    with:
+        dir: _sources
+        ref: gh-pages

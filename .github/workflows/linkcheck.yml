@@ -4,51 +4,7 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '0 0 1 * *' # Every month
-  push:
-    branches:
-      - main
-    paths:
-      - '.github/workflows/linkcheck.yml'
 
 jobs:
   linkcheck:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Julia
-        uses: julia-actions/setup-julia@v1
-      - name: Convert literate notebooks to Markdown
-        shell: julia --color=yes {0}
-        working-directory: docs/
-        run: |
-          import Pkg
-          Pkg.add("Literate")
-          using Literate
-          for (root, dirs, files) in walkdir(pwd())
-            for file in files
-              if endswith(file, ".jl")
-                Literate.markdown(joinpath(root, file); mdstrings=true, flavor = Literate.CommonMarkFlavor())
-              end
-            end
-          end
-      - name: Restore lychee cache
-        uses: actions/cache@v3
-        with:
-          path: .lycheecache
-          key: cache-lychee-${{ github.sha }}
-          restore-keys: cache-lychee-
-      - name: Link Checker
-        uses: lycheeverse/lychee-action@v1.6.1
-        id: lychee
-        with:
-          args: '--accept 200,204,429 --verbose --no-progress --cache --max-cache-age 1d docs/'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Create Issue From File
-        if: ${{ steps.lychee.outputs.exit_code != 0 }}
-        uses: peter-evans/create-issue-from-file@v4
-        with:
-          title: Link Checker Report
-          content-filepath: ./lychee/out.md
-          labels: lychee
+    uses: sosiristseng/jbook-workflows/.github/workflows/lychee.yml@main

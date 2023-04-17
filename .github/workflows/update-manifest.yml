@@ -4,46 +4,19 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '0 0 * * 1' # Every week
-  push:
-    branches:
-      - main
-    paths:
-      - '.github/workflows/update-manifest.yml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  update-manifest:
+  update:
     permissions:
       contents: write
       pull-requests: write
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Julia
-        uses: julia-actions/setup-julia@v1
-        with:
-          version: ~1.9.0-rc2
-      - name: Update Julia dependencies
-        env:
-          JULIA_PKG_PRECOMPILE_AUTO: 0
-        run: julia --color=yes --project=@. -e "import Pkg; Pkg.update()"
-      # Authenticate with a custom GitHub APP
-      # https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#authenticating-with-github-app-generated-tokens
-      - name: Generate token for PR
-        uses: tibdex/github-app-token@v1
-        id: generate-token
-        with:
-          app_id: ${{ secrets.APP_ID }} # https://github.com/apps/wen-wei-s-pr-bot
-          private_key: ${{ secrets.APP_PRIVATE_KEY }}
-      - name: Create Pull Request
-        id: cpr
-        uses: peter-evans/create-pull-request@v5
-        with:
-          title: Julia Dependency Update
-          token: ${{ steps.generate-token.outputs.token }}
-          labels: |
-            automerge
+    uses: sosiristseng/jbook-workflows/.github/workflows/update-manifest.yml@main
+    with:
+      julia-version: "~1.9.0-rc2"
+    secrets:
+      APP_ID: ${{ secrets.APP_ID }}
+      APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
