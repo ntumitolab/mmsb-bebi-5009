@@ -5,10 +5,10 @@ manifest_format = "2.0"
 project_hash = "2eb3917650c670319976664a69f7dc55e4a354b3"
 
 [[deps.AbstractAlgebra]]
-deps = ["GroupsCore", "InteractiveUtils", "LinearAlgebra", "MacroTools", "Markdown", "Random", "RandomExtensions", "SparseArrays", "Test"]
-git-tree-sha1 = "a69dbe3b376ace7d9eebe2db43216e8b52ba6da9"
+deps = ["GroupsCore", "InteractiveUtils", "LinearAlgebra", "MacroTools", "Random", "RandomExtensions", "SparseArrays", "Test"]
+git-tree-sha1 = "3ee5c58774f4487a5bf2bb05e39d91ff5022b4cc"
 uuid = "c3fe647b-3220-5bb0-a1ea-a7954cac585d"
-version = "0.29.2"
+version = "0.29.4"
 
 [[deps.AbstractTrees]]
 git-tree-sha1 = "faa260e4cb5aba097a73fab382dd4b5819d8ec8c"
@@ -205,9 +205,9 @@ version = "1.0.2"
 
 [[deps.CommonMark]]
 deps = ["Crayons", "JSON", "SnoopPrecompile", "URIs"]
-git-tree-sha1 = "e2f4627b0d3f2c1876360e0b242a7c23923b469d"
+git-tree-sha1 = "4a52799aee66e9528bd59e9c0bdd9322c0bf6998"
 uuid = "a80b9123-70ca-4bc0-993e-6e3bcb318db6"
-version = "0.8.10"
+version = "0.8.11"
 
 [[deps.CommonSolve]]
 git-tree-sha1 = "9441451ee712d1aec22edad62db1a9af3dc8d852"
@@ -1129,9 +1129,9 @@ version = "1.6.0"
 
 [[deps.OrdinaryDiffEq]]
 deps = ["Adapt", "ArrayInterface", "DataStructures", "DiffEqBase", "DocStringExtensions", "ExponentialUtilities", "FastBroadcast", "FastClosures", "FiniteDiff", "ForwardDiff", "FunctionWrappersWrappers", "IfElse", "LinearAlgebra", "LinearSolve", "Logging", "LoopVectorization", "MacroTools", "MuladdMacro", "NLsolve", "NonlinearSolve", "Polyester", "PreallocationTools", "Preferences", "RecursiveArrayTools", "Reexport", "SciMLBase", "SciMLNLSolve", "SimpleNonlinearSolve", "SimpleUnPack", "SnoopPrecompile", "SparseArrays", "SparseDiffTools", "StaticArrayInterface", "StaticArrays", "TruncatedStacktraces"]
-git-tree-sha1 = "9fb1f72106bfa1370006b90771cfbcce6c7468b6"
+git-tree-sha1 = "b639e192c0422c849aeda7240382375961d0cb4b"
 uuid = "1dea7af3-3e70-54e6-95c3-0bf5283fa5ed"
-version = "6.49.4"
+version = "6.50.0"
 
 [[deps.PCRE2_jll]]
 deps = ["Artifacts", "Libdl"]
@@ -1539,9 +1539,9 @@ weakdeps = ["OffsetArrays", "StaticArrays"]
 
 [[deps.StaticArrays]]
 deps = ["LinearAlgebra", "Random", "StaticArraysCore", "Statistics"]
-git-tree-sha1 = "b8d897fe7fa688e93aef573711cb207c08c9e11e"
+git-tree-sha1 = "63e84b7fdf5021026d0f17f76af7c57772313d99"
 uuid = "90137ffa-7385-5640-81b9-e52037218182"
-version = "1.5.19"
+version = "1.5.21"
 
 [[deps.StaticArraysCore]]
 git-tree-sha1 = "6b7ba252635a5eff6a0b0664a41ee140a1c9e72a"
@@ -1744,9 +1744,9 @@ version = "0.4.1"
 
 [[deps.Unitful]]
 deps = ["ConstructionBase", "Dates", "LinearAlgebra", "Random"]
-git-tree-sha1 = "823d8c0d0955aa6df3f715067ec4536562f42912"
+git-tree-sha1 = "dba3eba51b9512695b59e0bd8263ac074c5ed2d9"
 uuid = "1986cc42-f94f-5a68-af5c-568840ba703d"
-version = "1.13.0"
+version = "1.13.1"
 
 [[deps.Unityper]]
 deps = ["ConstructionBase"]
