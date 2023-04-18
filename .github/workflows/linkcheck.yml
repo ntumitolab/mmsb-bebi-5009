@@ -4,7 +4,12 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '0 0 1 * *' # Every month
+  push:
+    branches:
+      main
+    paths:
+      .github/workflows/linkcheck.yml
 
 jobs:
   linkcheck:
-    uses: sosiristseng/jbook-workflows/.github/workflows/lychee.yml@main
+    uses: sosiristseng/juliabook/.github/workflows/lychee.yml@main

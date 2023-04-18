@@ -1,6 +1,7 @@
 name: Jupyter Book Website
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
   pull_request:
@@ -20,18 +21,20 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NPROC: '2'
-      JULIA_CACHE: '2'
+      JULIA_CACHE: '1'
     container:
       image: ghcr.io/sosiristseng/juliabook:1.9.0rc2
       env:
         JULIA_NUM_THREADS: 'auto'
-        JULIA_CONDAPKG_BACKEND: 'Null' # Let PythonCall use built-in python
+        # Let PythonCall use built-in python
+        JULIA_CONDAPKG_BACKEND: 'Null'
         GKSwstype: 100
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Cache Julia dependencies
-        uses: actions/cache@v3
+      - name: Restore Julia dependencies
+        id: restore-cache
+        uses: actions/cache/restore@v3
         if: ${{ env.JULIA_CACHE != '0'}}
         with:
           path: ~/.julia
@@ -39,27 +42,37 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-
       - name: Install Julia dependencies
-        run: JULIA_PROJECT="@." julia --color=yes  -e 'import Pkg; Pkg.Registry.update(); Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()'
-      - name: Build notebooks with ${{ env.NPROC }} process(es)
-        run: JULIA_PROJECT="@." julia --color=yes -p ${{ env.NPROC }} literate.jl
+        run: |
+          julia --color=yes --project="" -e 'import Pkg; Pkg.Registry.update(); Pkg.add(["Literate", "PrettyTables"])'
+          julia --color=yes --project=@. -e 'import Pkg; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()'
+      - name: Save Julia dependencies
+        uses: actions/cache/save@v3
+        if: ${{ steps.restore-cache.outputs.cache-hit != 'true' && env.JULIA_CACHE != '0' }}
+        with:
+          path: ~/.julia
+          key: ${{ steps.restore-cache.outputs.cache-primary-key }}
+      - name: Build notebooks with ${{ env.NPROC }} processes
+        run: JULIA_PROJECT=@. julia --color=yes -p ${{ env.NPROC }} literate.jl
       - name: Build website
         run: jupyter-book build docs/
-      - name: Copy binder environment
+      - name: Copy environment files for binder
+        env:
+          DEST: docs/_build/html/_sources
         run: |
-          cp Project.toml *.txt docs/_build/html/_sources
-          cp -R src docs/_build/html/_sources
+          cp *.txt $DEST || true
+          cp Project.toml $DEST
+          cp -R src $DEST
       - name: Deploy Notebooks
         if: ${{ github.ref == 'refs/heads/main' }}
         uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ github.token }}
           publish_dir: docs/_build/html/
           force_orphan: true
-
   binder:
     needs: jupyter-book
     if: ${{ github.ref == 'refs/heads/main' }}
-    uses: sosiristseng/jbook-workflows/.github/workflows/binder.yml@main
+    uses: sosiristseng/juliabook/.github/workflows/binder.yml@main
     with:
         dir: _sources
         ref: gh-pages
