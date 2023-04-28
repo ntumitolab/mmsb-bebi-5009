@@ -10,7 +10,7 @@ using Plots
 Plots.default(linewidth=2)
 import DisplayAs.SVG
 
-#---
+# Reaction neetwork
 rn = @reaction_network begin
     (k1, km1), S + E <--> ES
     k2, ES --> E + P
