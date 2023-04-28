@@ -7,7 +7,7 @@ See also [BifurcationKit.jl](https://github.com/bifurcationkit/BifurcationKit.jl
 ===#
 
 using DifferentialEquations
-using UnPack
+using SimpleUnPack
 using LabelledArrays
 using Plots
 Plots.default(linewidth=2)

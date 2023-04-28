@@ -6,7 +6,7 @@ Steady states and phase plots in an asymmetric network.
 
 using DifferentialEquations
 using LabelledArrays
-using UnPack
+using SimpleUnPack
 using Plots
 Plots.default(linewidth=2)
 import DisplayAs.SVG

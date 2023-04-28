@@ -6,7 +6,7 @@ Methionine model
 
 using DifferentialEquations
 using LabelledArrays
-using UnPack
+using SimpleUnPack
 using Plots
 Plots.default(linewidth=2)
 import DisplayAs.SVG

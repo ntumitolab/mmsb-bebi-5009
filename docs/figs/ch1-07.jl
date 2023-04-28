@@ -8,7 +8,7 @@ For Figures 1.7, 7.13, 7.14, 7.15
 
 using DifferentialEquations
 using LabelledArrays
-using UnPack
+using SimpleUnPack
 using Plots
 Plots.default(linewidth=2)
 import DisplayAs.SVG
