@@ -6,9 +6,9 @@ on:
     - cron: '0 0 * * 1' # Every week
   push:
     branches:
-      main
+      - main
     paths:
-      .github/workflows/update-manifest.yml
+      - .github/workflows/update-manifest.yml
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -20,8 +20,6 @@ jobs:
       contents: write
       pull-requests: write
     uses: sosiristseng/juliabook/.github/workflows/update-manifest.yml@main
-    with:
-      julia-version: "1.9.0-rc2"
     secrets:
       APP_ID: ${{ secrets.APP_ID }}
       APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
