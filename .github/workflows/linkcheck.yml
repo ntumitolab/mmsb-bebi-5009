@@ -6,9 +6,10 @@ on:
     - cron: '0 0 1 * *' # Every month
   push:
     branches:
-      main
+      - main
     paths:
-      .github/workflows/linkcheck.yml
+      - 'docs/**'
+      - '.github/workflows/linkcheck.yml'
 
 jobs:
   linkcheck:

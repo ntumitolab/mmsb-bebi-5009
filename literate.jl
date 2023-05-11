@@ -10,6 +10,7 @@ config = Dict("mdstrings" => true, "execute" => true)
 
 nbs = String[]
 
+# Collect the list of Literate notebooks
 for (root, dirs, files) in walkdir(basedir)
     for file in files
         if (endswith(file, ".jl"))
@@ -18,6 +19,7 @@ for (root, dirs, files) in walkdir(basedir)
     end
 end
 
+# Execute the notebooks in worker processes
 ts = pmap(nbs; on_error=ex->NaN) do nb
     @elapsed Literate.notebook(nb, dirname(nb); config)
 end

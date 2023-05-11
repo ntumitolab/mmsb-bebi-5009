@@ -15,11 +15,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  update:
+  update-manifest:
     permissions:
       contents: write
       pull-requests: write
     uses: sosiristseng/juliabook/.github/workflows/update-manifest.yml@main
+    with:
+      julia-version: '1'
     secrets:
-      APP_ID: ${{ secrets.APP_ID }}
+      APP_ID: ${{ secrets.APP_ID }} # https://github.com/apps/wen-wei-s-pr-bot
       APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
