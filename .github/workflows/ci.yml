@@ -21,14 +21,16 @@ jobs:
     env:
       NPROC: '2'       # Number of Julia processes to run the notebooks
       JULIA_CACHE: '1' # Set this env var zero to disable caching
-    container:
-      image: python:3.11.3-slim
-      env:
-        GKSwstype: 100
-        JULIA_NUM_THREADS: 'auto'
+      GKSwstype: 100
+      JULIA_NUM_THREADS: 'auto'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+      - name: Setup Python ${{ env.PYTHON_VER }}
+        uses: actions/setup-python@v4
+        id: python
+        with:
+          python-version: ${{ env.PYTHON_VER }}
       - name: Install Python dep
         run: pip install -r requirements.txt
       - name: Read Julia version
@@ -44,19 +46,21 @@ jobs:
         uses: actions/cache/restore@v3
         if: ${{ env.JULIA_CACHE != '0'}}
         with:
-          path: ~/.julia
-          key: ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-${{ hashFiles('*.toml') }}
+          path: |
+            ~/.julia
+          key: ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-${{ hashFiles('Manifest.toml') }}
           restore-keys: |
             ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-
       - name: Install Julia dependencies
         run: |
-          JULIA_PROJECT="" julia --color=yes -e 'import Pkg; Pkg.Registry.update(); Pkg.add(["Literate", "PrettyTables"])'
-          JULIA_PROJECT=@. julia --color=yes -e 'import Pkg; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile(); Pkg.gc()'
+          julia --color=yes --project="" -e 'import Pkg; Pkg.Registry.update(); Pkg.add(["Literate", "PrettyTables"])'
+          julia --color=yes --project=@. -e 'import Pkg; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile(); Pkg.gc()'
       - name: Save Julia dependencies
         uses: actions/cache/save@v3
         if: ${{ steps.restore-cache.outputs.cache-hit != 'true' && env.JULIA_CACHE != '0' }}
         with:
-          path: ~/.julia
+          path: |
+            ~/.julia
           key: ${{ steps.restore-cache.outputs.cache-primary-key }}
       - name: Build notebooks with ${{ env.NPROC }} processes
         run: JULIA_PROJECT=@. julia --color=yes -p ${{ env.NPROC }} literate.jl
@@ -109,70 +113,6 @@ jobs:
         if: ${{ github.ref == 'refs/heads/main' }}
         with:
           path: docs/_build/html
-
-  binder:
-    name: Build binder image
-    needs: jupyter-book
-    if: ${{ github.ref == 'refs/heads/main' }}
-    permissions:
-      packages: write
-      contents: write
-      pull-requests: write
-    env:
-      IMAGE_NAME: ghcr.io/${{ github.repository }}:binder
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Python ${{ env.PYTHON_VER }}
-        uses: actions/setup-python@v4
-        id: python
-        with:
-          python-version: ${{ env.PYTHON_VER }}
-      - name: Remove existing binder dockerfile and docs folder
-        run: |
-          rm -rf .binder || true
-          rm -rf docs || true
-      - name: Download built notebooks to replace the original
-        uses: actions/download-artifact@v3
-        with:
-          name: notebooks
-          path: docs/
-      - name: Display structure of downloaded files
-        run: ls -R
-        working-directory: docs/
-      - name: Install repo2docker
-        run: |
-          pip install -U pip setuptools wheel
-          pip install https://github.com/jupyterhub/repo2docker/archive/main.zip
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Pull Image
-        run: docker pull ${{ env.IMAGE_NAME }} || true
-      - name: Build binder image with repo2docker
-        run: >
-          jupyter-repo2docker
-          --user-id 1000 --user-name jovyan
-          --image-name ${{ env.IMAGE_NAME }}
-          --cache-from ${{ env.IMAGE_NAME }}
-          --push --no-run
-          .
-      - name: Add binder Dockerfile
-        run: |
-          mkdir -p .binder
-          echo "FROM ${{ env.IMAGE_NAME }}" > .binder/Dockerfile
-      - name: Create Pull Request
-        id: cpr
-        uses: peter-evans/create-pull-request@v5
-        with:
-          title: Binder dockerfile update
-          branch: binderfile
-          add-paths: |
-            .binder/Dockerfile
 
   deploy:
     name: Deploy to GitHub pages
