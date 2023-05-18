@@ -11,36 +11,33 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  PYTHON_VER: '3.11'
-
 jobs:
   execute:
     name: Execute notebooks
     runs-on: ubuntu-latest
     env:
       NPROC: '2'       # Number of Julia processes to run the notebooks
-      JULIA_CACHE: '1' # Set this env var zero to disable caching
+      JULIA_CACHE: '2' # Set this env var zero to disable caching
       GKSwstype: 100
       JULIA_NUM_THREADS: 'auto'
+      JULIA_CONDAPKG_BACKEND: 'Null'
+    container:
+      image: python:3.11.3-slim
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Setup Python ${{ env.PYTHON_VER }}
-        uses: actions/setup-python@v4
-        id: python
-        with:
-          python-version: ${{ env.PYTHON_VER }}
-      - name: Install Python dep
-        run: pip install -r requirements.txt
+      - name: Install Python dependencies
+        run: pip install --no-cache-dir -r requirements.txt
       - name: Read Julia version
         id: read_toml
-        run: |
-          echo "JULIA_VER=$(python read_toml.py)" | tee -a "$GITHUB_ENV"
-      - name: Setup Julia ${{ env.JULIA_VER }}
+        uses: SebRollen/toml-action@v1.0.2
+        with:
+          file: 'Manifest.toml'
+          field: 'julia_version'
+      - name: Setup Julia
         uses: julia-actions/setup-julia@v1
         with:
-          version: ${{ env.JULIA_VER }}
+          version: ${{ steps.read_toml.outputs.value }}
       - name: Restore Julia dependencies
         id: restore-cache
         uses: actions/cache/restore@v3
@@ -73,6 +70,8 @@ jobs:
   jupyter-book:
     name: Jupyter Book
     runs-on: ubuntu-latest
+    container:
+      image: python:3.11.3-slim
     needs: execute
     steps:
       - name: Checkout
@@ -87,27 +86,10 @@ jobs:
       - name: Display structure of downloaded files
         run: ls -R
         working-directory: docs/
-      - name: Setup Python ${{ env.PYTHON_VER }}
-        uses: actions/setup-python@v4
-        id: python
-        with:
-          python-version: ${{ env.PYTHON_VER }}
-      - uses: syphar/restore-virtualenv@v1
-        id: cache-virtualenv
-        with:
-          requirement_files: .github/requirements.txt  # this is optional
-      - uses: syphar/restore-pip-download-cache@v1
-        if: steps.cache-virtualenv.outputs.cache-hit != 'true'
-        # the package installation will only be executed when the
-        # requirements-files have changed.
       - name: Install Python dependencies
-        if: steps.cache-virtualenv.outputs.cache-hit != 'true'
-        run: pip install -r .github/requirements.txt
-      - name: Setup Pages
-        id: pages
-        uses: actions/configure-pages@v3
+        run: pip install --no-cache-dir -r .github/requirements.txt
       - name: Build website
-        run: jupyter-book build docs
+        run: jupyter-book build docs/
       - name: Upload artifact for GH pages
         uses: actions/upload-pages-artifact@v1
         if: ${{ github.ref == 'refs/heads/main' }}
