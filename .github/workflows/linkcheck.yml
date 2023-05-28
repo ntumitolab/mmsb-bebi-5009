@@ -12,7 +12,7 @@ on:
       - '.github/workflows/linkcheck.yml'
 
 env:
-  DIR: "docs"
+  DIR: 'docs'
 
 jobs:
   linkcheck:
