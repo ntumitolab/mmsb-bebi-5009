@@ -13,7 +13,7 @@ concurrency:
 
 env:
   NPROC: '2'       # Number of Julia processes to run the notebooks
-  JULIA_CACHE: '2' # Set this env var zero to disable caching
+  JULIA_CACHE: '1' # Set this to zero to disable caching
   JULIA_CONDAPKG_BACKEND: 'Null'  # Use system python for PythonCall.jl
   GKSwstype: 100
   JULIA_NUM_THREADS: 'auto'
