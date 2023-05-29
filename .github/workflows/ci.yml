@@ -57,8 +57,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-
       - name: Install Julia dependencies
+        shell: julia --project=@. --color=yes {0}
         run: |
-          JULIA_PROJECT=@. julia --color=yes -e 'import Pkg; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile(); Pkg.gc()'
+          import Pkg
+          Pkg.Registry.update()
+          Pkg.instantiate()
+          Pkg.resolve()
+          Pkg.precompile()
+          Pkg.gc()
       - name: Save Julia dependencies
         uses: actions/cache/save@v3
         if: ${{ steps.restore-cache.outputs.cache-hit != 'true' && env.JULIA_CACHE != '0' }}
@@ -67,7 +73,9 @@ jobs:
             ~/.julia
           key: ${{ steps.restore-cache.outputs.cache-primary-key }}
       - name: Build notebooks with ${{ env.NPROC }} processes
-        run: JULIA_PROJECT=@. julia --color=yes -p ${{ env.NPROC }} literate.jl
+        env:
+          JULIA_PROJECT: '@.'
+        run: julia --color=yes -p ${{ env.NPROC }} literate.jl
       - name: Build website
         run: jupyter-book build docs/
       - name: Upload artifact for GH pages
