@@ -20,8 +20,7 @@ env:
   PY_VER: '3.11'
 
 jobs:
-  execute:
-    name: Execute notebooks and build website
+  CI:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -86,7 +85,7 @@ jobs:
 
   deploy:
     name: Deploy to GitHub pages
-    needs: execute
+    needs: CI
     if: ${{ github.ref == 'refs/heads/main'}}
     # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
     permissions:
