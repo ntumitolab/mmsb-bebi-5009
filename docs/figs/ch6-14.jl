@@ -74,11 +74,3 @@ sol = solve(prob, callback=cbs)
 fig = plot(sol, idxs=[Am], title="Fig 6.14", xlabel="Time", ylabel="Active CheA ([Am])", ylims=(0.01, 0.04), legend=false)
 
 fig |> SVG
-
-# ## Runtime information
-import Pkg
-Pkg.status()
-
-#---
-import InteractiveUtils
-InteractiveUtils.versioninfo()

@@ -75,11 +75,3 @@ fig = plot(lrange, [pstar rl], label=["P*" "RL"], title="Fig. 6.3 (B)",
 xlabel="Ligand", ylabel="Steady-state concentration", xlims=(0, 1), ylims=(0, 8))
 
 fig |> SVG
-
-# ## Runtime information
-import Pkg
-Pkg.status()
-
-#---
-import InteractiveUtils
-InteractiveUtils.versioninfo()

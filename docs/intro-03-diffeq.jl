@@ -272,12 +272,3 @@ prob = ODEProblem(sir_rn, u0, tspan, p)
 sol = solve(prob)
 
 plot(sol, legend=:right, title = "SIR Model")
-
-# ## Runtime information
-
-import Pkg
-Pkg.status()
-
-#---
-import InteractiveUtils
-InteractiveUtils.versioninfo()

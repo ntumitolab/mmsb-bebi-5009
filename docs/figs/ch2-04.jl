@@ -15,11 +15,3 @@ end
 plot!(fig, xlim = (0, 5), ylim=(0, 3.2), xlabel="Time", ylabel="Concentration")
 
 fig |> SVG
-
-# ## Runtime information
-import Pkg
-Pkg.status()
-
-#---
-import InteractiveUtils
-InteractiveUtils.versioninfo()

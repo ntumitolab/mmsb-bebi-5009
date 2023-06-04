@@ -21,11 +21,3 @@ p4 = contourf(x2, y2, z2)
 fig = plot(p1, p2, p3, p4, size=(800, 600))
 
 fig |> PNG
-
-# ## Runtime information
-import Pkg
-Pkg.status()
-
-#---
-import InteractiveUtils
-InteractiveUtils.versioninfo()

@@ -77,11 +77,3 @@ plot!(fig, title="Fig. 3.03",
 )
 
 fig |> SVG
-
-# ## Runtime information
-import Pkg
-Pkg.status()
-
-#---
-import InteractiveUtils
-InteractiveUtils.versioninfo()

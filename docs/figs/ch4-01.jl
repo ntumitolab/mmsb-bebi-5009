@@ -158,11 +158,3 @@ plot!(fig, Float64[], Float64[], line=(:black, :dash), label="B nullcline") ## A
 plot!(fig, xlim=(0., 2.), ylim=(0., 2.), legend=:bottomright, size=(600, 600), xlabel="[A]", ylabel="[B]")
 
 fig |> SVG
-
-# ## Runtime information
-import Pkg
-Pkg.status()
-
-#---
-import InteractiveUtils
-InteractiveUtils.versioninfo()

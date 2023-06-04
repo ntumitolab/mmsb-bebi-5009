@@ -29,11 +29,3 @@ plot!(fig, xlabel="Reaction rate", ylabel="Inhibitor concentration",
 )
 
 fig |> SVG
-
-# ## Runtime information
-import Pkg
-Pkg.status()
-
-#---
-import InteractiveUtils
-InteractiveUtils.versioninfo()

@@ -1,3 +1,5 @@
+#===
+
 # Mathematical Modeling in Systems Biology
 
 ## Course information
@@ -33,3 +35,13 @@ Chapter 5 and beyond are applications in specific biological domain(s).
 ### Agent-based modeling
 
 See <https://sosiristseng.github.io/jl-abm/>
+
+===#
+
+# ## Runtime information
+import Pkg
+Pkg.status()
+
+#---
+import InteractiveUtils
+InteractiveUtils.versioninfo()

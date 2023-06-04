@@ -116,11 +116,3 @@ quiver(xx, yy, quiver=∇f, aspect_ratio=:equal, line=(:black), arrow=(:closed))
 savefig("vfield.png")
 # Save the figure saved in a variable
 savefig(fig, "subplots.png")
-
-# ## Runtime information
-import Pkg
-Pkg.status()
-
-#---
-import InteractiveUtils
-InteractiveUtils.versioninfo()

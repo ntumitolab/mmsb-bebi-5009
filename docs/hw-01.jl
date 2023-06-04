@@ -106,11 +106,3 @@ sol = mysolve(model, u0, tspan, p, dt=1.0, method=rk4)
 ```
 
 ===#
-
-# ## Runtime information
-import Pkg
-Pkg.status()
-
-#---
-import InteractiveUtils
-InteractiveUtils.versioninfo()

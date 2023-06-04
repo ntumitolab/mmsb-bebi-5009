@@ -40,11 +40,3 @@ fig = plot(sol, legend=:bottomright, title="Fig 2.9",
 )
 
 fig |> SVG
-
-# ## Runtime information
-import Pkg
-Pkg.status()
-
-#---
-import InteractiveUtils
-InteractiveUtils.versioninfo()

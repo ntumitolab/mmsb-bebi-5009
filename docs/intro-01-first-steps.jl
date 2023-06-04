@@ -829,11 +829,3 @@ func(-2 + 0im)
 
 #---
 func(true, "it just works and compiles down to optimal code")
-
-# ## Runtime information
-import Pkg
-Pkg.status()
-
-#---
-import InteractiveUtils
-InteractiveUtils.versioninfo()

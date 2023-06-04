@@ -146,11 +146,3 @@ fig = plot(lerange, [sim sim_mod], label=["Original" "Modified"],
 )
 
 fig |> SVG
-
-# ## Runtime information
-import Pkg
-Pkg.status()
-
-#---
-import InteractiveUtils
-InteractiveUtils.versioninfo()

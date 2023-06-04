@@ -16,11 +16,3 @@ plot!(fig, x -> f607(x, 0.1, 0.1), y -> y, 0, 1, label="K1=K2=0.1")
 plot!(fig, x -> f607(x, 0.01, 0.01), y -> y, 0, 1, label="K1=K2=0.01")
 
 fig |> SVG
-
-# ## Runtime information
-import Pkg
-Pkg.status()
-
-#---
-import InteractiveUtils
-InteractiveUtils.versioninfo()

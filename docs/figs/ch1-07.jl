@@ -52,11 +52,3 @@ sol = solve(prob, callback=events)
 fig = plot(sol, legend=:right, xlabel = "Time", ylabel="Concentration", title="Fig 1.7")
 
 fig |> SVG
-
-# ## Runtime information
-import Pkg
-Pkg.status()
-
-#---
-import InteractiveUtils
-InteractiveUtils.versioninfo()

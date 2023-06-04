@@ -80,11 +80,3 @@ sol = solve(prob, callback=cbs)
 fig = plot(sol, idxs=[C8s, C3s], title="Fig 6.16", xlabel="Time", ylabel="Concentration", legend=:right, rightmargin=5*Plots.mm)
 
 fig |> SVG
-
-# ## Runtime information
-import Pkg
-Pkg.status()
-
-#---
-import InteractiveUtils
-InteractiveUtils.versioninfo()
