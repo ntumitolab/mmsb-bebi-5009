@@ -12,8 +12,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NPROC: '2'       # Number of Julia processes to run the notebooks
-  JULIA_CACHE: '1' # Set this to zero to disable caching
+  NPROC: '6'       # Number of Julia processes to run the notebooks
+  JULIA_CACHE: '0' # Set this to '0' to disable caching
   JULIA_CONDAPKG_BACKEND: 'Null'  # Use system python for PythonCall.jl
   GKSwstype: 100
   JULIA_NUM_THREADS: 'auto'
@@ -21,18 +21,19 @@ env:
 
 jobs:
   CI:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
       - name: Setup Python ${{ env.PY_VER }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@
+        id: python
         with:
           python-version: ${{ env.PY_VER }}
-          cache: 'pip'
-          cache-dependency-path: |
-            requirements.txt
-            .github/requirements.txt
+          # cache: 'pip'
+          # cache-dependency-path: |
+          #   requirements.txt
+          #   .github/requirements.txt
       - name: Install Python dependencies
         run: pip install -r requirements.txt -r .github/requirements.txt
       - name: Read Julia version
@@ -56,6 +57,8 @@ jobs:
           # restore-keys: |
           #   ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-
       - name: Install Julia dependencies
+        env:
+          PYTHON: ${{ steps.python.outputs.python-path }}
         shell: julia --project=@. --color=yes {0}
         run: |
           import Pkg
@@ -72,9 +75,7 @@ jobs:
             ~/.julia
           key: ${{ steps.restore-cache.outputs.cache-primary-key }}
       - name: Build notebooks with ${{ env.NPROC }} processes
-        env:
-          JULIA_PROJECT: '@.'
-        run: julia --color=yes -p ${{ env.NPROC }} literate.jl
+        run: JULIA_PROJECT=@. julia --color=yes -p ${{ env.NPROC }} literate.jl
       - name: Build website
         run: jupyter-book build docs/
       - name: Upload artifact for GH pages
