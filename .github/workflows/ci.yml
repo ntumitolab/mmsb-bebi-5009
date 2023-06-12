@@ -54,8 +54,8 @@ jobs:
           path: |
             ~/.julia
           key: ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-${{ hashFiles('**/Manifest.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-
+          # restore-keys: |
+          #   ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-
       - name: Install Julia dependencies
         env:
           PYTHON: ${{ steps.python.outputs.python-path }}
