@@ -1,6 +1,9 @@
 name: Cleanup caches
 on:
   workflow_dispatch:
+  pull_request:
+    types:
+      - closed
 
 jobs:
   cleanup:
