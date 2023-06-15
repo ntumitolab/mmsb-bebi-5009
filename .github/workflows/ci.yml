@@ -17,25 +17,17 @@ env:
   JULIA_CONDAPKG_BACKEND: 'Null'  # Use system python for PythonCall.jl
   GKSwstype: 100
   JULIA_NUM_THREADS: 'auto'
-  PY_VER: '3.11'
 
 jobs:
   CI:
+    container:
+      image: ghcr.io/sosiristseng/docker-jupyterbook:latest
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Setup Python ${{ env.PY_VER }}
-        uses: actions/setup-python@v4
-        id: python
-        with:
-          python-version: ${{ env.PY_VER }}
-          cache: 'pip'
-          cache-dependency-path: |
-            requirements.txt
-            .github/requirements.txt
       - name: Install Python dependencies
-        run: pip install -r requirements.txt -r .github/requirements.txt
+        run: pip install --no-cache-dir -r requirements.txt
       - name: Read Julia version
         id: read_toml
         uses: SebRollen/toml-action@v1.0.2
@@ -57,12 +49,12 @@ jobs:
           # restore-keys: |
           #   ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-
       - name: Install Julia dependencies
-        env:
-          PYTHON: ${{ steps.python.outputs.python-path }}
-        shell: julia --project=@. --color=yes {0}
+        shell: julia --project="" --color=yes {0}
         run: |
           import Pkg
           Pkg.Registry.update()
+          Pkg.add(["Literate", "PrettyTables"])
+          Pkg.activate(".")
           Pkg.instantiate()
           Pkg.resolve()
           Pkg.precompile()
