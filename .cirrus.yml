@@ -3,7 +3,7 @@ ci_task:
   execution_lock: $CIRRUS_CHANGE_IN_REPO
   auto_cancellation: true
   env:
-    NPROC: '3'
+    NPROC: '2'
   container:
     dockerfile: .github/Dockerfile
     cpu: 2
