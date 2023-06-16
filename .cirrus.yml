@@ -1,0 +1,15 @@
+ci_task:
+  only_if: $CIRRUS_BRANCH == 'main' || $CIRRUS_BASE_BRANCH == 'main' || $CIRRUS_TAG != ''
+  execution_lock: $CIRRUS_CHANGE_IN_REPO
+  auto_cancellation: true
+  env:
+    NPROC: '2'
+  container:
+    dockerfile: .github/Dockerfile
+    cpu: 1
+    memory: 4G
+    greedy: true
+  literate_script: |
+    JULIA_PROJECT=@. julia --color=yes -p ${NPROC} literate.jl
+  notebooks_artifacts:
+    path: "docs/**"

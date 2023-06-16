@@ -14,6 +14,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  DFILE: '.github/Dockerfile'
+  IMAGE_NAME: 'app:test'
+
 jobs:
   update-manifest:
     permissions:
@@ -23,14 +27,21 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup Julia
-        uses: julia-actions/setup-julia@v1
+      - name: Build and cache Docker container
+        uses: docker/build-push-action@v4
         with:
-          version: '1'
+          target: base
+          context: .
+          file: ${{ env.DFILE }}
+          tags: ${{ env.IMAGE_NAME }}
+          load: true
       - name: Update Julia dependencies
-        env:
-          JULIA_PKG_PRECOMPILE_AUTO: 0
-        run: julia --color=yes --project=@. -e "import Pkg; Pkg.update()"
+        run: >
+          docker run
+          --workdir=/tmp -v ${{ github.workspace }}:/tmp
+          -e JULIA_PKG_PRECOMPILE_AUTO=0
+          ${{ env.IMAGE_NAME }}
+          julia --color=yes --project=@. -e "import Pkg; Pkg.update()"
       # Authenticate with a custom GitHub APP
       # https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#authenticating-with-github-app-generated-tokens
       - name: Generate token for PR
