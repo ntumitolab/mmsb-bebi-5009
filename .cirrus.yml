@@ -6,8 +6,8 @@ ci_task:
     NPROC: '2'
   container:
     dockerfile: .github/Dockerfile
-    cpu: 1
-    memory: 4G
+    cpu: 2
+    memory: 8G
     greedy: true
   literate_script: |
     JULIA_PROJECT=@. julia --color=yes -p ${NPROC} literate.jl
