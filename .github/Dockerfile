@@ -4,6 +4,8 @@ ENV JULIA_CI true
 ENV JULIA_NUM_THREADS "auto"
 # Let PythonCall use built-in python
 ENV JULIA_CONDAPKG_BACKEND "Null"
+# Headless Plots.jl
+ENV GKSwstype 140
 ENV JULIA_PATH /usr/local/julia/
 ENV PATH ${JULIA_PATH}/bin:${PATH}
 ENV JULIA_CPU_TARGET 'generic;znver3,clone_all'
