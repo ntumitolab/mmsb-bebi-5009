@@ -8,8 +8,8 @@ on:
     branches:
       - main
     paths:
-      - '.github/workflows/linkcheck.yml'
       - 'docs/**'
+      - '.github/workflows/linkcheck.yml'
 
 env:
   DIR: 'docs'
