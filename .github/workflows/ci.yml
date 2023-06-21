@@ -22,17 +22,21 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Build and cache Docker container
-        uses: docker/build-push-action@v4
+      - name: Cache docker image
+        uses: actions/cache@v3
+        id: cache
         with:
-          context: .
-          file: ${{ env.DFILE }}
-          tags: ${{ env.IMAGE_NAME }}
-          load: true
-          cache-from: type=gha
-          cache-to: type=gha
+          path: /tmp/image.tar
+          key: ${{ runner.os }}-dockerimage-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-dockerimage-
+      - name: Load docker image
+        run: docker load -i /tmp/image.tar || true
+      - name: Build docker image
+        run: docker build --cache-from ${{ env.IMAGE_NAME }} -t ${{ env.IMAGE_NAME }} -f ${{ env.DFILE }} .
+      - name: Save docker image
+        run: docker save -o /tmp/image.tar ${{ env.IMAGE_NAME }}
+        if: steps.cache.outputs.cache-hit != 'true'
       - name: Build notebooks with ${{ env.NPROC }} processes
         run: >
           docker run
