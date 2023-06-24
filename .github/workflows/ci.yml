@@ -11,50 +11,88 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  packages: write
+
 env:
   NPROC: '2'                      # Number of Julia processes to run the notebooks
-  DFILE: '.github/Dockerfile'
   IMAGE_NAME: 'app:test'
 
 jobs:
-  CI:
+  setup:
     runs-on: ubuntu-latest
+    outputs:
+      hash: ${{ steps.hash.outputs.id }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner	}}
+          password: ${{ github.token	}}
+      - name: Get docker image hash
+        id: hash
+        run: echo "id=${{ hashFiles('requirements.txt', 'Project.toml', 'Manifest.toml', 'src/**', '.github/Dockerfile') }}" >> "$GITHUB_OUTPUT"
       - name: Build and cache Docker container
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: ${{ env.DFILE }}
-          tags: ${{ env.IMAGE_NAME }}
-          load: true
-          cache-from: type=gha
-          cache-to: type=gha
+          file: '.github/Dockerfile'
+          tags: ghcr.io/${{ github.repository }}:${{ steps.hash.outputs.id }}
+          push: true
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:${{ steps.hash.outputs.id }}
+          cache-to: type=inline
+  execute:
+    needs: setup
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/${{ github.repository }}:${{ needs.setup.outputs.hash }}
+    # store success output flag for the ci job
+    outputs:
+      success: ${{ steps.setoutput.outputs.success }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
       - name: Build notebooks with ${{ env.NPROC }} processes
-        run: >
-          docker run
-          --workdir=/work -v ${{ github.workspace }}:/work
-          -e JULIA_PROJECT=@.
-          ${{ env.IMAGE_NAME }}
-          julia --color=yes -p ${{ env.NPROC }} literate.jl
+        run: JULIA_PROJECT=@. julia --color=yes -p ${{ env.NPROC }} literate.jl
       - name: Build website with Jupyter Book
-        run: >
-          docker run
-          --workdir=/work -v ${{ github.workspace }}:/work
-          ${{ env.IMAGE_NAME }}
-          jupyter-book build docs/
+        run: jupyter-book build docs/
       - name: Upload artifact for GH pages
         uses: actions/upload-pages-artifact@v1
         if: ${{ github.ref == 'refs/heads/main' }}
         with:
           path: docs/_build/html
+      - name: Set output flag
+        id: setoutput
+        run: echo "success=true" >> $GITHUB_OUTPUT
+
+  # CI conclusion for GitHub status check
+  # https://brunoscheufler.com/blog/2022-04-09-the-required-github-status-check-that-wasnt
+  CI:
+    needs: execute
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      # pass step only when output of previous jupyter-book job is set
+      # in case at least one of the execution fails, jupyter-book is skipped
+      # and the output will not be set, which will then cause the ci job to fail
+      - run: |
+          passed="${{ needs.execute.outputs.success }}"
+          if [[ $passed == "true" ]]; then
+            echo "Tests passed"
+            exit 0
+          else
+            echo "Tests failed"
+            exit 1
+          fi
 
   deploy:
     name: Deploy to GitHub pages
-    needs: CI
+    needs: execute
     if: ${{ github.ref == 'refs/heads/main'}}
     # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
     permissions:
