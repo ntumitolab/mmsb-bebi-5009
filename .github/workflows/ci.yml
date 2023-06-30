@@ -16,7 +16,6 @@ permissions:
 
 env:
   NPROC: '2'                      # Number of Julia processes to run the notebooks
-  IMAGE_NAME: 'app:test'
 
 jobs:
   setup:
