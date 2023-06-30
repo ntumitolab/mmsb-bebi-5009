@@ -1,7 +1,7 @@
 #===
 # Fig 7.17
 
-Goodwin oscillator model
+Goodwin oscillator model: https://en.wikipedia.org/wiki/Goodwin_model_(biology)
 ===#
 
 using Catalyst

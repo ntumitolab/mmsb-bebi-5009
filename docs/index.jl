@@ -32,9 +32,10 @@ Chapter 5 and beyond are applications in specific biological domain(s).
 - Gene regulatory networks.
 - Electrophysiology and action potentials in exitable cells.
 
-### Agent-based modeling
+Other topics:
 
-See <https://sosiristseng.github.io/jl-abm/>
+- Agent-based modeling (ABM)
+- (Metabolic) flux balance analysis
 
 ===#
 
