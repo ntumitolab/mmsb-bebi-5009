@@ -14,6 +14,9 @@ concurrency:
 permissions:
   packages: write
 
+env:
+  NPROC: '2'                      # Number of Julia processes to run the notebooks
+
 jobs:
   setup:
     runs-on: ubuntu-latest
@@ -42,7 +45,6 @@ jobs:
           push: true
           cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:${{ steps.hash.outputs.id }}
           cache-to: type=inline
-
   execute:
     needs: setup
     runs-on: ubuntu-latest
@@ -54,8 +56,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Build notebooks
-        run: JULIA_PROJECT=@. julia --color=yes literate.jl
+      - name: Build notebooks with ${{ env.NPROC }} processes
+        run: JULIA_PROJECT=@. julia --color=yes -p ${{ env.NPROC }} literate.jl
       - name: Build website with Jupyter Book
         run: jupyter-book build docs/
       - name: Upload artifact for GH pages
