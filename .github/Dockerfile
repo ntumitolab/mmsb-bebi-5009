@@ -11,7 +11,7 @@ ENV JULIA_CPU_TARGET "generic"
 ENV JULIA_PATH /usr/local/julia/
 ENV JULIA_DEPOT_PATH /srv/juliapkg/
 ENV PATH ${JULIA_PATH}/bin:${PATH}
-COPY --from=julia:1.9.1 ${JULIA_PATH} ${JULIA_PATH}
+COPY --from=julia:1.9.2 ${JULIA_PATH} ${JULIA_PATH}
 
 FROM base
 
