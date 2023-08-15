@@ -11,49 +11,17 @@ on:
       - 'docs/**'
       - '.github/workflows/linkcheck.yml'
 
-env:
-  DIR: 'docs'
-
 jobs:
   linkcheck:
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/sosiristseng/docker-jupyterbook:latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Setup Julia
-        uses: julia-actions/setup-julia@v1
-      - name: Convert literate notebooks to Markdown
-        shell: julia --color=yes {0}
-        working-directory: ${{ env.DIR }}
-        run: |
-          import Pkg
-          Pkg.add("Literate")
-          using Literate
-          for (root, dirs, files) in walkdir(pwd())
-            for file in files
-              if endswith(file, ".jl")
-                Literate.markdown(joinpath(root, file); mdstrings=true, flavor = Literate.CommonMarkFlavor())
-              end
-            end
-          end
-      - name: Restore lychee cache
-        id: restore-cache
-        uses: actions/cache/restore@v3
+      - name: Disable code cell execution
+        uses: mikefarah/yq@master
         with:
-          path: .lycheecache
-          key: cache-lychee-${{ github.sha }}
-          restore-keys: cache-lychee-
-      - name: Lychee Checker
-        uses: lycheeverse/lychee-action@v1.8.0
-        id: lychee
-        with:
-          fail: true
-          args: '--accept 200,204,429 --verbose --no-progress --cache --max-cache-age 1d ${{ env.DIR }}'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Save lychee cache
-        uses: actions/cache/save@v3
-        if: always()
-        with:
-          path: .lycheecache
-          key: ${{ steps.restore-cache.outputs.cache-primary-key }}
+          cmd: yq -i '.execute.execute_notebooks = "off"' 'docs/_config.yml'
+      - name: Check links
+        run: jupyter-book build docs/ --builder linkcheck

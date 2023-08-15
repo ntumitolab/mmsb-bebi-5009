@@ -8,6 +8,7 @@ on:
     branches:
       - main
     paths:
+      - .github/Dockerfile
       - .github/workflows/update-manifest.yml
 
 concurrency:
