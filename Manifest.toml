@@ -2,7 +2,7 @@
 
 julia_version = "1.9.2"
 manifest_format = "2.0"
-project_hash = "2fe1be1564292689cf5beead3dbfa2578bda44d9"
+project_hash = "e5d853094c68e1fd5207d82fb89df98edd10d8b4"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "f5c25e8a5b29b5e941b7408bc8cc79fea4d9ef9a"
@@ -483,11 +483,6 @@ git-tree-sha1 = "1cfe0178410e1bb4b14058c537d0f347eb9d95dc"
 uuid = "0c46a032-eb83-5123-abaf-570d42b7fbaa"
 version = "7.8.0"
 
-[[deps.DisplayAs]]
-git-tree-sha1 = "43c017d5dd3a48d56486055973f443f8a39bb6d9"
-uuid = "0b91fe84-8a4c-11e9-3e1d-67c38462b6d6"
-version = "0.1.6"
-
 [[deps.Distances]]
 deps = ["LinearAlgebra", "Statistics", "StatsAPI"]
 git-tree-sha1 = "b6def76ffad15143924a2199f72a5cd883a2e8a9"
@@ -807,9 +802,9 @@ version = "1.3.1"
 
 [[deps.GraphMakie]]
 deps = ["DataStructures", "GeometryBasics", "Graphs", "LinearAlgebra", "Makie", "NetworkLayout", "PolynomialRoots", "SimpleTraits", "StaticArrays"]
-git-tree-sha1 = "969a8bbc241342557197272b6bf31c24768ccedb"
+git-tree-sha1 = "005289c1020e55641af09a38e95e098b7ba0ca18"
 uuid = "1ecd5474-83a3-4783-bb4f-06765db800d2"
-version = "0.5.5"
+version = "0.5.6"
 
 [[deps.Graphics]]
 deps = ["Colors", "LinearAlgebra", "NaNMath"]
@@ -2428,9 +2423,9 @@ version = "0.4.1"
 
 [[deps.Unitful]]
 deps = ["Dates", "LinearAlgebra", "Random"]
-git-tree-sha1 = "64eb17acef1d9734cf09967539818f38093d9b35"
+git-tree-sha1 = "607c142139151faa591b5e80d8055a15e487095b"
 uuid = "1986cc42-f94f-5a68-af5c-568840ba703d"
-version = "1.16.2"
+version = "1.16.3"
 
     [deps.Unitful.extensions]
     ConstructionBaseUnitfulExt = "ConstructionBase"
