@@ -16,30 +16,13 @@ parts:
     chapters:
     - file: mmsb-README
       sections:
-      - file: figs/ch1-07
-      - file: figs/ch1-09
-      - file: figs/ch2-04
-      - file: figs/ch2-09
-      - file: figs/ch2-11
-      - file: figs/ch2-p246
-      - file: figs/ch3-03
-      - file: figs/ch3-13
-      - file: figs/ch4-01
-      - file: figs/ch4-07
-      - file: figs/ch4-11
-      - file: figs/ch4-15
-      - file: figs/ch4-18
-      - file: figs/ch4-22
-      - file: figs/ch5-10
-      - file: figs/ch6-03
-      - file: figs/ch6-05
-      - file: figs/ch6-07
-      - file: figs/ch6-14
-      - file: figs/ch6-16
-      - file: figs/ch6-18
-      - file: figs/ch7-07
-      - file: figs/ch7-11
-      - file: figs/ch7-17
+      - file: figs/ch1
+      - file: figs/ch2
+      - file: figs/ch3
+      - file: figs/ch4
+      - file: figs/ch5
+      - file: figs/ch6
+      - file: figs/ch7
   - caption: Homework
     chapters:
       - file: hw-00
