@@ -1,9 +1,9 @@
-# .kodiak.toml
+# https://kodiakhq.com/docs/quickstart
 version = 1
 
 [merge]
-  method = "squash"
+method = "squash"
 
   [merge.message]
-    title = "pull_request_title"
-    body  = "pull_request_body"
+  title = "pull_request_title"
+  body  = "pull_request_body"

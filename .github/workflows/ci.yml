@@ -63,8 +63,8 @@ jobs:
         # Notebooks need to be executed
         notebook: ${{ fromJSON(needs.setup.outputs.matrix) }}
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/${{ github.repository }}:${{ needs.setup.outputs.hash }}
+    env:
+      IMAGE: ghcr.io/${{ github.repository }}:${{ needs.setup.outputs.hash }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -80,17 +80,23 @@ jobs:
         with:
           path: ${{ steps.file.outputs.name }}
           key: ${{ runner.os }}-${{ steps.hash.outputs.id }}
+      - name: Get Julia version
+        if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        id: julia
+        run: echo "ver=$(docker run ${{ env.IMAGE }} julia -e 'print(VERSION.minor)')" >> "$GITHUB_OUTPUT"
+      - name: Julia precompile
+        if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        run: docker run -w /tmp -v ${{ github.workspace }}:/tmp ${{ env.IMAGE }} julia --project=@. -e 'import Pkg; Pkg.instantiate(); Pkg.precompile()'
       - name: Install IJulia kernel
         if: ${{ steps.cache.outputs.cache-hit != 'true' }}
-        run: |
-          julia --project=@. -e 'import Pkg; Pkg.instantiate(); Pkg.precompile()'
-          julia --project="" --color=yes -e 'import IJulia; IJulia.installkernel("Julia", "--project=@.")'
+        run: docker run -w /tmp -v ${{ github.workspace }}:/tmp ${{ env.IMAGE }} julia --project="" --color=yes -e 'import IJulia; IJulia.installkernel("Julia", "--project=@.")'
       - name: Execute Notebook
         if: ${{ steps.cache.outputs.cache-hit != 'true' }}
         run: >
+          docker run -w /tmp -v ${{ github.workspace }}:/tmp ${{ env.IMAGE }}
           jupyter nbconvert --to notebook --execute --inplace ${{ env.EXTRA_ARGS }}
           --ExecutePreprocessor.timeout=${{ env.TIMEOUT }}
-          --ExecutePreprocessor.kernel_name=julia-1.$(julia -e 'print(VERSION.minor)')
+          --ExecutePreprocessor.kernel_name=julia-1.${{ steps.julia.outputs.ver }}
           docs/${{ matrix.notebook }}
       - name: Cache notebook
         uses: actions/cache/save@v3
