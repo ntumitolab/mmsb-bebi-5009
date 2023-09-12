@@ -37,7 +37,7 @@ jobs:
         id: hash
         run: echo "id=${{ hashFiles('requirements.txt', 'Project.toml', 'Manifest.toml', 'src/**', '.github/Dockerfile') }}" >> "$GITHUB_OUTPUT"
       - name: Build and cache Docker container
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           context: .
           file: '.github/Dockerfile'
