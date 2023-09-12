@@ -9,6 +9,7 @@ on:
       - main
     paths:
       - 'docs/**'
+      - '.lycheeignore'
       - '.github/workflows/linkcheck.yml'
 
 env:
