@@ -1,8 +1,7 @@
 {
-    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-    "extends": [
-        "config:recommended"
-    ],
-    "automerge": true,
-    "automergeStrategy": "fast-forward"
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+      "config:recommended",
+      ":automergeMajor"
+  ]
 }
