@@ -8,7 +8,7 @@ ENV JULIA_NUM_THREADS "auto"
 ENV JULIA_CONDAPKG_BACKEND "Null"
 # Headless Plots.jl
 ENV GKSwstype 100
-ENV JULIA_CPU_TARGET "generic"
+ENV JULIA_CPU_TARGET "generic;haswell,clone_all"
 ENV JULIA_PATH /usr/local/julia/
 ENV JULIA_DEPOT_PATH /srv/juliapkg/
 ENV PATH ${JULIA_PATH}/bin:${PATH}
