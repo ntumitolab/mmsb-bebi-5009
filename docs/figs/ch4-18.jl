@@ -11,7 +11,6 @@ using SimpleUnPack
 using LabelledArrays
 using Plots
 Plots.default(linewidth=2)
-import DisplayAs.SVG
 
 #---
 hil(x, k) = x / (x + k)
@@ -40,5 +39,3 @@ fig = plot(
     xlabel = "K1" , ylabel= "Steady state [A]",
     legend=nothing, ylim=(0, 4), xlim=(0, 1000)
 )
-
-fig |> SVG

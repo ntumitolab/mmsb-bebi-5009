@@ -9,7 +9,6 @@ using LabelledArrays
 using SimpleUnPack
 using Plots
 Plots.default(linewidth=2)
-import DisplayAs.SVG
 
 #---
 
@@ -62,8 +61,6 @@ quiver!(fig, xx, yy, quiver=∂F, line=(:lightblue), arrow=(:closed))
 
 plot!(fig, xlims=(0, 250), ylims=(0, 250), xlabel="[cI] (nM)", ylabel="[cro] (nM)", aspect_ratio=:equal, legend=:top, size=(600, 600))
 
-fig |> SVG
-
 # ## Fig 7.11 (B)
 
 ps2 = merge(ps1, (; delta_r=ps1.delta_r * 10))
@@ -91,5 +88,3 @@ plot!(fig, Float64[], Float64[], line=(:black, :dash), label="C nullcline")
 quiver!(fig, xx, yy, quiver=∂F, line=(:lightblue), arrow=(:closed))
 
 plot!(fig, xlims=(0, 250), ylims=(0, 250), xlabel="[cI] (nM)", ylabel="[cro] (nM)", aspect_ratio=:equal, legend=:top, size=(600, 600))
-
-fig |> SVG

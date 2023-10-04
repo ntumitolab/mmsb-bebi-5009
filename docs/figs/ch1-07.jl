@@ -11,7 +11,6 @@ using LabelledArrays
 using SimpleUnPack
 using Plots
 Plots.default(linewidth=2)
-import DisplayAs.SVG
 
 # Convenience functions
 hil(x, k) = x / (x + k)
@@ -50,5 +49,3 @@ prob = ODEProblem(collins!, u0, tend, ps)
 sol = solve(prob, callback=events)
 
 fig = plot(sol, legend=:right, xlabel = "Time", ylabel="Concentration", title="Fig 1.7")
-
-fig |> SVG

@@ -8,7 +8,6 @@ using DifferentialEquations
 using Catalyst
 using Plots
 Plots.default(linewidth=2)
-import DisplayAs.SVG
 
 # Reaction neetwork
 rn = @reaction_network begin
@@ -43,8 +42,6 @@ sol = solve(prob)
 @unpack S, ES, E, P = osys
 fig = plot(sol, idxs=[S, ES, E, P], xlabel="Time (AU)", ylabel="Concentration (AU)", legend=:right, title="Fig 3.03")
 
-fig |> SVG
-
 #---
 rn303mm = @reaction_network begin
     mm(S, k2 * ET, (km1 + k2) / k1), S ⇒ P ## using \Rightarrow
@@ -75,5 +72,3 @@ plot!(fig, title="Fig. 3.03",
     xlabel="Time (AU)", ylabel="Concentration (AU)",
     xlims=(0., tend), ylims=(0., 5.), legend=:right
 )
-
-fig |> SVG

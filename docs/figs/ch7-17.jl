@@ -9,7 +9,6 @@ using ModelingToolkit
 using DifferentialEquations
 using Plots
 Plots.default(linewidth=2)
-import DisplayAs.SVG
 
 #---
 rn = @reaction_network begin
@@ -41,8 +40,6 @@ sol = solve(prob)
 
 #---
 fig = plot(sol, title="Fig 7.17 (A)", xlabel="Time", ylabel="Concentration")
-fig |> SVG
+
 #---
 fig = plot(sol, idxs=(1, 2, 3), title="Fig 7.17 (B)", legend=false, size=(600, 600))
-
-fig |> SVG

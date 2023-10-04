@@ -10,7 +10,6 @@ using LabelledArrays
 using SimpleUnPack
 using Plots
 Plots.default(linewidth=2)
-import DisplayAs.SVG
 
 # Convenience functions
 hil(x, k) = x / (x + k)
@@ -65,5 +64,3 @@ p1 = plot(sol, idxs=[:v], ylabel="Membrane potential (mV)", xlabel="", legend=fa
 p2 = plot(sol, idxs = [:m, :h, :n], xlabel="")
 p3 = plot(_istim, sol.t, xlabel="Time (ms)", ylabel="Current", labels="Stimulation current")
 fig = plot(p1, p2, p3, layout=(3, 1), size=(600, 900), leftmargin=5*Plots.mm)
-
-fig |> SVG

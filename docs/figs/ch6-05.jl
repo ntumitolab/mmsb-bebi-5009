@@ -9,7 +9,6 @@ using Catalyst
 using DifferentialEquations
 using Plots
 Plots.default(linewidth=2)
-import DisplayAs.SVG
 
 #---
 
@@ -57,8 +56,6 @@ sol = solve(prob, Rodas5(), callback=cbs, abstol=1e-8, reltol=1e-8, saveat=0:10:
 @unpack RL, Ga = osys
 fig = plot(sol, idxs=[RL, Ga], title="Fig 6.05 (A)", xlabel="Time", ylabel="Abundance")
 
-fig |> SVG
-
 # ## Fig 6.5 B
 
 lrange = range(0, 20 * 1e-9, 101)
@@ -77,5 +74,3 @@ ga = map(s->s[Ga], sim)
 rl = map(s->s[RL], sim)
 fig = plot(lrange .* 1e9, [ga rl], label=["Ga" "RL"], title="Fig. 6.5 (B)",
 xlabel="Ligand (nM)", ylabel="Steady-state abundance", xlims=(0, 20), ylims=(0, 3500))
-
-fig |> SVG

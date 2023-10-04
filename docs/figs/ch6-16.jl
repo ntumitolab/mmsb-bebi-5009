@@ -9,7 +9,6 @@ using ModelingToolkit
 using DifferentialEquations
 using Plots
 Plots.default(linewidth=2)
-import DisplayAs.SVG
 
 #---
 rn = @reaction_network begin
@@ -78,5 +77,3 @@ sol = solve(prob, callback=cbs)
 
 @unpack C8s, C3s = osys
 fig = plot(sol, idxs=[C8s, C3s], title="Fig 6.16", xlabel="Time", ylabel="Concentration", legend=:right, rightmargin=5*Plots.mm)
-
-fig |> SVG
