@@ -9,8 +9,8 @@ using Plots
 using Interpolations
 using Statistics        ## mean()
 using Random            ## randexp()
-import DisplayAs.PNG    ## Save memory and disk space
 Random.seed!(2022)
+Plots.default(fmt=:png)
 
 
 #===
@@ -121,13 +121,13 @@ for sol in sols
     plot!(fig1, sol.t, sol.u, linecolor=[:blue :red], linealpha=0.05, label=false)
 end
 
-fig1 |> PNG
+fig1
 
 # Plot averages
 plot!(fig1, a_avg, 0.0, tend, linecolor=:black, linewidth=3, linestyle = :solid, label="Avarage [A]")
 plot!(fig1, b_avg, 0.0, tend, linecolor=:black, linewidth=3, linestyle = :dash, label="Avarage [B]")
 
-fig1 |> PNG
+fig1
 
 #===
 ## Using Catalyst
@@ -158,19 +158,19 @@ jumpProb = JumpProblem(rn, dprob, Direct())
 sol = solve(jumpProb, SSAStepper())
 fig = plot(sol)
 
-fig |> PNG
+fig
 
 # Parallel ensemble simulation
 ensprob = EnsembleProblem(jumpProb)
 sim = solve(ensprob, SSAStepper(), EnsembleThreads(); trajectories=50)
 fig = plot(sim, alpha=0.1, color=[:blue :red])
 
-fig |> PNG
+fig
 #---
 
 summ = EnsembleSummary(sim, 0:0.1:10)
 fig = plot(summ,fillalpha=0.5)
-fig |> PNG
+fig
 
 #===
 **See also** the [JumpProcesses.jl docs](https://docs.sciml.ai/JumpProcesses/stable/api/#JumpProcesses.ConstantRateJump) about discrete stochastic examples.

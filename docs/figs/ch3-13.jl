@@ -6,7 +6,6 @@ Generalized mass action (GMA) vs. Michaelis-Menten rate laws
 
 using Plots
 Plots.default(linewidth=2)
-import DisplayAs.SVG
 
 mm = t -> 2t / (1+t)
 gma = t -> t^0.4
@@ -17,5 +16,3 @@ fig = plot(
     xlabel= "Substrate concentration (AU)",
     ylabel="Reaction rate (AU)"
 )
-
-fig |> SVG

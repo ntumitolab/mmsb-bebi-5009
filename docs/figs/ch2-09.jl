@@ -11,7 +11,6 @@ using Catalyst
 using ModelingToolkit
 using Plots
 Plots.default(linewidth=2)
-import DisplayAs.SVG
 
 #---
 rn = @reaction_network begin
@@ -38,5 +37,3 @@ fig = plot(sol, legend=:bottomright, title="Fig 2.9",
     xlims=(0., 4.), ylims=(0., 1.),
     xlabel="Time (sec)", ylabel="Concentration (mM)"
 )
-
-fig |> SVG

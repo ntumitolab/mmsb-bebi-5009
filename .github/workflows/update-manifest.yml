@@ -15,8 +15,13 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  DFILE: '.github/Dockerfile'
-  IMAGE_NAME: 'app:test'
+  PYTHON_VER: '3.11'
+  APP_ID: '189113' # https://github.com/apps/wen-wei-s-pr-bot
+  JULIA_CPU_TARGET: 'generic;haswell,clone_all'
+  JULIA_NUM_THREADS: 'auto'
+  JULIA_CONDAPKG_BACKEND: 'Null'
+  JULIA_PKG_PRECOMPILE_AUTO: '0'
+  JULIA_PROJECT: '@.'
 
 jobs:
   update-manifest:
@@ -24,31 +29,31 @@ jobs:
       contents: write
       pull-requests: write
     runs-on: ubuntu-latest
+    container:
+      image: julia:1.9.3
     steps:
+      - name: Install Git
+        run: apt update && apt install -y git
+      - name: Set safe directory
+        run: git config --global --add safe.directory '*'
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Build and cache Docker container
-        uses: docker/build-push-action@v5
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
-          target: base
-          context: .
-          file: ${{ env.DFILE }}
-          tags: ${{ env.IMAGE_NAME }}
-          load: true
+          python-version: ${{ env.PYTHON_VER }}
       - name: Update Julia dependencies
-        run: >
-          docker run
-          --workdir=/tmp -v ${{ github.workspace }}:/tmp
-          -e JULIA_PKG_PRECOMPILE_AUTO=0
-          ${{ env.IMAGE_NAME }}
-          julia --color=yes --project=@. -e "import Pkg; Pkg.update()"
+        env:
+          PYTHON: ${{ env.pythonLocation }}/python
+          JULIA_PYTHONCALL_EXE: ${{ env.pythonLocation }}/python
+        run: julia --color=yes -e "import Pkg; Pkg.update()"
       # Authenticate with a custom GitHub APP
       # https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#authenticating-with-github-app-generated-tokens
       - name: Generate token for PR
         uses: tibdex/github-app-token@v2
         id: generate-token
         with:
-          app_id: ${{ secrets.APP_ID }} # https://github.com/apps/wen-wei-s-pr-bot
+          app_id: ${{ env.APP_ID }}
           private_key: ${{ secrets.APP_PRIVATE_KEY }}
       - name: Create Pull Request
         id: cpr

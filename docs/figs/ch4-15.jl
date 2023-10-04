@@ -11,7 +11,6 @@ using LabelledArrays
 using SimpleUnPack
 using Plots
 Plots.default(linewidth=2)
-import DisplayAs.SVG
 
 #---
 
@@ -49,8 +48,6 @@ end
 
 fig = plot(sols[1], xlabel="Time", ylabel="Concentration", title ="Fig 4.15 (A)", xlims=(0., 8.))
 
-fig |> SVG
-
 # ## Fig 4.15 (B)
 
 ∂F415 = function (x, y; scale=20)
@@ -85,8 +82,6 @@ for sol in sols
 end
 plot!(fig, xlim=(0, 4), ylim=(0, 4), legend=:topright, size=(600, 600), xlabel="[A]", ylabel="[B]")
 
-fig |> SVG
-
 #===
 ## Fig 4.16 A
 
@@ -107,8 +102,6 @@ sols = map(u0s) do u0
 end;
 
 fig = plot(sols[1], xlabel="Time", ylabel="Concentration", title ="Fig 4.16(A)", xlims=(0., 8.))
-
-fig |> SVG
 
 # ## Fig 4.16 b
 ∂F416 = function (x, y; scale=20)
@@ -142,8 +135,6 @@ for sol in sols
 end
 plot!(fig, xlim=(0, 4), ylim=(0, 4), legend=:topright, size=(600, 600), xlabel="[A]", ylabel="[B]")
 
-fig |> SVG
-
 # ## Fig 4.17
 
 sol = solve(ODEProblem(model415!, LVector(a=2.0, b=1.5), 10.0, ps2))
@@ -156,5 +147,3 @@ plot!(fig, identity, 0, 0, line=(:black), label="A nullcline")
 contour!(fig, 1:0.01:3, 1:0.01:3, ∂B, levels=[0], cbar=false, line=(:black, :dash))
 plot!(fig, identity, 0, 0, line=(:black, :dash), label="B nullcline")
 plot!(fig, xlims=(1, 3), ylims=(1, 3), legend=:topright, size=(600, 600), xlabel="[A]", ylabel="[B]")
-
-fig |> SVG

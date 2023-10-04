@@ -5,12 +5,12 @@ using PrettyTables
     using Literate
 end
 
-basedir = "docs/"
-config = Dict("mdstrings" => true, "execute" => true)
+basedir = "docs"
+config = Dict("mdstrings" => true, "execute" => true, "flavor" => Literate.CommonMarkFlavor())
 
 nbs = String[]
 
-# Collect the list of Literate notebooks
+# Collect the list of Literate notebooks (ends with .jl)
 for (root, dirs, files) in walkdir(basedir)
     for file in files
         if (endswith(file, ".jl"))
@@ -21,7 +21,9 @@ end
 
 # Execute the notebooks in worker processes
 ts = pmap(nbs; on_error=ex->NaN) do nb
-    @elapsed Literate.notebook(nb, dirname(nb); config)
+    cd(dirname(nb)) do
+        @elapsed Literate.markdown(basename(nb); config)
+    end
 end
 
 pretty_table([nbs ts], header=["Notebook", "Elapsed (s)"])
@@ -32,7 +34,9 @@ for (nb, t) in zip(nbs, ts)
         println("Debugging notebook: ", nb)
         try
             withenv("JULIA_DEBUG" => "Literate") do
-                Literate.notebook(nb, tempdir(); config)
+                cd(dirname(nb)) do
+                    Literate.markdown(basename(nb); config)
+                end
             end
         catch e
             println("An error occured:", e)

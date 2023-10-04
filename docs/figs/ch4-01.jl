@@ -9,7 +9,6 @@ using LabelledArrays
 using SimpleUnPack
 using Plots
 Plots.default(linewidth=2)
-import DisplayAs.SVG
 
 # Convenience functions
 
@@ -55,8 +54,6 @@ sols = [solve(ODEProblem(model41!, u0, tend, ps1)) for u0 in u0s];
 #---
 fig = plot(sols[1], xlabel="Time", ylabel="Concentration", title="Fig. 4.2 A (Time series)", labels=["[A]" "[B]"])
 
-fig |> SVG
-
 # ## Fig. 4.2 B (Phase plot)
 
 fig = plot( sols[1], idxs=(:a, :b),
@@ -65,8 +62,6 @@ fig = plot( sols[1], idxs=(:a, :b),
     title="Fig. 4.2 B (Phase plot)",
     ylims=(0.0, 2.0), xlims=(0.0, 2.0)
 )
-
-fig |> SVG
 
 # ## Fig. 4.3 A (Multiple time series)
 
@@ -78,8 +73,6 @@ end
 
 plot!(fig, xlabel="Time", ylabel="Concentration")
 
-fig |> SVG
-
 # ## Fig. 4.3 B (Phase plot)
 
 fig = plot(title="Fig. 4.3 B (Phase plot)")
@@ -89,8 +82,6 @@ for sol in sols
 end
 
 plot!(fig, xlabel="[A]", ylabel="[B]", xlims=(0., 2.), ylims=(0., 2.), aspect_ratio=:equal)
-
-fig |> SVG
 
 # Let's sketch vector fields in phase plots.
 ∂A = function (x, y)
@@ -124,8 +115,6 @@ end
 
 plot!(fig, size=(600, 600), xlims=(rxy[1], rxy[end]), ylims=(rxy[1], rxy[end]), xlabel="[A]", ylabel="[B]")
 
-fig |> SVG
-
 # ## Figure 4.5A
 
 fig = plot(title="Fig. 4.5 A (Phase plot with nullclines)")
@@ -142,8 +131,6 @@ contour!(fig, 0:0.01:2, 0:0.01:2, ∂B, levels=[0], cbar=false, line=(:black, :d
 plot!(fig, Float64[], Float64[], line=(:black, :dash), label="B nullcline") ## Adding a fake line for the legend of B nullcline
 plot!(fig, xlim=(0., 2.), ylim=(0., 2.), legend=:bottomright, size=(600, 600), xlabel="[A]", ylabel="[B]", aspect_ratio=:equal)
 
-fig |> SVG
-
 # ## Figure 4.5 B
 
 ## Vector field
@@ -156,5 +143,3 @@ plot!(fig, Float64[], Float64[], line=(:black), label="A nullcline")  ## Adding 
 contour!(fig, 0:0.01:2, 0:0.01:2, ∂B, levels=[0], cbar=false, line=(:black, :dash))
 plot!(fig, Float64[], Float64[], line=(:black, :dash), label="B nullcline") ## Adding a fake line for the legend of B nullcline
 plot!(fig, xlim=(0., 2.), ylim=(0., 2.), legend=:bottomright, size=(600, 600), xlabel="[A]", ylabel="[B]")
-
-fig |> SVG

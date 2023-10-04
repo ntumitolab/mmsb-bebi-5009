@@ -11,7 +11,6 @@ parts:
       - file: intro-02-plotting
       - file: intro-03-diffeq
       - file: intro-04-gillespie
-      - file: intro-05-social-distancing
   - caption: MMSB textbook
     chapters:
     - file: mmsb-README
