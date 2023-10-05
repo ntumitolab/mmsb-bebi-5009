@@ -25,16 +25,16 @@ function model418!(D, u, p, t)
 end
 
 function ainf(k1)
-    ps = LVector(k1 = k1, k2 = 5.0, k3 = 5.0, k4 = 5.0, k5 = 2.0, n = 4)
+    ps = LVector(k1 = k1, k2 = 5., k3 = 5., k4 = 5., k5 = 2., n = 4.)
     u0 = LVector(a=0., b=0.)
     prob = SteadyStateProblem(model418!, u0, ps)
-    sol = solve(prob)
+    sol = solve(prob, DynamicSS(Rodas5()))
     return sol.u.a
 end
 
 #---
 fig = plot(
-    ainf, 0, 1000,
+    ainf, 0., 1000.,
     title = "Fig 4.18",
     xlabel = "K1" , ylabel= "Steady state [A]",
     legend=nothing, ylim=(0, 4), xlim=(0, 1000)
