@@ -13,45 +13,48 @@ concurrency:
 
 env:
   NPROC: '2' # Number of Julia processes to run the notebooks
-  PYTHON_VER: '3.11'
-  JULIA_CPU_TARGET: 'generic;haswell,clone_all'
-  JULIA_NUM_THREADS: 'auto'
-  JULIA_CONDAPKG_BACKEND: 'Null'
-  GKSwstype: '100'
 
 jobs:
-  execute:
-    container:
-      image: julia:1.9.3
+  setup:
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    outputs:
+      hash: ${{ steps.hash.outputs.id }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Setup Python
-        uses: actions/setup-python@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
         with:
-          python-version: ${{ env.PYTHON_VER }}
-      - name: Install Python deps
-        run: python -m pip install --no-cache-dir -r requirements.txt
-      - name: Cache Julia deps
-        uses: actions/cache@v3
+          registry: ghcr.io
+          username: ${{ github.repository_owner	}}
+          password: ${{ github.token	}}
+      - name: Get docker image hash
+        id: hash
+        run: echo "id=${{ hashFiles('requirements.txt', 'Project.toml', 'Manifest.toml', 'src/**', '.github/Dockerfile') }}" >> "$GITHUB_OUTPUT"
+      - name: Build and cache Docker container
+        uses: docker/build-push-action@v5
         with:
-          path: |
-            ~/.julia/artifacts
-            ~/.julia/compiled
-            ~/.julia/packages
-          key: ${{ runner.os }}-juliacontainer-${{ hashFiles('Manifest.toml')}}
-          restore-keys: |
-            ${{ runner.os }}-juliacontainer-
-      - name: Install Julia packages
-        env:
-          PYTHON: ${{ env.pythonLocation }}/python
-          JULIA_PYTHONCALL_EXE: ${{ env.pythonLocation }}/python
-        run: julia --color=yes setup.jl
+          context: .
+          file: '.github/Dockerfile'
+          tags: ghcr.io/${{ github.repository }}:${{ steps.hash.outputs.id }}
+          push: true
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:${{ steps.hash.outputs.id }}
+          cache-to: type=inline
+
+  execute:
+    needs: setup
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/${{ github.repository }}:${{ needs.setup.outputs.hash }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
       - name: Build notebooks with ${{ env.NPROC }} processes
-        env:
-          JULIA_PROJECT: '@.'
-        run: julia --color=yes -p ${{ env.NPROC }} literate.jl
+        run: JULIA_PROJECT=@. julia --color=yes -p ${{ env.NPROC }} literate.jl
       - name: Upload notebooks
         uses: actions/upload-artifact@v3
         with:
@@ -59,7 +62,7 @@ jobs:
           path: docs
           retention-days: 1
 
-  jupyter-book:
+  render:
     needs: execute
     runs-on: ubuntu-latest
     # store success output flag for the ci job
@@ -100,15 +103,15 @@ jobs:
   # CI conclusion for GitHub status check
   # https://brunoscheufler.com/blog/2022-04-09-the-required-github-status-check-that-wasnt
   CI:
-    needs: jupyter-book
+    needs: render
     if: always()
     runs-on: ubuntu-latest
     steps:
-      # pass step only when output of previous jupyter-book job is set
-      # in case at least one of the execution fails, jupyter-book is skipped
+      # pass step only when output of previous render job is set
+      # in case at least one of the execution fails, render is skipped
       # and the output will not be set, which will then cause the ci job to fail
       - run: |
-          passed="${{ needs.jupyter-book.outputs.success }}"
+          passed="${{ needs.render.outputs.success }}"
           if [[ $passed == "true" ]]; then
             echo "Tests passed"
             exit 0
@@ -119,7 +122,7 @@ jobs:
 
   deploy:
     name: Deploy to GitHub pages
-    needs: jupyter-book
+    needs: render
     if: ${{ github.ref == 'refs/heads/main'}}
     # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
     permissions:
