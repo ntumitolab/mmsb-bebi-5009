@@ -1,9 +1,0 @@
-{
-  "extends": [
-    "config:recommended",
-    ":automergeMajor"
-  ],
-  "git-submodules": {
-      "enabled": true
-  }
-}

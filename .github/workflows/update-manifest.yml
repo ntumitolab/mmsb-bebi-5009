@@ -15,8 +15,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  PYTHON_VER: '3.11'
   APP_ID: '189113' # https://github.com/apps/wen-wei-s-pr-bot
+  IMG_NAME: 'app:test'
 
 jobs:
   update-manifest:
@@ -27,20 +27,20 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup Python
-        uses: actions/setup-python@v4
+      - name: Build and load docker image
+        uses: docker/build-push-action@v5
         with:
-          python-version: ${{ env.PYTHON_VER }}
-      - name: Setup Julia
-        uses: julia-actions/setup-julia@v1
+          context: .
+          file: 'env.Dockerfile'
+          tags: ${{ env.IMG_NAME }}
+          load: true
+          target: base
       - name: Update Julia dependencies
-        env:
-          PYTHON: ${{ env.pythonLocation }}/python
-          JULIA_PYTHONCALL_EXE: ${{ env.pythonLocation }}/python
-          JULIA_CONDAPKG_BACKEND: 'Null'
-          JULIA_PKG_PRECOMPILE_AUTO: '0'
-          JULIA_NUM_THREADS: 'auto'
-        run: julia --color=yes --project=@. -e "import Pkg; Pkg.update()"
+        run: >
+          docker run --rm -e JULIA_PKG_PRECOMPILE_AUTO=0
+          -w /tmp -v ${{ github.workspace }}:/tmp
+          ${{ env.IMG_NAME }}
+          julia --color=yes --project=@. -e 'import Pkg; Pkg.update()'
       # Authenticate with a custom GitHub APP
       # https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#authenticating-with-github-app-generated-tokens
       - name: Generate token for PR
