@@ -13,52 +13,76 @@ concurrency:
 
 env:
   NPROC: '2' # Number of Julia processes to run the notebooks
+  PYTHON_VER: '3.11'
 
 jobs:
-  CI:
+  execute:
     runs-on: ubuntu-latest
-    permissions:
-      packages: write
+    container:
+      image: julia:1.9.3
+      env:
+        JULIA_CPU_TARGET: 'generic;haswell,clone_all'
+        JULIA_NUM_THREADS: auto
+        JULIA_CONDAPKG_BACKEND: 'Null'
+        JULIA_CI: 'true'
+        GKSwstype: '100'  # Null GR backend for Plots.jl
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner	}}
-          password: ${{ github.token	}}
-      - name: Get docker image hash
-        id: hash
-        run: echo "id=${{ hashFiles('requirements.txt', 'Project.toml', 'Manifest.toml', 'src/**', 'env.Dockerfile') }}" >> "$GITHUB_OUTPUT"
-      - name: Set image name
-        run: echo "IMG=ghcr.io/${{ github.repository }}:${{ steps.hash.outputs.id }}" >> "$GITHUB_ENV"
-      - name: Build and load Docker container
-        uses: docker/build-push-action@v5
+          python-version: ${{ env.PYTHON_VER }}
+      - name: Install Python deps
+        run: python -m pip install --no-cache-dir -r requirements.txt
+      - name: Cache Julia deps
+        uses: actions/cache@v3
         with:
-          context: .
-          file: 'env.Dockerfile'
-          tags: ${{ env.IMG }}
-          load: true
-          cache-from: type=registry,ref=${{ env.IMG }}
-      - name: Push Docker container
-        uses: docker/build-push-action@v5
+          path: |
+            ~/.julia/artifacts
+            ~/.julia/compiled
+            ~/.julia/packages
+            ~/.julia/environments
+          key: ${{ runner.os }}-juliacontainer-${{ hashFiles('src/**','Project.toml', 'Manifest.toml')}}
+          restore-keys: |
+            ${{ runner.os }}-juliacontainer-
+      - name: Install Julia deps
+        env:
+          PYTHON: ${{ env.pythonLocation }}/python
+          JULIA_PYTHONCALL_EXE: ${{ env.pythonLocation }}/python
+        run: |
+          julia --color=yes -e 'using Pkg; Pkg.add(["PrettyTables", "Literate"])'
+          julia --project=@. --color=yes -e 'using Pkg; Pkg.activate("."); Pkg.instantiate(); Pkg.gc()'
+      - name: Run program
+        env:
+          JULIA_PROJECT: '@.'
+        run: julia --color=yes -p ${{ env.NPROC }} literate.jl
+      - name: Upload Results
+        uses: actions/upload-artifact@v3
         with:
-          context: .
-          file: 'env.Dockerfile'
-          tags: ${{ env.IMG }}
-          push: true
-          cache-from: type=registry,ref=${{ env.IMG }}
-          cache-to: type=inline
-      - name: Build notebooks with ${{ env.NPROC }} processes
-        run: >
-          docker run --rm -e JULIA_PROJECT=@. -w /tmp -v ${{ github.workspace }}:/tmp
-          ${{ env.IMG }}
-          julia --color=yes -p ${{ env.NPROC }} literate.jl
-      - name: Retake ownership
-        run: sudo chown -R $USER docs/
+          name: notebooks
+          path: docs/
+          retention-days: 1
+
+  render:
+    needs: execute
+    runs-on: ubuntu-latest
+    # store success output flag for the ci job
+    outputs:
+      success: ${{ steps.setoutput.outputs.success }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Download notebooks
+        uses: actions/download-artifact@v3
+        with:
+          name: notebooks
+          path: out/
+      - name: Display structure of downloaded files
+        run: ls -R
+        working-directory: out
+      - name: Copy back built notebooks
+        run: cp --verbose -rf out/* docs/
       - name: Setup micromamba
         uses: mamba-org/setup-micromamba@v1
         with:
@@ -69,24 +93,38 @@ jobs:
       - name: Build website
         shell: micromamba-shell {0}
         run: jupyter-book build docs/
-      - name: Push Docker container
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: 'env.Dockerfile'
-          tags: ${{ env.IMG }}
-          push: true
-          cache-from: type=registry,ref=${{ env.IMG }}
-          cache-to: type=inline
       - name: Upload pages artifact
         if: ${{ github.ref == 'refs/heads/main' }}
         uses: actions/upload-pages-artifact@v2
         with:
           path: docs/_build/html
+      - name: Set output flag
+        id: setoutput
+        run: echo "success=true" >> $GITHUB_OUTPUT
+
+  # CI conclusion for GitHub status check
+  # https://brunoscheufler.com/blog/2022-04-09-the-required-github-status-check-that-wasnt
+  CI:
+    needs: render
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      # pass step only when output of previous jupyter-book job is set
+      # in case at least one of the execution fails, jupyter-book is skipped
+      # and the output will not be set, which will then cause the ci job to fail
+      - run: |
+          passed="${{ needs.render.outputs.success }}"
+          if [[ $passed == "true" ]]; then
+            echo "Tests passed"
+            exit 0
+          else
+            echo "Tests failed"
+            exit 1
+          fi
 
   deploy:
     name: Deploy to GitHub pages
-    needs: CI
+    needs: render
     if: ${{ github.ref == 'refs/heads/main'}}
     # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
     permissions:
