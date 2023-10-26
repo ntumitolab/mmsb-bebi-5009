@@ -16,6 +16,7 @@ concurrency:
 
 env:
   APP_ID: '189113' # https://github.com/apps/wen-wei-s-pr-bot
+  JULIA_PKG_PRECOMPILE_AUTO: '0'
 
 jobs:
   update-manifest:
