@@ -14,27 +14,29 @@ concurrency:
 env:
   NPROC: '2' # Number of Julia processes to run the notebooks
   PYTHON_VER: '3.11'
+  JULIA_CPU_TARGET: 'generic;haswell,clone_all'
+  JULIA_NUM_THREADS: 'auto'
+  JULIA_CONDAPKG_BACKEND: 'Null'
+  JULIA_CI: 'true'
+  GKSwstype: '100'
 
 jobs:
   execute:
     runs-on: ubuntu-latest
-    container:
-      image: julia:1.9.3
-      env:
-        JULIA_CPU_TARGET: 'generic;haswell,clone_all'
-        JULIA_NUM_THREADS: auto
-        JULIA_CONDAPKG_BACKEND: 'Null'
-        JULIA_CI: 'true'
-        GKSwstype: '100'  # Null GR backend for Plots.jl
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Setup Python
-        uses: actions/setup-python@v4
+      - name: Read Julia version
+        uses: SebRollen/toml-action@v1.0.2
+        id: read_toml
         with:
-          python-version: ${{ env.PYTHON_VER }}
-      - name: Install Python deps
-        run: python -m pip install --no-cache-dir -r requirements.txt
+          file: 'Manifest.toml'
+          field: 'julia_version'
+      - name: Install Julia using jill.sh
+        run: |
+          wget -O /tmp/jill.sh https://raw.githubusercontent.com/abelsiqueira/jill/main/jill.sh
+          bash /tmp/jill.sh --version ${{ steps.read_toml.outputs.value }} -y
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
       - name: Cache Julia deps
         uses: actions/cache@v3
         with:
@@ -43,16 +45,24 @@ jobs:
             ~/.julia/compiled
             ~/.julia/packages
             ~/.julia/environments
-          key: ${{ runner.os }}-juliacontainer-${{ hashFiles('src/**','Project.toml', 'Manifest.toml')}}
+          key: ${{ runner.os }}-jill-${{ hashFiles('src/**','Project.toml', 'Manifest.toml')}}
           restore-keys: |
-            ${{ runner.os }}-juliacontainer-
+            ${{ runner.os }}-jill-
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        id: python3
+        with:
+          python-version: ${{ env.PYTHON_VER }}
+          cache: 'pip'
+      - name: Install Python deps
+        run: python -m pip install -r requirements.txt
       - name: Install Julia deps
         env:
-          PYTHON: ${{ env.pythonLocation }}/python
-          JULIA_PYTHONCALL_EXE: ${{ env.pythonLocation }}/python
+          PYTHON: ${{ steps.python3.outputs.python-path }}
+          JULIA_PYTHONCALL_EXE: ${{ steps.python3.outputs.python-path }}
         run: |
           julia --color=yes -e 'using Pkg; Pkg.add(["PrettyTables", "Literate"])'
-          julia --project=@. --color=yes -e 'using Pkg; Pkg.activate("."); Pkg.instantiate(); Pkg.gc()'
+          julia --project=@. --color=yes -e 'using Pkg; Pkg.instantiate(); Pkg.gc()'
       - name: Run program
         env:
           JULIA_PROJECT: '@.'
@@ -67,9 +77,6 @@ jobs:
   render:
     needs: execute
     runs-on: ubuntu-latest
-    # store success output flag for the ci job
-    outputs:
-      success: ${{ steps.setoutput.outputs.success }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -103,18 +110,14 @@ jobs:
         run: echo "success=true" >> $GITHUB_OUTPUT
 
   # CI conclusion for GitHub status check
-  # https://brunoscheufler.com/blog/2022-04-09-the-required-github-status-check-that-wasnt
+  # Adaped from https://brunoscheufler.com/blog/2022-04-09-the-required-github-status-check-that-wasnt
   CI:
     needs: render
     if: always()
     runs-on: ubuntu-latest
     steps:
-      # pass step only when output of previous jupyter-book job is set
-      # in case at least one of the execution fails, jupyter-book is skipped
-      # and the output will not be set, which will then cause the ci job to fail
       - run: |
-          passed="${{ needs.render.outputs.success }}"
-          if [[ $passed == "true" ]]; then
+          if [[ ${{ needs.render.result }} == "success" ]]; then
             echo "Tests passed"
             exit 0
           else

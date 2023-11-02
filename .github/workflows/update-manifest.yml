@@ -16,7 +16,6 @@ concurrency:
 
 env:
   APP_ID: '189113' # https://github.com/apps/wen-wei-s-pr-bot
-  JULIA_PKG_PRECOMPILE_AUTO: '0'
 
 jobs:
   update-manifest:
@@ -30,6 +29,8 @@ jobs:
       - name: Setup Julia
         uses: julia-actions/setup-julia@v1
       - name: Update Julia dependencies
+        env:
+          JULIA_PKG_PRECOMPILE_AUTO: '0'
         run: julia --color=yes --project=@. -e 'import Pkg; Pkg.update()'
       # Authenticate with a custom GitHub APP
       # https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#authenticating-with-github-app-generated-tokens
