@@ -1,0 +1,10 @@
+name: ci
+
+dependencies:
+  - python>=3.11
+  # Jupyter Book
+  - jupyter-book
+  - docutils>=0.17.1,<0.18|>=0.20
+  # PythonPlot
+  # - matplotlib
+  # - libstdcxx-ng<13.0

@@ -1,7 +1,0 @@
-name: jb
-channels:
-  - conda-forge
-dependencies:
-  - python>=3.11
-  - jupyter-book
-  - docutils>=0.17.1,<0.18|>=0.20
