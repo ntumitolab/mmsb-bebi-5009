@@ -13,58 +13,46 @@ concurrency:
 
 env:
   NPROC: '2' # Number of Julia processes to run the notebooks
-  JULIA_CPU_TARGET: 'generic;haswell,clone_all'
-  JULIA_NUM_THREADS: 'auto'
-  JULIA_CONDAPKG_BACKEND: 'Current'
-  JULIA_CI: 'true'
-  GKSwstype: '100'
-  JULIA_CACHE_NUM: '1'
 
 jobs:
   CI:
     runs-on: ubuntu-latest
+    permissions:
+      packages: write
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.repository_owner	}}
+        password: ${{ github.token }}
+    - name: Get docker image hash
+      id: img
+      run: echo "hash=${{ hashFiles('requirements.txt', 'Project.toml', 'Manifest.toml', 'src/**', 'env.Dockerfile') }}" >> "$GITHUB_OUTPUT"
+    - name: Build Docker container
+      env:
+        IMG: ghcr.io/${{ github.repository }}:${{ steps.img.outputs.hash }}
+      run: |
+        docker manifest inspect ${IMG} && exit 0
+        docker build -f env.Dockerfile -t ${IMG} .
+        docker push ${IMG}
+    - name: Run Literate notebooks
+      env:
+        IMG: ghcr.io/${{ github.repository }}:${{ steps.img.outputs.hash }}
+      run: >
+        docker run --rm
+        -w /tmp -v ${{ github.workspace }}:/tmp
+        -e JULIA_PROJECT=@.
+        ${IMG}
+        julia --color=yes -p ${{ env.NPROC }} literate.jl
     - name: Setup micromamba
       uses: mamba-org/setup-micromamba@v1
       with:
-        environment-file: environment.yml
+        environment-file: conda.yml
         cache-environment: true
         post-cleanup: all
-    - name: Read Julia version
-      uses: SebRollen/toml-action@v1.0.2
-      id: read_toml
-      with:
-        file: 'Manifest.toml'
-        field: 'julia_version'
-    - name: Install Julia using jill.sh
-      run: |
-        wget -O /tmp/jill.sh https://raw.githubusercontent.com/abelsiqueira/jill/main/jill.sh
-        bash /tmp/jill.sh --version ${{ steps.read_toml.outputs.value }} -y
-        echo "$HOME/.local/bin" >> $GITHUB_PATH
-    - name: Cache Julia deps
-      uses: actions/cache@v3
-      with:
-        path: |
-          ~/.julia/artifacts
-          ~/.julia/compiled
-          ~/.julia/packages
-          ~/.julia/environments
-          ~/.julia/scratchspaces
-        key: ${{ runner.os }}-jill-${{ env.JULIA_CACHE_NUM }}-${{ hashFiles('src/**','Project.toml', 'Manifest.toml')}}
-        restore-keys: |
-          ${{ runner.os }}-jill-${{ env.JULIA_CACHE_NUM }}-
-    - name: Install Julia deps
-      shell: micromamba-shell {0}
-      run: |
-        julia --color=yes -e 'using Pkg; Pkg.add(["PrettyTables", "Literate"])'
-        julia --project=@. --color=yes -e 'using Pkg, Dates; Pkg.instantiate(); Pkg.precompile(); Pkg.gc(collect_delay=Day(1))'
-    - name: Run program
-      shell: micromamba-shell {0}
-      env:
-        JULIA_PROJECT: '@.'
-      run: julia --color=yes -p ${{ env.NPROC }} literate.jl
     - name: Build website
       shell: micromamba-shell {0}
       run: jupyter-book build docs/
