@@ -39,9 +39,9 @@ for (nb, t) in zip(nbs, ts)
                 end
             end
         catch e
-            println("An error occured:", e)
+            println("An error occured: ", e)
         end
     end
 end
 
-any(isnan, ts) && error("Please checkout errors.")
+any(isnan, ts) && error("Please check errors.")

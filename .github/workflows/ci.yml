@@ -14,9 +14,8 @@ concurrency:
 env:
   NPROC: '2' # Number of Julia processes to run the notebooks
   CACHE_NUM: '1'
-  JULIA_CPU_TARGET: 'generic;haswell,clone_all'
   JULIA_NUM_THREADS: 'auto'
-  JULIA_CONDAPKG_BACKEND: 'Current'
+  JULIA_CONDAPKG_BACKEND: 'Null'
   JULIA_CI: 'true'
 
 jobs:
@@ -25,6 +24,12 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+    - name: Setup micromamba
+      uses: mamba-org/setup-micromamba@v1
+      with:
+        environment-file: environment.yml
+        cache-environment: true
+        post-cleanup: all
     - name: Read Julia version
       uses: SebRollen/toml-action@v1.0.2
       id: read_toml
@@ -36,8 +41,9 @@ jobs:
         wget -O /tmp/jill.sh https://raw.githubusercontent.com/abelsiqueira/jill/main/jill.sh
         bash /tmp/jill.sh --version ${{ steps.read_toml.outputs.value }} -y
         echo "$HOME/.local/bin" >> $GITHUB_PATH
-    - name: Cache Julia deps
-      uses: actions/cache@v3
+    - name: Restore Julia packages
+      uses: actions/cache/restore@v3
+      id: cache
       with:
         path: |
           ~/.julia
@@ -45,17 +51,19 @@ jobs:
         key: ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-${{ hashFiles('src/**','Project.toml', 'Manifest.toml')}}
         restore-keys: |
           ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-
-    - name: Setup micromamba
-      uses: mamba-org/setup-micromamba@v1
-      with:
-        environment-file: environment.yml
-        cache-environment: true
-        post-cleanup: all
-    - name: Install Julia deps
+    - name: Install Julia packages
       shell: micromamba-shell {0}
       run: |
         julia --color=yes -e 'using Pkg; Pkg.add(["PrettyTables", "Literate"])'
         julia --project=@. --color=yes -e 'using Pkg, Dates; Pkg.instantiate(); Pkg.gc(collect_delay=Day(1))'
+    - name: Save Julia packages
+      uses: actions/cache/save@v3
+      if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+      with:
+        path: |
+          ~/.julia
+          !~/.julia/registries
+        key: ${{ steps.cache.outputs.cache-primary-key }}
     - name: Run program
       shell: micromamba-shell {0}
       env:
