@@ -437,7 +437,7 @@ And they are called with `func(a, b)` or `func(a, b, 3)`
 
 ### Keyword arguments
 
-[Keyword arguments](https://docs.julialang.org/en/v1/manual/functions/#Keyword-Arguments) are listed after `;`
+[Keyword arguments](https://docs.julialang.org/en/v1/manual/functions/#Keyword-Arguments) are listed after `;`. They are called by name rather than order.
 
 ```julia
 function plot(x, y; style="solid", width=1, color="black")
@@ -449,7 +449,7 @@ And they are called with `plot(x, y, width=2)` or `plot(x, y; width=2)`
 
 ===#
 
-args_kwargs(args...; kwargs...) = (args, kwargs)  ## mind the semicolon ;
+args_kwargs(args...; kwargs...) = (args, kwargs)  ## Note the semicolon
 
 args_kwargs(1, 2, 3; a=4, b=5.0, c="Hello")
 
@@ -459,7 +459,6 @@ args_kwargs(1, 2, 3; a=4, b=5.0, c="Hello")
 
 - [Compositing functions and pipes](https://docs.julialang.org/en/v1/manual/functions/#Function-composition-and-piping)
 - [Variable argument (vararg) functions](https://docs.julialang.org/en/v1/manual/functions/#Varargs-Functions)
-- [Argument destructuring](https://docs.julialang.org/en/v1/manual/functions/#Argument-destructuring)
 - [Scope of variables](https://docs.julialang.org/en/v1/manual/variables-and-scoping/)
 
 ===#
