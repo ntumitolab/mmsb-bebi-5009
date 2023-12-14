@@ -12,6 +12,9 @@ using ModelingToolkit
 using Plots
 Plots.default(linewidth=2)
 
+# PNG output in Literate.jl
+PNG(fig) = display("image/png", fig)
+
 #---
 rn = @reaction_network begin
     k1, 0 --> A
