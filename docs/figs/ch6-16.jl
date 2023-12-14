@@ -10,6 +10,9 @@ using DifferentialEquations
 using Plots
 Plots.default(linewidth=2)
 
+# PNG output in Literate.jl
+PNG(fig) = display("image/png", fig)
+
 #---
 rn = @reaction_network begin
     (k1, k2), 0 <--> C8
@@ -77,3 +80,5 @@ sol = solve(prob, callback=cbs)
 
 @unpack C8s, C3s = osys
 fig = plot(sol, idxs=[C8s, C3s], title="Fig 6.16", xlabel="Time", ylabel="Concentration", legend=:right, rightmargin=5*Plots.mm)
+
+fig |> PNG

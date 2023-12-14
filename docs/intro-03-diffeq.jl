@@ -22,6 +22,9 @@ using DifferentialEquations
 using Plots
 Plots.default(linewidth=2)
 
+# PNG output in Literate.jl
+PNG(fig) = display("image/png", fig)
+
 #===
 
 ### Exponential decay model
@@ -55,7 +58,9 @@ prob = ODEProblem(expdecay, u0, tspan, p)
 sol = solve(prob)
 
 # Visualize the solution
-plot(sol, legend=:right)
+fig = plot(sol, legend=:right)
+
+fig |> PNG
 
 # Solution at time t=1.0 (with interpolation)
 sol(1.0)
@@ -117,7 +122,9 @@ prob = ODEProblem(sir!, u0, tspan, p)
 sol = solve(prob)
 
 # Visualize the solution
-plot(sol, label=["S" "I" "R"], legend=:right)
+fig = plot(sol, label=["S" "I" "R"], legend=:right)
+
+fig |> PNG
 
 #===
 ### Lorenz system
@@ -155,15 +162,19 @@ prob = ODEProblem(lorenz!,u0,tspan,p)
 sol = solve(prob)
 
 # x-y-z time-series
-plot(sol)
+fig = plot(sol)
+
+fig |> PNG
 
 # `idxs=(1, 2, 3)` makes a phase plot with 1st, 2nd, and the 3rd state variable. With `LabelledArrays`, you can use symbols instead of index numbers.
 
-plot(sol, idxs=(:x, :y, :z))
+fig = plot(sol, idxs=(:x, :y, :z))
+fig |> PNG
 
 # The zeroth variable in `idxs` is the independent variable (usually time). The below command plots the time series of the second state variable (`y`).
 
-plot(sol, idxs=(0, 2))
+fig = plot(sol, idxs=(0, 2))
+fig |> PNG
 
 # ## Saving simulation results
 
@@ -206,7 +217,8 @@ tspan = (0.0, 2.0)
 prob = ODEProblem(expdecaySys, u0, tspan, p)
 sol = solve(prob)
 
-plot(sol)
+fig = plot(sol)
+fig |> PNG
 
 # ### SIR model
 
@@ -229,7 +241,8 @@ tspan = (0.0, 20.0)
 prob = ODEProblem(sirSys, u0, tspan, p)
 sol = solve(prob)
 
-plot(sol)
+fig = plot(sol)
+fig |> PNG
 
 #===
 ## Using Catalyst.jl for chemical reaction networks
@@ -255,7 +268,8 @@ tspan = (0., 2.)
 prob = ODEProblem(decay_rn, u0, tspan, p)
 sol = solve(prob)
 
-plot(sol, title="Exponential Decay")
+fig = plot(sol, title="Exponential Decay")
+fig |> PNG
 
 # ### SIR model
 
@@ -271,4 +285,5 @@ tspan = (0., 20.)
 prob = ODEProblem(sir_rn, u0, tspan, p)
 sol = solve(prob)
 
-plot(sol, legend=:right, title = "SIR Model")
+fig = plot(sol, legend=:right, title = "SIR Model")
+fig |> PNG

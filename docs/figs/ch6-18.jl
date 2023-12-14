@@ -10,6 +10,9 @@ using DifferentialEquations
 using Plots
 Plots.default(linewidth=2)
 
+# PNG output in Literate.jl
+PNG(fig) = display("image/png", fig)
+
 #---
 rn = @reaction_network begin
     (k1 * I, km1), R <--> RI
@@ -52,6 +55,8 @@ sol = solve(prob)
 @unpack C, RIC, RICC = osys
 fig = plot(sol, idxs=[C, RIC, RICC], title="Fig 6.18 (A)", xlabel="Time", ylabel="Abundance", legend=:topright)
 
+fig |> PNG
+
 # ## Fig 6.18 (B)
 
 idx = findfirst(isequal(I), parameters(osys))
@@ -65,3 +70,5 @@ sol = solve(prob, callback=cbs)
 
 @unpack C = osys
 fig = plot(sol, idxs=[C], title="Fig 6.18 (B)", xlabel="Time", ylabel="Ca concentration", legend=false, ylim=(0, 2.5))
+
+fig |> PNG

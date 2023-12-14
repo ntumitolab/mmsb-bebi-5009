@@ -12,6 +12,9 @@ using LabelledArrays
 using Plots
 Plots.default(linewidth=2)
 
+# PNG output in Literate.jl
+PNG(fig) = display("image/png", fig)
+
 #---
 hil(x, k) = x / (x + k)
 hil(x, k, n) = hil(x^n, k^n)
@@ -39,3 +42,5 @@ fig = plot(
     xlabel = "K1" , ylabel= "Steady state [A]",
     legend=nothing, ylim=(0, 4), xlim=(0, 1000)
 )
+
+fig |> PNG

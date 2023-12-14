@@ -66,8 +66,13 @@ analytical(t) = 1 - exp(-t)
 using Plots
 Plots.default(linewidth=2)
 
-plot(sol.t, sol.u, label="FE method")
-plot!(analytical, sol.t[begin], sol.t[end], label = "Analytical solution", linestyle=:dash)
+# PNG output in Literate.jl
+PNG(fig) = display("image/png", fig)
+
+fig = plot(sol.t, sol.u, label="FE method")
+plot!(fig, analytical, sol.t[begin], sol.t[end], label = "Analytical solution", linestyle=:dash)
+
+fig |> PNG
 
 #===
 

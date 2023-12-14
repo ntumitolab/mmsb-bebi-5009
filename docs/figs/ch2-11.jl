@@ -10,6 +10,11 @@ using ModelingToolkit
 using Plots
 Plots.default(linewidth=2)
 
+# PNG output in Literate.jl
+PNG(fig) = display("image/png", fig)
+
+#---
+
 rn211 = @reaction_network begin
     k0, 0 --> A
     (k1, km1), A <--> B
@@ -29,7 +34,7 @@ fig = plot(
     xlabel="Time (AU)",
     ylabel="Concentration (AU)",
     title="Fig. 2.11 (Full model)"
-)
+) |> PNG
 
 
 # ## Figure 2.12 : Rapid equilibrium assumption
@@ -80,6 +85,8 @@ plot!(fig,
     ylabel="Concentration (AU)"
 )
 
+fig |> PNG
+
 #===
 ## Figure 2.13: Rapid equilibrium (take 2)
 
@@ -100,6 +107,8 @@ plot!(fig,
     xlabel="Time (AU)",
     ylabel="Concentration (AU)"
 )
+
+fig |> PNG
 
 
 #===
@@ -136,3 +145,5 @@ plot!(fig,
     title="Figure 2.14: Ref vs QSSA",
     xlims=(0.0, tend)
 )
+
+fig |> PNG

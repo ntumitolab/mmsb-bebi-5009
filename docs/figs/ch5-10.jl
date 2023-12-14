@@ -10,6 +10,9 @@ using SimpleUnPack
 using Plots
 Plots.default(linewidth=2)
 
+# PNG output in Literate.jl
+PNG(fig) = display("image/png", fig)
+
 #---
 hil(x, k=one(x)) = x / (x + k)
 hil(x, k, n) = hil(x^n, k^n)
@@ -62,6 +65,8 @@ sol = solve(prob)
 
 fig = plot(sol, title="Figure 5.10", xlabel="Time (hr)", ylabel="Concentration (μM)", xlims=(0, 1), legend=:right)
 
+fig |> PNG
+
 # ## Figure 5.11 A
 
 rx = range(0, 1200, 101)
@@ -101,6 +106,8 @@ end
 
 plot!(fig, xlims=(0, 1200), ylims=(0, 6), xlabel="AdoMet (μM)", ylabel="AdoHcy (μM)", legend=:bottomright)
 
+fig |> PNG
+
 # ## Figure 5.11 B
 # Increase methionine level
 
@@ -139,3 +146,5 @@ for sol in sols
 end
 
 plot!(fig, xlims=(0, 1200), ylims=(0, 6), xlabel="AdoMet (μM)", ylabel="AdoHcy (μM)", legend=:bottomright)
+
+fig |> PNG

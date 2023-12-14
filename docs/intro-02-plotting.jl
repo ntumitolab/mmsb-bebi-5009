@@ -9,6 +9,8 @@
 ===#
 
 using Plots
+# PNG output in Literate.jl
+PNG(fig) = display("image/png", fig)
 
 #---
 f(x) = sin(sin(x) + 1)
@@ -114,5 +116,6 @@ quiver(xx, yy, quiver=∇f, aspect_ratio=:equal, line=(:black), arrow=(:closed))
 
 # Save the current figure
 savefig("vfield.png")
+
 # Save the figure saved in a variable
 savefig(fig, "subplots.png")

@@ -12,6 +12,9 @@ using SimpleUnPack
 using Plots
 Plots.default(linewidth=2)
 
+# PNG output in Literate.jl
+PNG(fig) = display("image/png", fig)
+
 # Convenience functions
 hil(x, k) = x / (x + k)
 hil(x, k, n) = hil(x^n, k^n)
@@ -49,3 +52,5 @@ prob = ODEProblem(collins!, u0, tend, ps)
 sol = solve(prob, callback=events)
 
 fig = plot(sol, legend=:right, xlabel = "Time", ylabel="Concentration", title="Fig 1.7")
+
+fig |> PNG

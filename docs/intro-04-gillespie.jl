@@ -12,6 +12,8 @@ using Random            ## randexp()
 Random.seed!(2022)
 Plots.default(fmt=:png)
 
+# PNG output in Literate.jl
+PNG(fig) = display("image/png", fig)
 
 #===
 Stochastic chemical reaction: Gillespie Algorithm (direct method)
@@ -85,14 +87,18 @@ soldirect = ssa_direct(model, u0, tend, parameters, stoich)
 solfirst = ssa_first(model, u0, tend, parameters, stoich)
 
 # Plot the solution from the direct method
-plot(soldirect.t, soldirect.u,
+fig = plot(soldirect.t, soldirect.u,
     xlabel="time", ylabel="# of molecules",
     title = "SSA (direct method)", label=["A" "B"])
 
+fig |> PNG
+
 # Plot the solution by the first reaction method
-plot(solfirst.t, solfirst.u,
+fig = plot(solfirst.t, solfirst.u,
     xlabel="time", ylabel="# of molecules",
     title = "SSA (1st reaction method)", label=["A" "B"])
+
+fig |> PNG
 
 # Running 50 simulations
 numRuns = 50
@@ -121,13 +127,13 @@ for sol in sols
     plot!(fig1, sol.t, sol.u, linecolor=[:blue :red], linealpha=0.05, label=false)
 end
 
-fig1
+fig1 |> PNG
 
 # Plot averages
 plot!(fig1, a_avg, 0.0, tend, linecolor=:black, linewidth=3, linestyle = :solid, label="Avarage [A]")
 plot!(fig1, b_avg, 0.0, tend, linecolor=:black, linewidth=3, linestyle = :dash, label="Avarage [B]")
 
-fig1
+fig1 |> PNG
 
 #===
 ## Using Catalyst
@@ -158,19 +164,19 @@ jumpProb = JumpProblem(rn, dprob, Direct())
 sol = solve(jumpProb, SSAStepper())
 fig = plot(sol)
 
-fig
+fig |> PNG
 
 # Parallel ensemble simulation
 ensprob = EnsembleProblem(jumpProb)
 sim = solve(ensprob, SSAStepper(), EnsembleThreads(); trajectories=50)
 fig = plot(sim, alpha=0.1, color=[:blue :red])
 
-fig
+fig |> PNG
 #---
 
 summ = EnsembleSummary(sim, 0:0.1:10)
 fig = plot(summ,fillalpha=0.5)
-fig
+fig |> PNG
 
 #===
 **See also** the [JumpProcesses.jl docs](https://docs.sciml.ai/JumpProcesses/stable/api/#JumpProcesses.ConstantRateJump) about discrete stochastic examples.
