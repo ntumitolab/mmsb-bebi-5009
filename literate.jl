@@ -6,7 +6,7 @@ using PrettyTables
 end
 
 basedir = "docs"
-config = Dict("mdstrings" => true, "execute" => true, "flavor" => Literate.CommonMarkFlavor())
+config = Dict("mdstrings" => true, "execute" => true)
 
 nbs = String[]
 
@@ -21,9 +21,7 @@ end
 
 # Execute the notebooks in worker processes
 ts = pmap(nbs; on_error=ex->NaN) do nb
-    cd(dirname(nb)) do
-        @elapsed Literate.markdown(basename(nb); config)
-    end
+    @elapsed Literate.notebook(nb, dirname(nb); config)
 end
 
 pretty_table([nbs ts], header=["Notebook", "Elapsed (s)"])
@@ -34,12 +32,10 @@ for (nb, t) in zip(nbs, ts)
         println("Debugging notebook: ", nb)
         try
             withenv("JULIA_DEBUG" => "Literate") do
-                cd(dirname(nb)) do
-                    Literate.markdown(basename(nb); config)
-                end
+                Literate.notebook(nb, dirname(nb); config)
             end
         catch e
-            println("An error occured: ", e)
+            println(e)
         end
     end
 end

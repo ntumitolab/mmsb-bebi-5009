@@ -12,7 +12,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NPROC: '2' # Number of Julia processes to run the notebooks
+  NPROC: '3' # Number of Julia processes to run the notebooks
+  PY_VER: '3.12'
   CACHE_NUM: '1'
   JULIA_NUM_THREADS: 'auto'
   JULIA_CONDAPKG_BACKEND: 'Null'
@@ -24,12 +25,20 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-    - name: Setup micromamba
-      uses: mamba-org/setup-micromamba@v1
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      id: cp
       with:
-        environment-file: environment.yml
-        cache-environment: true
-        post-cleanup: all
+        python-version: ${{ env.PY_VER }}
+    - name: Cache pip
+      uses: actions/cache@v3
+      id: cache-pip
+      with:
+        path: ${{ env.pythonLocation }}
+        key: ${{ runner.os }}-pip-${{ steps.cp.outputs.python-version }}-${{ hashFiles('requirements.txt') }}
+    - name: Install python packages
+      if: ${{ steps.cache-pip.outputs.cache-hit != 'true' }}
+      run: pip install -r requirements.txt
     - name: Read Julia version
       uses: SebRollen/toml-action@v1.0.2
       id: read_toml
@@ -41,9 +50,9 @@ jobs:
         wget -O /tmp/jill.sh https://raw.githubusercontent.com/abelsiqueira/jill/main/jill.sh
         bash /tmp/jill.sh --version ${{ steps.read_toml.outputs.value }} -y
         echo "$HOME/.local/bin" >> $GITHUB_PATH
-    - name: Restore Julia packages
+    - name: Cache Julia packages
       uses: actions/cache/restore@v3
-      id: cache
+      id: cache-julia
       with:
         path: |
           ~/.julia
@@ -52,26 +61,24 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-
     - name: Install Julia packages
-      shell: micromamba-shell {0}
+      if: ${{ steps.cache-julia.outputs.cache-hit != 'true' }}
       run: |
         julia --color=yes -e 'using Pkg; Pkg.add(["PrettyTables", "Literate"])'
-        julia --project=@. --color=yes -e 'using Pkg, Dates; Pkg.instantiate(); Pkg.gc(collect_delay=Day(1))'
+        julia --project=@. --color=yes -e 'using Pkg, Dates; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile(); Pkg.gc(collect_delay=Day(0))'
     - name: Save Julia packages
       uses: actions/cache/save@v3
-      if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+      if: ${{ steps.cache-julia.outputs.cache-hit != 'true' }}
       with:
         path: |
           ~/.julia
           !~/.julia/registries
-        key: ${{ steps.cache.outputs.cache-primary-key }}
+        key: ${{ steps.cache-julia.outputs.cache-primary-key }}
     - name: Run program
-      shell: micromamba-shell {0}
       env:
         JULIA_PROJECT: '@.'
         GKSwstype: '100'
       run: julia --color=yes -p ${{ env.NPROC }} literate.jl
     - name: Build website
-      shell: micromamba-shell {0}
       run: jupyter-book build docs/
     - name: Upload pages artifact
       if: ${{ github.ref == 'refs/heads/main' }}
