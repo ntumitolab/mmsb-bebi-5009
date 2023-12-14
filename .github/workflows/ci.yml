@@ -58,8 +58,8 @@ jobs:
           ~/.julia
           !~/.julia/registries
         key: ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-${{ hashFiles('src/**','Project.toml', 'Manifest.toml')}}
-        restore-keys: |
-          ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-
+        # restore-keys: |
+        #   ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-
     - name: Install Julia packages
       if: ${{ steps.cache-julia.outputs.cache-hit != 'true' }}
       run: |
