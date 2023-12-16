@@ -6,7 +6,7 @@ using PrettyTables
     using Literate, Pkg
     Pkg.activate(Base.current_project())
 end
-s
+
 basedir = "docs"
 config = Dict("mdstrings" => true, "execute" => true)
 
