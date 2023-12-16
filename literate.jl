@@ -2,9 +2,11 @@ using Distributed
 using PrettyTables
 
 @everywhere begin
-    using Literate
+    ENV["GKSwstype"] = 100
+    using Literate, Pkg
+    Pkg.activate(Base.current_project())
 end
-
+s
 basedir = "docs"
 config = Dict("mdstrings" => true, "execute" => true)
 
@@ -19,7 +21,7 @@ for (root, dirs, files) in walkdir(basedir)
     end
 end
 
-# Execute the notebooks in worker processes
+# Execute the notebooks in worker process(es)
 ts = pmap(nbs; on_error=ex->NaN) do nb
     @elapsed Literate.notebook(nb, dirname(nb); config)
 end
