@@ -13,7 +13,7 @@ parts:
       - file: intro-04-gillespie
   - caption: MMSB textbook
     chapters:
-    - file: mmsb-README
+    - file: figs/README
       sections:
       - file: figs/ch1-07
       - file: figs/ch1-09
