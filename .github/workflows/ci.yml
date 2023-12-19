@@ -30,14 +30,7 @@ jobs:
       id: cp
       with:
         python-version: ${{ env.PY_VER }}
-    # - name: Cache pip
-    #   uses: actions/cache@v3
-    #   id: cache-pip
-    #   with:
-    #     path: ${{ env.pythonLocation }}
-    #     key: ${{ runner.os }}-pip-${{ steps.cp.outputs.python-version }}-${{ hashFiles('requirements.txt') }}
     - name: Install python packages
-      # if: ${{ steps.cache-pip.outputs.cache-hit != 'true' }}
       run: pip install -r requirements.txt
     - name: Read Julia version
       uses: SebRollen/toml-action@v1.0.2
