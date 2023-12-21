@@ -12,16 +12,15 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NPROC: '4' # Number of Julia processes to run the notebooks
-  PY_VER: '3.12'
+  NPROC: '2' # Number of Julia processes to run the notebooks
   CACHE_NUM: '1'
-  JULIA_NUM_THREADS: 'auto'
+  PY_VER: '3.12'
   JULIA_CONDAPKG_BACKEND: 'Null'
   JULIA_CI: 'true'
 
 jobs:
   CI:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -30,7 +29,14 @@ jobs:
       id: cp
       with:
         python-version: ${{ env.PY_VER }}
+    - name: Cache pip
+      uses: actions/cache@v3
+      id: cache-pip
+      with:
+        path: ${{ env.pythonLocation }}
+        key: ${{ runner.os }}-pip-${{ steps.cp.outputs.python-version }}-${{ hashFiles('requirements.txt') }}
     - name: Install python packages
+      if: ${{ steps.cache-pip.outputs.cache-hit != 'true' }}
       run: pip install -r requirements.txt
     - name: Read Julia version
       uses: SebRollen/toml-action@v1.0.2
@@ -39,28 +45,47 @@ jobs:
         file: 'Manifest.toml'
         field: 'julia_version'
     - name: Install Julia using jill.sh
-      uses: julia-actions/setup-julia@v1
+      run: |
+        wget -O /tmp/jill.sh https://raw.githubusercontent.com/abelsiqueira/jill/main/jill.sh
+        bash /tmp/jill.sh --version ${{ steps.read_toml.outputs.value }} -y
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
+    - name: Cache Julia packages
+      uses: actions/cache/restore@v3
+      id: cache-julia
       with:
-        version: ${{ steps.read_toml.outputs.value }}
-        show-versioninfo: 'true'
+        path: |
+          ~/.julia
+          !~/.julia/registries
+        key: ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-${{ hashFiles('src/**','Project.toml', 'Manifest.toml')}}
+        restore-keys: |
+          ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-
     - name: Install Julia packages
+      if: ${{ steps.cache-julia.outputs.cache-hit != 'true' }}
       run: |
         julia --color=yes -e 'using Pkg; Pkg.add(["PrettyTables", "Literate"])'
-        julia --project=@. --color=yes -e 'using Pkg; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()'
+        julia --project=@. --color=yes -e 'using Pkg, Dates; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile(); Pkg.gc(collect_delay=Day(0))'
+    - name: Save Julia packages
+      uses: actions/cache/save@v3
+      if: ${{ steps.cache-julia.outputs.cache-hit != 'true' }}
+      with:
+        path: |
+          ~/.julia
+          !~/.julia/registries
+        key: ${{ steps.cache-julia.outputs.cache-primary-key }}
     - name: Run program
       run: julia --color=yes -p ${{ env.NPROC }} literate.jl
     - name: Build website
       run: jupyter-book build docs/
-    - name: Upload pages artifact
+    - name: Upload page artifact
       if: ${{ github.ref == 'refs/heads/main' }}
       uses: actions/upload-pages-artifact@v3
       with:
         path: docs/_build/html
 
+  # Deploy pages
   deploy:
-    name: Deploy to GitHub pages
     needs: CI
-    if: ${{ github.ref == 'refs/heads/main'}}
+    if: ${{ github.ref == 'refs/heads/main' }}
     # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
     permissions:
       pages: write # to deploy to Pages
@@ -71,6 +96,6 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v4
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
