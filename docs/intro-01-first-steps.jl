@@ -281,10 +281,10 @@ https://en.wikipedia.org › wiki › Short-circuit_evaluation).
 ===#
 
 # && evaluates and returns the second argument if the first is true
-true && println("Hi")
+(2 > 1) && println("Hi")
 
 # && otherwise returns false
-false && println("Hi")
+(2 < 1) && println("Hi")
 
 # `if` block has return value(s)
 let score = 10
