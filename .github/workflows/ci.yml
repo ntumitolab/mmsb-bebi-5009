@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NPROC: '2' # Number of Julia processes to run the notebooks
+  NPROC: '4' # Number of Julia processes to run the notebooks
   CACHE_NUM: '1'
   PY_VER: '3.12'
   JULIA_CONDAPKG_BACKEND: 'Null'
