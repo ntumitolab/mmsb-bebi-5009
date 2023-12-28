@@ -7,7 +7,6 @@ Hodgkin-Huxley model
 
 using DifferentialEquations
 using ModelingToolkit
-using IfElse
 using Plots
 Plots.default(linewidth=2)
 
