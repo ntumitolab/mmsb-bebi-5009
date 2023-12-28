@@ -38,10 +38,11 @@ jobs:
       with:
         file: 'Manifest.toml'
         field: 'julia_version'
-    - name: Install Julia
-      uses: julia-actions/setup-julia@v1
-      with:
-        version: ${{ steps.read_toml.outputs.value }}
+    - name: Install Julia using jill.sh
+      run: |
+        wget -O /tmp/jill.sh https://raw.githubusercontent.com/abelsiqueira/jill/main/jill.sh
+        bash /tmp/jill.sh --version ${{ steps.read_toml.outputs.value }} -y
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
     - name: Install Julia packages
       run: |
         julia --color=yes -e 'using Pkg; Pkg.add(["PrettyTables", "Literate"])'
