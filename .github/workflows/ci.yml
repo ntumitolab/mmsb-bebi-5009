@@ -20,7 +20,7 @@ env:
 
 jobs:
   CI:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -29,14 +29,7 @@ jobs:
       id: cp
       with:
         python-version: ${{ env.PY_VER }}
-    - name: Cache pip
-      uses: actions/cache@v3
-      id: cache-pip
-      with:
-        path: ${{ env.pythonLocation }}
-        key: ${{ runner.os }}-pip-${{ steps.cp.outputs.python-version }}-${{ hashFiles('requirements.txt') }}
     - name: Install python packages
-      if: ${{ steps.cache-pip.outputs.cache-hit != 'true' }}
       run: pip install -r requirements.txt
     - name: Read Julia version
       uses: SebRollen/toml-action@v1.0.2
@@ -44,34 +37,14 @@ jobs:
       with:
         file: 'Manifest.toml'
         field: 'julia_version'
-    - name: Install Julia using jill.sh
-      run: |
-        wget -O /tmp/jill.sh https://raw.githubusercontent.com/abelsiqueira/jill/main/jill.sh
-        bash /tmp/jill.sh --version ${{ steps.read_toml.outputs.value }} -y
-        echo "$HOME/.local/bin" >> $GITHUB_PATH
-    - name: Cache Julia packages
-      uses: actions/cache/restore@v3
-      id: cache-julia
+    - name: Install Julia
+      uses: julia-actions/setup-julia@v1
       with:
-        path: |
-          ~/.julia
-          !~/.julia/registries
-        key: ${{ runner.os }}-julia-${{ steps.read_toml.outputs.value }}-${{ env.CACHE_NUM }}-${{ hashFiles('src/**','Project.toml', 'Manifest.toml')}}
-        restore-keys: |
-          ${{ runner.os }}-julia-${{ steps.read_toml.outputs.value }}-${{ env.CACHE_NUM }}-
+        version: ${{ steps.read_toml.outputs.value }}
     - name: Install Julia packages
-      if: ${{ steps.cache-julia.outputs.cache-hit != 'true' }}
       run: |
         julia --color=yes -e 'using Pkg; Pkg.add(["PrettyTables", "Literate"])'
-        julia --project=@. --color=yes -e 'using Pkg, Dates; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile(); Pkg.gc(collect_delay=Day(0))'
-    - name: Save Julia packages
-      uses: actions/cache/save@v3
-      if: ${{ steps.cache-julia.outputs.cache-hit != 'true' }}
-      with:
-        path: |
-          ~/.julia
-          !~/.julia/registries
-        key: ${{ steps.cache-julia.outputs.cache-primary-key }}
+        julia --project=@. --color=yes -e 'using Pkg, Dates; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()'
     - name: Run program
       run: julia --color=yes -p ${{ env.NPROC }} literate.jl
     - name: Build website
