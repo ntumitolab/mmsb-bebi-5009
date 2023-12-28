@@ -60,7 +60,7 @@ fig |> PNG
 
 # ## Fig. 4.2 B (Phase plot)
 
-fig = plot( sols[1], idxs=(:a, :b),
+fig = plot( sols[1], idxs=(1, 2),
     xlabel="[A]", ylabel="[B]",
     aspect_ratio=:equal, legend=nothing,
     title="Fig. 4.2 B (Phase plot)",
@@ -86,7 +86,7 @@ fig |> PNG
 fig = plot(title="Fig. 4.3 B (Phase plot)")
 
 for sol in sols
-    plot!(fig, sol, idxs=(:a, :b), legend=nothing)
+    plot!(fig, sol, idxs=(1, 2), legend=nothing)
 end
 
 plot!(fig, xlabel="[A]", ylabel="[B]", xlims=(0., 2.), ylims=(0., 2.), aspect_ratio=:equal)
@@ -120,7 +120,7 @@ fig = plot(title="Fig. 4.4 A (Phase plot with vector field)")
 quiver!(fig, xx, yy, quiver=∂F44, line=(:lightgrey), arrow=(:closed), aspect_ratio=:equal)
 
 for sol in sols
-    plot!(fig, sol, idxs=(:a, :b), linealpha=0.7, legend=nothing)
+    plot!(fig, sol, idxs=(1, 2), linealpha=0.7, legend=nothing)
 end
 
 plot!(fig, size=(600, 600), xlims=(rxy[1], rxy[end]), ylims=(rxy[1], rxy[end]), xlabel="[A]", ylabel="[B]")
@@ -133,7 +133,7 @@ fig = plot(title="Fig. 4.5 A (Phase plot with nullclines)")
 
 ## Phase plots
 for sol in sols
-    plot!(fig, sol, idxs=(:a, :b), linealpha=0.7, lab=nothing)
+    plot!(fig, sol, idxs=(1, 2), linealpha=0.7, lab=nothing)
 end
 
 ## nullclines

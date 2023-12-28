@@ -83,7 +83,7 @@ plot!(fig, Float64[], Float64[], line=(:black), label="A nullcline")
 contour!(fig, 0:0.01:4, 0:0.01:4, ∂B, levels=[0], cbar=false, line=(:black, :dash))
 plot!(fig, Float64[], Float64[], line=(:black, :dash), label="B nullcline")
 for sol in sols
-    plot!(fig, sol, idxs=(:a, :b), label=nothing)
+    plot!(fig, sol, idxs=(1, 2), label=nothing)
 end
 plot!(fig, xlim=(0, 4), ylim=(0, 4), legend=:topright, size=(600, 600), xlabel="[A]", ylabel="[B]")
 
@@ -140,7 +140,7 @@ plot!(fig, Float64[], Float64[], line=(:black), label="A nullcline")
 contour!(fig, 0:0.01:4, 0:0.01:4, ∂B, levels=[0], cbar=false, line=(:black, :dash))
 plot!(fig, Float64[], Float64[], line=(:black, :dash), label="B nullcline")
 for sol in sols
-    plot!(fig, sol, idxs=(:a, :b), label=nothing)
+    plot!(fig, sol, idxs=(1, 2), label=nothing)
 end
 plot!(fig, xlim=(0, 4), ylim=(0, 4), legend=:topright, size=(600, 600), xlabel="[A]", ylabel="[B]")
 
@@ -151,7 +151,7 @@ fig |> PNG
 sol = solve(ODEProblem(model415!, LVector(a=2.0, b=1.5), 10.0, ps2))
 
 fig = plot(title="Fig 4.17")
-plot!(fig, sol, idxs=(:a, :b), label=nothing, arrow=:closed)
+plot!(fig, sol, idxs=(1, 2), label=nothing, arrow=:closed)
 quiver!(fig, xx, yy, quiver=∂F416, line=(:lightgrey), arrow=(:closed), aspect_ratio=:equal)
 contour!(fig, 1:0.01:3, 1:0.01:3, ∂A, levels=[0], cbar=false, line=(:black))
 plot!(fig, identity, 0, 0, line=(:black), label="A nullcline")

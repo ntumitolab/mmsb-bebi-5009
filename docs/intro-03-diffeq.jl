@@ -2,11 +2,12 @@
 
 # Solving differential equations in Julia
 
-## Standard procedures
+**Standard procedures**
 
 - Define a model function representing the right-hand-side (RHS) of the sysstem.
   - Out-of-place form: `f(u, p, t)` where `u` is the state variable(s), `p` is the parameter(s), and `t` is the independent variable (usually time). The output is the right hand side (RHS) of the differential equation system.
   - In-place form: `f!(du, u, p, t)`, where the output is saved to `du`. The rest is the same as the out of place form. The in-place form has potential performance benefits since it allocates less than the out-of-place (`f(u, p, t)`) counterpart.
+  - Using ModelingToolkit.jl : define equations and build an ODE system.
 - Initial conditions (`u0`) for the state variable(s).
 - (Optional) define parameter(s) `p`.
 - Define a problem (e.g. `ODEProblem`) using the modeling function (`f`), initial conditions (`u0`), simulation time span (`tspan == (tstart, tend)`), and parameter(s) `p`.
@@ -15,17 +16,6 @@
 ## Solve ODEs using DifferentialEquations.jl
 
 Documentation: <https://docs.sciml.ai/DiffEqDocs/stable/>
-
-===#
-
-using DifferentialEquations
-using Plots
-Plots.default(linewidth=2)
-
-# PNG output in Literate.jl
-PNG(fig) = display("image/png", fig)
-
-#===
 
 ### Exponential decay model
 
@@ -43,8 +33,14 @@ $$
 
 ===#
 
-# Model function, in the out-of-place form `f(u, p, t)`
+using DifferentialEquations
+using Plots
+Plots.default(linewidth=2)
 
+# PNG output in Literate.jl
+PNG(fig) = display("image/png", fig)
+
+# Model function, in the out-of-place form `f(u, p, t)`
 expdecay(u, p, t) = p * u
 
 p = -1.0            ## Rate of exponential decay
@@ -68,7 +64,7 @@ sol(1.0)
 # Time points
 sol.t
 
-# Solutions at respective time points
+# Solutions at corresponding time points
 sol.u
 
 #===
@@ -127,73 +123,14 @@ fig = plot(sol, label=["S" "I" "R"], legend=:right)
 fig |> PNG
 
 #===
-### Lorenz system
 
-The Lorenz system is a system of ordinary differential equations having chaotic solutions for certain parameter values and initial conditions. ([Wikipedia](https://en.wikipedia.org/wiki/Lorenz_system))
+## Using ModelingToolkit.jl (recommended)
 
-$$
-\begin{align}
-  \frac{dx}{dt} &= \sigma(y-x) \\
-  \frac{dy}{dt} &= x(\rho - z) -y \\
-  \frac{dz}{dt} &= xy - \beta z
-\end{align}
-$$
-
-In this example, we will use [LabelledArrays.jl](https://github.com/SciML/LabelledArrays.jl) to get DSL-like syntax.
+[ModelingToolkit.jl](https://mtk.sciml.ai/dev/) is a high-level package for symbolic-numeric modeling and simulation in the Julia ecosystem.
 ===#
 
-using LabelledArrays
-using DifferentialEquations
-using Plots
-Plots.default(linewidth=2)
-
-#---
-function lorenz!(du,u,p,t)
-    du.x = p.σ*(u.y-u.x)
-    du.y = u.x*(p.ρ-u.z) - u.y
-    du.z = u.x*u.y - p.β*u.z
-end
-
-#---
-u0 = LVector(x=1.0, y=0.0, z=0.0)
-p = LVector(σ=10.0, ρ=28.0, β=8/3)
-tspan = (0.0, 100.0)
-prob = ODEProblem(lorenz!,u0,tspan,p)
-sol = solve(prob)
-
-# x-y-z time-series
-fig = plot(sol)
-
-fig |> PNG
-
-# `idxs=(1, 2, 3)` makes a phase plot with 1st, 2nd, and the 3rd state variable. With `LabelledArrays`, you can use symbols instead of index numbers.
-
-fig = plot(sol, idxs=(:x, :y, :z))
-fig |> PNG
-
-# The zeroth variable in `idxs` is the independent variable (usually time). The below command plots the time series of the second state variable (`y`).
-
-fig = plot(sol, idxs=(0, 2))
-fig |> PNG
-
-# ## Saving simulation results
-
-using DataFrames
-using CSV
-
-df = DataFrame(sol)
-CSV.write("lorenz.csv", df)
-
-#===
-
-## Using ModelingToolkit.jl (advanced)
-
-[ModelingToolkit.jl](https://mtk.sciml.ai/dev/) is a high-level package for symbolic-numeric modeling and simulation ni the Julia DiffEq ecosystem.
-
-===#
-
-using DifferentialEquations
 using ModelingToolkit
+using DifferentialEquations
 using Plots
 Plots.default(linewidth=2)
 
@@ -203,11 +140,8 @@ Plots.default(linewidth=2)
 @variables t C(t)   ## Time and concentration
 D = Differential(t) ## Differential operator
 
-# Define ODE equation(s)
-eqs = [D(C) ~ -λ*C]
-
-# Define an ODE system
-@named expdecaySys = ODESystem(eqs)
+# Define an ODE with equations
+@named expdecaySys = ODESystem([D(C) ~ -λ*C])
 
 #---
 u0 = [C => 1.0]
@@ -220,7 +154,81 @@ sol = solve(prob)
 fig = plot(sol)
 fig |> PNG
 
+#===
+### Lorenz system
+
+The Lorenz system is a system of ordinary differential equations having chaotic solutions for certain parameter values and initial conditions. ([Wikipedia](https://en.wikipedia.org/wiki/Lorenz_system))
+
+$$
+\begin{align}
+  \frac{dx}{dt} &= \sigma(y-x) \\
+  \frac{dy}{dt} &= x(\rho - z) -y \\
+  \frac{dz}{dt} &= xy - \beta z
+\end{align}
+$$
+===#
+using DifferentialEquations
+using ModelingToolkit
+using Plots
+Plots.default(linewidth=2)
+
+function build_lorentz(; name)
+    @parameters begin
+        σ=10.0
+        ρ=28.0
+        β=8/3
+    end
+
+    @variables begin
+        t           ## Independent variable (time)
+        x(t)=1.0    ## Independent variable (time)
+        y(t)=0.0    ## Independent variable (time)
+        z(t)=0.0    ## Independent variable (time)
+    end
+
+    D = Differential(t)
+
+    eqs = [
+        D(x) ~ σ * ( y -x ),
+        D(y) ~ x * (ρ - z) - y,
+        D(z) ~ x * y - β * z
+    ]
+
+    sys = ODESystem(eqs; name)
+    return sys
+end
+
+#---
+tspan = (0.0, 100.0)
+@named sys = build_lorentz()
+prob = ODEProblem(sys,[],tspan, [])
+sol = solve(prob)
+
+# x-y-z time-series
+fig = plot(sol)
+fig |> PNG
+
+#---
+fig = plot(sol, idxs=[sys.y])
+fig |> PNG
+
+# `idxs=(sys.x, sys.y, sys.z)` makes a phase plot with 1st, 2nd, and the 3rd state variable.
+fig = plot(sol, idxs=(sys.x, sys.y, sys.z), label=false, size=(800,800))
+fig |> PNG
+
+# ## Saving simulation results
+using DataFrames
+using CSV
+
+df = DataFrame(sol)
+CSV.write("lorenz.csv", df)
+
 # ### SIR model
+
+using DifferentialEquations
+using ModelingToolkit
+using Plots
+Plots.default(linewidth=2)
 
 @parameters β γ
 @variables t s(t) i(t) r(t)
@@ -278,8 +286,10 @@ sir_rn = @reaction_network begin
     γ, I --> R
 end
 
-p = [:β => 1.0, :γ => 0.3]
-u0 = [:S => 0.99, :I => 0.01, :R => 0.00]
+@unpack β, γ, S, I, R = sir_rn
+
+p = [β => 1.0, γ => 0.3]
+u0 = [S => 0.99, I => 0.01, R => 0.00]
 tspan = (0., 20.)
 
 prob = ODEProblem(sir_rn, u0, tspan, p)
