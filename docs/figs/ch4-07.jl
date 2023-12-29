@@ -2,8 +2,6 @@
 # Symmetric (bistable) biological networks.
 
 using DifferentialEquations
-using LabelledArrays
-using SimpleUnPack
 using Plots
 Plots.default(linewidth=2)
 
@@ -17,13 +15,13 @@ hil(x, k, n) = hil(x^n, k^n)
 #---
 function ∂A47(u, p, t)
     a, b = u
-    @unpack k1, k2, k3, k4, n1, n2 = p
+    k1, k2, k3, k4, n1, n2 = p
     return da = k1 * hil(1, b, n1) - k3 * a
 end
 
 function ∂B47(u, p, t)
     a, b = u
-    @unpack k1, k2, k3, k4, n1, n2 = p
+    k1, k2, k3, k4, n1, n2 = p
     return db = k2 * hil(1, a, n2) - k4 * b
 end
 
@@ -42,8 +40,8 @@ Asymmetric parameter set
 ps1 = (k1=20., k2=20., k3=5., k4=5., n1=4., n2=1.)
 tend = 4.0
 
-sol1 = solve(ODEProblem(model47!, LVector(a=3., b=1.), tend, ps1))
-sol2 = solve(ODEProblem(model47!, LVector(a=1., b=3.), tend, ps1))
+sol1 = solve(ODEProblem(model47!, [3., 1.], tend, ps1))
+sol2 = solve(ODEProblem(model47!, [1., 3.], tend, ps1))
 
 ax1 = plot(sol1, xlabel="Time", ylabel="Concentration", legend=:right, title= "Fig 4.7A (1)")
 ax2 = plot(sol2, xlabel="Time", ylabel="Concentration", legend=:right, title= "Fig 4.7A (2)")
@@ -93,8 +91,8 @@ Symmetric parameter set
 ps2 = LVector(k1=20., k2=20., k3=5., k4=5., n1=4., n2=4.)
 
 tend = 4.0
-sol1 = solve(ODEProblem(model47!, LVector(a=3., b=1.), tend, ps2))
-sol2 = solve(ODEProblem(model47!, LVector(a=1., b=3.), tend, ps2))
+sol1 = solve(ODEProblem(model47!, [3., 1.], tend, ps2))
+sol2 = solve(ODEProblem(model47!, [1., 3.], tend, ps2))
 
 ax1 = plot(sol1, xlabel="Time", ylabel="Concentration", legend=:right, title= "Fig 4.8A (1)")
 ax2 = plot(sol2, xlabel="Time", ylabel="Concentration", legend=:right, title= "Fig 4.8A (2)")

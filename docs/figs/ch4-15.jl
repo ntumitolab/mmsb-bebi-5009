@@ -7,8 +7,6 @@ Oscillatory networks.
 ===#
 
 using DifferentialEquations
-using LabelledArrays
-using SimpleUnPack
 using Plots
 Plots.default(linewidth=2)
 
@@ -19,13 +17,13 @@ PNG(fig) = display("image/png", fig)
 
 function dA415(u, p, t)
     a, b = u
-    @unpack k0, k1, k2, n = p
+    k0, k1, k2, n = p
     return dA = k0 - k1 * a * (1 + b^n)
 end
 
 function dB415(u, p, t)
     a, b = u
-    @unpack k0, k1, k2, n = p
+    k0, k1, k2, n = p
     return dB = k1 * a * (1 + b^n) - k2 * b
 end
 
@@ -38,10 +36,10 @@ end
 #---
 ps1 = (k0 = 8., k1 = 1., k2 = 5., n = 2.)
 u0s = (
-    LVector(a=1.5, b=1.0),
-    LVector(a=0.0, b=1.0),
-    LVector(a=0.0, b=3.0),
-    LVector(a=2.0, b=0.0),
+    [1.5, 1.0],
+    [0.0, 1.0],
+    [0.0, 3.0],
+    [2.0, 0.0],
 )
 
 tend = 8.
@@ -98,10 +96,10 @@ Oscillatory parameter set
 ps2 = (k0 = 8., k1 = 1., k2 = 5., n = 2.5)
 tend = 100.0
 u0s = (
-    LVector(a=1.5, b=1.0),
-    LVector(a=0.0, b=1.0),
-    LVector(a=0.0, b=3.0),
-    LVector(a=2.0, b=0.0),
+    [1.5, 1.0],
+    [0.0, 1.0],
+    [0.0, 3.0],
+    [2.0, 0.0],
 )
 
 sols = map(u0s) do u0
@@ -148,7 +146,7 @@ fig |> PNG
 
 # ## Fig 4.17
 
-sol = solve(ODEProblem(model415!, LVector(a=2.0, b=1.5), 10.0, ps2))
+sol = solve(ODEProblem(model415!, [2.0, 1.5], 10.0, ps2))
 
 fig = plot(title="Fig 4.17")
 plot!(fig, sol, idxs=(1, 2), label=nothing, arrow=:closed)

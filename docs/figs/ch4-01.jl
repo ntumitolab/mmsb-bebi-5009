@@ -5,7 +5,6 @@ Steady states and phase plots in an asymmetric network.
 ===#
 
 using DifferentialEquations
-using LabelledArrays
 using SimpleUnPack
 using Plots
 Plots.default(linewidth=2)
@@ -41,11 +40,11 @@ end
 
 ps1 = (k1=20., k2=5., k3=5., k4=5., k5=2., n=4.)
 u0s = [
-    LVector(a=0.0, b=0.0),
-    LVector(a=0.5, b=0.6),
-    LVector(a=0.17, b=1.1),
-    LVector(a=0.25, b=1.9),
-    LVector(a=1.85, b=1.7),
+    [0.0, 0.0],
+    [0.5, 0.6],
+    [0.17, 1.1],
+    [0.25, 1.9],
+    [1.85, 1.7],
 ]
 
 tend = 1.5

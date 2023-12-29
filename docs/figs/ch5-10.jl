@@ -5,7 +5,6 @@ Methionine model
 ===#
 
 using DifferentialEquations
-using LabelledArrays
 using SimpleUnPack
 using Plots
 Plots.default(linewidth=2)
@@ -58,7 +57,7 @@ ps = (
 )
 
 tend = 5.
-u0 = LVector(AdoMet=10., AdoHcy=10.)
+u0 = [AdoMet=10., AdoHcy=10.]
 
 prob = ODEProblem(metmodel!, u0, tend, ps)
 sol = solve(prob)

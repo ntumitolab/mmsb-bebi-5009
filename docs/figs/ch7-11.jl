@@ -5,8 +5,6 @@ Model of phage lambda decision switch
 ===#
 
 using DifferentialEquations
-using LabelledArrays
-using SimpleUnPack
 using Plots
 Plots.default(linewidth=2)
 
@@ -19,7 +17,7 @@ function model711(u, p, t)
     r, c = u
     rd = r / 2 ## r Dimer
     cd = c / 2 ## c Dimer
-    @unpack K1, K2, K3, K4 , delta_r, delta_c, a, b = p
+    K1, K2, K3, K4 , delta_r, delta_c, a, b = p
     f1 = K1 * rd^2
     f2 = K2 * rd
     f3 = K3 * cd
