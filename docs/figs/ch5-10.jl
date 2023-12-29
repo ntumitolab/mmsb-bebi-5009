@@ -57,12 +57,12 @@ ps = (
 )
 
 tend = 5.
-u0 = [AdoMet=10., AdoHcy=10.]
+u0 = [10., 10.]
 
 prob = ODEProblem(metmodel!, u0, tend, ps)
 sol = solve(prob)
 
-fig = plot(sol, title="Figure 5.10", xlabel="Time (hr)", ylabel="Concentration (μM)", xlims=(0, 1), legend=:right)
+fig = plot(sol, title="Figure 5.10", xlabel="Time (hr)", ylabel="Concentration (μM)", xlims=(0, 1), legend=:right, label=["AdoMet" "AdoHcy"])
 
 fig |> PNG
 

@@ -31,21 +31,21 @@ function ∂B41(u, p, t)
 end
 
 function model41!(D, u, p, t)
-    D.a = ∂A41(u, p, t)
-    D.b = ∂B41(u, p, t)
+    D[1] = ∂A41(u, p, t)
+    D[2] = ∂B41(u, p, t)
     return nothing
 end
 
 # ## Fig 4.2 A
 
 ps1 = (k1=20., k2=5., k3=5., k4=5., k5=2., n=4.)
-u0s = [
+u0s = (
     [0.0, 0.0],
     [0.5, 0.6],
     [0.17, 1.1],
     [0.25, 1.9],
     [1.85, 1.7],
-]
+)
 
 tend = 1.5
 

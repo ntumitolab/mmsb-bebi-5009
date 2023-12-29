@@ -28,8 +28,8 @@ function dB415(u, p, t)
 end
 
 function model415!(D, u, p, t)
-    D.a = dA415(u, p, t)
-    D.b = dB415(u, p, t)
+    D[1] = dA415(u, p, t)
+    D[2] = dB415(u, p, t)
     return nothing
 end
 

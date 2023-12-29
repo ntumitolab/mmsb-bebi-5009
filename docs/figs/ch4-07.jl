@@ -26,8 +26,8 @@ function ∂B47(u, p, t)
 end
 
 function model47!(D, u, p, t)
-    D.a = ∂A47(u, p, t)
-    D.b = ∂B47(u, p, t)
+    D[1] = ∂A47(u, p, t)
+    D[2] = ∂B47(u, p, t)
     return nothing
 end
 
