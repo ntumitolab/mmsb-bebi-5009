@@ -88,7 +88,7 @@ fig |> PNG
 Symmetric parameter set
 ===#
 
-ps2 = LVector(k1=20., k2=20., k3=5., k4=5., n1=4., n2=4.)
+ps2 = (k1=20., k2=20., k3=5., k4=5., n1=4., n2=4.)
 
 tend = 4.0
 sol1 = solve(ODEProblem(model47!, [3., 1.], tend, ps2))
@@ -154,7 +154,7 @@ nca47(b, p) = p.k1 / p.k3 * hil(1, b, p.n1)
 ncb47(a, p) = p.k2 / p.k4 * hil(1, a, p.n2)
 
 pls = map((8.0, 16.0, 20.0, 35.0)) do k1
-    ps = LVector(k1=k1, k2=20., k3=5., k4=5., n1=4., n2=4.)
+    ps = (k1=k1, k2=20., k3=5., k4=5., n1=4., n2=4.)
     pl = plot(b -> nca47(b, ps), identity, 0., 7., label="Nullcline A")
     plot!(pl, identity, a -> ncb47(a, ps), 0., 7., label="Nullcline B")
     plot!(pl, title = "K1 = $k1", xlim=(0., 7.), ylim=(0., 7.), aspect_ratio = :equal, xlabel="[A]", ylabel="[B]")
