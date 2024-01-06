@@ -32,25 +32,23 @@ setdefaults!(rn, [
     :k3 => 2.,
 ])
 
-osys = convert(ODESystem, rn; remove_conserved = true)
+@variables t
+@unpack L = rn
+discrete_events = [(t==1.0) => [L~3.0], (t==3.0) => [L~0.0]]
+
+osys = convert(ODESystem, rn; discrete_events, remove_conserved = true)
 
 #---
 observed(osys)
 
-#---
-@unpack L = osys
-idx = findfirst(isequal(L), parameters(osys))
-
 # ## Fig. 6.3 A
+tspan = (0., 10.)
+prob = ODEProblem(osys, [], tspan, [])
 
-cb1 = PresetTimeCallback([1.0], i -> i.p[idx] = 3.)
-cb2 = PresetTimeCallback([3.0], i -> i.p[idx] = 0.)
-cbs = CallbackSet(cb1, cb2)
-prob = ODEProblem(osys, [], (0., 10.))
+sol = solve(prob; tstops=[1.0, 3.0]);
 
-sol = solve(prob, callback=cbs)
+#---
 @unpack RL, Ps = osys
-
 fig = plot(sol, idxs=[RL, Ps], labels= ["RL" "P*"])
 plot!(fig, t -> 3 * (1<=t<=3), label="Ligand", line=(:black, :dash), linealpha=0.7)
 plot!(fig, title="Fig. 6.3 (A)", xlabel="Time", ylabel="Concentration")
@@ -60,6 +58,7 @@ fig |> PNG
 # ## Fig 6.3 B
 
 lrange = 0:0.01:1
+idx = findfirst(isequal(L), parameters(osys))
 
 prob_func = function(prob, i, repeat)
     p = copy(prob.p)
@@ -67,7 +66,7 @@ prob_func = function(prob, i, repeat)
     remake(prob, p=p)
 end
 
-prob = SteadyStateProblem(osys, [])
+prob = SteadyStateProblem(osys, [], [])
 eprob = EnsembleProblem(prob; prob_func)
 sim = solve(eprob, DynamicSS(Rodas5()); trajectories=length(lrange))
 
