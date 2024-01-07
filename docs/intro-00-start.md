@@ -95,7 +95,7 @@ Pkg.activate("foldername")
 # Or activate the current working directory
 # current_project() is a little bit misleading
 # since it actually looks for available Project.toml file
-Pkg.activate(Base.current_project())
+Pkg.activate(".")
 
 # Install the packages according to the environment
 Pkg.instantiate()
