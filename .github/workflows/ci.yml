@@ -13,15 +13,15 @@ concurrency:
 
 env:
   NPROC: '2' # Number of Julia processes to run the notebooks
-  CACHE_NUM: '2'
+  CACHE_NUM: '1'
   PY_VER: '3.12'
   JULIA_CONDAPKG_BACKEND: 'Null'
-  JULIA_NUM_THREADS: '2'
   JULIA_CI: 'true'
+  JULIA_NUM_THREADS: '2'
 
 jobs:
   CI:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -30,7 +30,14 @@ jobs:
       id: cp
       with:
         python-version: ${{ env.PY_VER }}
+    - name: Cache pip
+      uses: actions/cache@v3
+      id: cache-pip
+      with:
+        path: ${{ env.pythonLocation }}
+        key: ${{ runner.os }}-pip-${{ steps.cp.outputs.python-version }}-${{ hashFiles('requirements.txt') }}
     - name: Install python packages
+      if: ${{ steps.cache-pip.outputs.cache-hit != 'true' }}
       run: pip install -r requirements.txt
     - name: Read Julia version
       uses: SebRollen/toml-action@v1.0.2
@@ -43,10 +50,30 @@ jobs:
       with:
         version: ${{ steps.read_toml.outputs.value }}
         show-versioninfo: 'true'
+    - name: Cache Julia packages
+      uses: actions/cache/restore@v3
+      id: cache-julia
+      with:
+        path: |
+          ~/.julia
+          !~/.julia/registries
+        key: ${{ runner.os }}-julia-${{ steps.read_toml.outputs.value }}-${{ env.CACHE_NUM }}-${{ hashFiles('src/**','Project.toml', 'Manifest.toml')}}
+        restore-keys: |
+          ${{ runner.os }}-julia-${{ steps.read_toml.outputs.value }}-${{ env.CACHE_NUM }}-
     - name: Install Julia packages
-      run: julia --color=yes --project=@. .github/installpkgs.jl
+      if: ${{ steps.cache-julia.outputs.cache-hit != 'true' }}
+      run: |
+        julia --project=@. --color=yes -e 'using Pkg, Dates; Pkg.instantiate(); Pkg.precompile(); Pkg.gc(collect_delay=Day(0))'
+    - name: Save Julia packages
+      uses: actions/cache/save@v3
+      if: ${{ steps.cache-julia.outputs.cache-hit != 'true' }}
+      with:
+        path: |
+          ~/.julia
+          !~/.julia/registries
+        key: ${{ steps.cache-julia.outputs.cache-primary-key }}
     - name: Run program
-      run: julia --color=yes --project=@. -p ${{ env.NPROC }} .github/literate.jl
+      run: julia --project=@. --color=yes -p ${{ env.NPROC }} literate.jl
     - name: Build website
       run: jupyter-book build docs/
     - name: Upload page artifact
