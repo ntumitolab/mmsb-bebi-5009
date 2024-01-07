@@ -92,19 +92,14 @@ using Pkg
 # Activate environment in the foldername directory
 Pkg.activate("foldername")
 
-# Or
-pkg"activate foldername"
-
-# Or Activate the current working directory
-Pkg.activate(".")
-
-# Or
-pkg"activate ."
+# Or activate the current working directory
+# current_project() is a little bit misleading
+# since it actually looks for available Project.toml file
+Pkg.activate(Base.current_project())
 
 # Install the packages according to the environment
 Pkg.instantiate()
 
-# Or
-pkg"instantiate"
+# If the above failed, try this
+Pkg.resolve()
 ```
-
