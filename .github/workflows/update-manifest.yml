@@ -1,0 +1,54 @@
+name: Auto update Julia dependencies
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 1' # Every week
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/update-manifest.yml
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  APP_ID: '189113' # https://github.com/apps/wen-wei-s-pr-bot
+  JL_VER: '1'
+
+jobs:
+  update-manifest:
+    permissions:
+      contents: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Julia
+        uses: julia-actions/setup-julia@v1
+        with:
+          version: ${{ env.JL_VER }}
+      - name: Update Julia dependencies
+        env:
+          JULIA_PKG_PRECOMPILE_AUTO: '0'
+          JULIA_PROJECT: '@.'
+        run: julia --color=yes -e 'import Pkg; Pkg.update()'
+      # Authenticate with a custom GitHub APP
+      # https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#authenticating-with-github-app-generated-tokens
+      - name: Generate token for PR
+        uses: tibdex/github-app-token@v2
+        id: generate-token
+        with:
+          app_id: ${{ env.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v5
+        with:
+          title: Julia Dependency Update
+          token: ${{ steps.generate-token.outputs.token }}
+          labels: |
+            automerge
