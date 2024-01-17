@@ -31,7 +31,7 @@ jobs:
       with:
         python-version: ${{ env.PY_VER }}
     - name: Cache pip
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       id: cache-pip
       with:
         path: ${{ env.pythonLocation }}
@@ -51,7 +51,7 @@ jobs:
         version: ${{ steps.read_toml.outputs.value }}
         show-versioninfo: 'true'
     - name: Cache Julia packages
-      uses: actions/cache/restore@v3
+      uses: actions/cache/restore@v4
       id: cache-julia
       with:
         path: |
@@ -65,7 +65,7 @@ jobs:
       run: |
         julia --project=@. --color=yes -e 'using Pkg, Dates; Pkg.instantiate(); Pkg.precompile(); Pkg.gc(collect_delay=Day(0))'
     - name: Save Julia packages
-      uses: actions/cache/save@v3
+      uses: actions/cache/save@v4
       if: ${{ steps.cache-julia.outputs.cache-hit != 'true' }}
       with:
         path: |
