@@ -61,7 +61,6 @@ fig = plot(sol, idxs=[RL, Ga], title="Fig 6.05 (A)", xlabel="Time", ylabel="Abun
 fig |> PNG
 
 # ## Fig 6.5 B
-
 lrange = range(0, 20 * 1e-9, 101)
 
 prob_func = function(prob, i, repeat)
@@ -70,12 +69,15 @@ prob_func = function(prob, i, repeat)
     remake(prob, p=p)
 end
 
-prob = SteadyStateProblem(osys, [])
+prob = ODEProblem(osys, [], Inf, [])
+callback = TerminateSteadyState()
+trajectories = length(lrange)
+alg = Rodas5()
 eprob = EnsembleProblem(prob; prob_func)
-sim = solve(eprob, DynamicSS(Rodas5()); trajectories=length(lrange))
+sim = solve(eprob, alg; save_everystep=false, trajectories, callback)
 
-ga = map(s->s[Ga], sim)
-rl = map(s->s[RL], sim)
+ga = map(s->s[Ga][end], sim)
+rl = map(s->s[RL][end], sim)
 fig = plot(lrange .* 1e9, [ga rl], label=["Ga" "RL"], title="Fig. 6.5 (B)",
 xlabel="Ligand (nM)", ylabel="Steady-state abundance", xlims=(0, 20), ylims=(0, 3500))
 
