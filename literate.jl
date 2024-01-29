@@ -8,8 +8,6 @@ using PrettyTables
 end
 
 basedir = "docs"
-config = Dict("mdstrings" => true, "execute" => true)
-
 nbs = String[]
 
 # Collect the list of Literate notebooks (ends with .jl)
@@ -23,7 +21,7 @@ end
 
 # Execute the notebooks in worker process(es)
 ts = pmap(nbs; on_error=ex->NaN) do nb
-    @elapsed Literate.notebook(nb, dirname(nb); config)
+    @elapsed Literate.notebook(nb, dirname(nb); mdstrings=true)
 end
 
 pretty_table([nbs ts], header=["Notebook", "Elapsed (s)"])

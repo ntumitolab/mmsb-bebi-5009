@@ -34,8 +34,11 @@ jobs:
     - name: Install python packages
       run: pip install -r requirements.txt
     - name: Read Julia version
+      uses: SebRollen/toml-action@v1.0.2
       id: read_toml
-      run: echo "value=$(python .github/read_toml.py)" >> "$GITHUB_OUTPUT"
+      with:
+        file: 'Manifest.toml'
+        field: 'julia_version'
     - name: Setup Julia
       uses: julia-actions/setup-julia@v1
       with:
@@ -48,7 +51,7 @@ jobs:
         path: |
           ~/.julia
           !~/.julia/registries
-        key: ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-${{ hashFiles('src/**','Project.toml', 'Manifest.toml')}}
+        key: ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml')}}
         restore-keys: |
           ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-
     - name: Install Julia packages
