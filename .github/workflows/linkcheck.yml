@@ -12,9 +12,6 @@ on:
       - '.lycheeignore'
       - '.github/workflows/linkcheck.yml'
 
-env:
-  DIR: 'docs'
-
 jobs:
   linkcheck:
     runs-on: ubuntu-latest
@@ -25,7 +22,7 @@ jobs:
         uses: julia-actions/setup-julia@v1
       - name: Convert literate notebooks to markdown files
         shell: julia --color=yes {0}
-        working-directory: ${{ env.DIR }}
+        working-directory: docs
         run: |
           import Pkg
           Pkg.add("Literate")
@@ -33,12 +30,12 @@ jobs:
           for (root, dirs, files) in walkdir(pwd())
             for file in files
               if endswith(file, ".jl")
-                Literate.markdown(joinpath(root, file); mdstrings=true, flavor = Literate.CommonMarkFlavor())
+                nb = joinpath(root, file)
+                Literate.markdown(nb, dirname(nb); mdstrings=true, flavor=Literate.CommonMarkFlavor())
               end
             end
           end
       - name: Restore lychee cache
-        id: restore-cache
         uses: actions/cache@v4
         with:
           save-always: 'true'
@@ -50,6 +47,6 @@ jobs:
         id: lychee
         with:
           fail: true
-          args: '--accept 200,204,429 --verbose --no-progress --cache --max-cache-age 1d ${{ env.DIR }}'
+          args: '--accept 200,204,429 --verbose --no-progress --cache --max-cache-age 1d docs/'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

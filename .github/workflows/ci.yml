@@ -38,7 +38,7 @@ jobs:
         path: ${{ env.pythonLocation }}
         key:  ${{ runner.os }}-pip-${{ env.CACHE_NUM }}-${{ steps.cp.outputs.python-version }}-${{ hashFiles('requirements.txt') }}
     - name: Install pip dependencies if cache miss
-      if: steps.cache-py.outputs.cache-hit != 'true'
+      if: ${{ steps.cache-py.outputs.cache-hit != 'true' }}
       run: pip install -r requirements.txt
     - name: Read Julia version
       uses: SebRollen/toml-action@v1.2.0
@@ -58,7 +58,7 @@ jobs:
         path: |
           ~/.julia
           !~/.julia/registries
-        key: ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml')}}
+        key: ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml' )}}
         restore-keys: |
           ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-
     - name: Install Julia packages
@@ -73,7 +73,17 @@ jobs:
         Pkg.instantiate()
         Pkg.precompile()
         Pkg.gc(collect_delay=Day(0))
-    - name: Run program
+    - name: Cache literate notebooks
+      uses: actions/cache@v4
+      id: cache-nb
+      with:
+        path: |
+          docs/**/*.ipynb
+          docs/**/*.sha
+        key: ${{ runner.os }}-nb-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml' )}}-${{ hashFiles('docs/**/*.jl') }}
+        restore-keys: |
+          ${{ runner.os }}-nb-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml' )}}-
+    - name: Run literate notebooks
       run: julia --color=yes -p ${{ env.NPROC }} literate.jl
     - name: Build website
       run: jupyter-book build docs/
