@@ -36,7 +36,7 @@ jobs:
       with:
         save-always: 'true'
         path: ${{ env.pythonLocation }}
-        key:  ${{ runner.os }}-pip-${{ env.CACHE_NUM }}-${{ steps.cp.outputs.python-version }}-${{ hashFiles('requirements.txt') }}
+        key:  ${{ runner.os }}-pip-${{ steps.cp.outputs.python-version }}-${{ hashFiles('requirements.txt') }}
     - name: Install pip dependencies if cache miss
       if: ${{ steps.cache-py.outputs.cache-hit != 'true' }}
       run: pip install -r requirements.txt
@@ -58,9 +58,9 @@ jobs:
         path: |
           ~/.julia
           !~/.julia/registries
-        key: ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml' )}}
+        key: ${{ runner.os }}-julia-${{ steps.read_toml.outputs.value }}-${{ env.CACHE_NUM }}-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml' )}}
         restore-keys: |
-          ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-
+          ${{ runner.os }}-julia-${{ steps.read_toml.outputs.value }}-${{ env.CACHE_NUM }}-
     - name: Install Julia packages
       if: ${{ steps.cache-julia.outputs.cache-hit != 'true' }}
       env:
