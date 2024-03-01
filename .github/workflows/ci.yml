@@ -50,6 +50,7 @@ jobs:
         Pkg.add(["PrettyTables", "Literate"])
         Pkg.activate(".")
         Pkg.instantiate()
+        Pkg.resolve()
         Pkg.precompile()
     - name: Cache literate notebooks
       uses: actions/cache@v4
