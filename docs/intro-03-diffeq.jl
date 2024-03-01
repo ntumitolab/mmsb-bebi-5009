@@ -141,7 +141,7 @@ Plots.default(linewidth=2)
 D = Differential(t) ## Differential operator
 
 # Define an ODE with equations
-@named expdecaySys = ODESystem([D(C) ~ -λ*C])
+@mtkbuild expdecaySys = ODESystem([D(C) ~ -λ*C])
 
 #---
 u0 = [C => 1.0]
@@ -200,7 +200,7 @@ end
 
 #---
 tspan = (0.0, 100.0)
-@named sys = build_lorentz()
+@mtkbuild sys = build_lorentz()
 prob = ODEProblem(sys,[],tspan, [])
 sol = solve(prob)
 
@@ -213,7 +213,7 @@ fig = plot(sol, idxs=[sys.y])
 fig |> PNG
 
 # `idxs=(sys.x, sys.y, sys.z)` makes a phase plot with 1st, 2nd, and the 3rd state variable.
-fig = plot(sol, idxs=(sys.x, sys.y, sys.z), label=false, size=(800,800))
+fig = plot(sol, idxs=(sys.x, sys.y, sys.z), label=false, size=(600,600))
 fig |> PNG
 
 # ## Saving simulation results
@@ -240,7 +240,7 @@ eqs = [
     D(r) ~ γ * i
 ]
 
-@named sirSys = ODESystem(eqs)
+@mtkbuild sirSys = ODESystem(eqs)
 
 p = [β => 1.0, γ => 0.3]
 u0 = [s => 0.99, i => 0.01, r => 0.00]
