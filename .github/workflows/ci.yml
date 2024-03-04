@@ -83,7 +83,7 @@ jobs:
     - name: Run literate notebooks
       run: julia --color=yes -p 2 literate.jl
     - name: Build website
-      run: jupyter-book build notebooks/
+      run: jupyter-book build docs/
     - name: Upload page artifact
       if: ${{ github.ref == 'refs/heads/main' }}
       uses: actions/upload-pages-artifact@v3
