@@ -12,10 +12,11 @@ concurrency:
   cancel-in-progress: true
 
 env:
+  NPROC: '2' # Number of Julia processes to run the notebooks
   CACHE_NUM: '1'
   JULIA_CONDAPKG_BACKEND: 'Null'
   JULIA_CI: 'true'
-  JULIA_NUM_THREADS: 'auto'
+  JULIA_NUM_THREADS: '2'
 
 jobs:
   CI:
@@ -48,8 +49,8 @@ jobs:
       uses: julia-actions/setup-julia@v1
       with:
         version: ${{ steps.read_toml.outputs.value }}
-    - name: Cache Julia packages
-      uses: actions/cache@v4
+    - name: Restore Julia packages
+      uses: actions/cache/restore@v4
       id: cache-julia
       with:
         path: |
@@ -62,33 +63,34 @@ jobs:
       if: ${{ steps.cache-julia.outputs.cache-hit != 'true' }}
       env:
         PYTHON: ${{ env.pythonLocation }}/python
-      shell: julia --color=yes {0}
-      run: |
-        using Pkg, Dates
-        Pkg.add(["PrettyTables", "Literate"])
-        Pkg.activate(".")
-        Pkg.instantiate()
-        Pkg.precompile()
-        Pkg.gc(collect_delay=Day(0))
+      run: julia --color=yes instantiate.jl
+    - name: Save Julia packages
+      uses: actions/cache/save@v4
+      if: ${{ steps.cache-julia.outputs.cache-hit != 'true' }}
+      with:
+        path: |
+          ~/.julia
+          !~/.julia/registries
+        key: ${{ steps.cache-julia.outputs.cache-primary-key }}
     - name: Cache literate notebooks
       uses: actions/cache@v4
       id: cache-nb
       with:
         path: |
-          notebooks/**/*.ipynb
-          notebooks/**/*.sha
-        key: ${{ runner.os }}-nb-${{ env.CACHE_NUM }}-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml')}}-${{ hashFiles('notebooks/**/*.jl') }}
+          docs/**/*.ipynb
+          docs/**/*.sha
+        key: ${{ runner.os }}-nb-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml' )}}-${{ hashFiles('docs/**/*.jl') }}
         restore-keys: |
-          ${{ runner.os }}-nb-${{ env.CACHE_NUM }}-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml')}}-
+          ${{ runner.os }}-nb-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml' )}}-
     - name: Run literate notebooks
-      run: julia --color=yes -p 2 literate.jl
+      run: julia --color=yes -p ${{ env.NPROC }} literate.jl
     - name: Build website
       run: jupyter-book build docs/
     - name: Upload page artifact
       if: ${{ github.ref == 'refs/heads/main' }}
       uses: actions/upload-pages-artifact@v3
       with:
-        path: notebooks/_build/html
+        path: docs/_build/html
 
   # Deploy pages
   deploy:

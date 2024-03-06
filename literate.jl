@@ -51,7 +51,7 @@ for (nb, t) in zip(nbs, ts)
         println("Debugging notebook: ", nb)
         try
             withenv("JULIA_DEBUG" => "Literate") do
-                Literate.notebook(nb, dirname(nb); config)
+                Literate.notebook(nb, dirname(nb); mdstrings=true)
             end
         catch e
             println(e)
