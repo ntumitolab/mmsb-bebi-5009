@@ -13,10 +13,11 @@ concurrency:
 
 env:
   NPROC: '2' # Number of Julia processes to run the notebooks
-  CACHE_NUM: '1'
+  CACHE_NUM: '2'
   JULIA_CONDAPKG_BACKEND: 'Null'
   JULIA_CI: 'true'
   JULIA_NUM_THREADS: '2'
+  JULIA_CPU_TARGET: 'generic;znver3'
 
 jobs:
   CI:
@@ -79,10 +80,11 @@ jobs:
         path: |
           docs/**/*.ipynb
           docs/**/*.sha
-        key: ${{ runner.os }}-nb-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml' )}}-${{ hashFiles('docs/**/*.jl') }}
+        key: ${{ steps.cache-julia.outputs.cache-primary-key }}-nb-${{ hashFiles('docs/**/*.jl') }}
         restore-keys: |
-          ${{ runner.os }}-nb-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml' )}}-
+          ${{ steps.cache-julia.outputs.cache-primary-key }}-nb-
     - name: Run literate notebooks
+      if: ${{ steps.cache-nb.outputs.cache-hit != 'true' }}
       run: julia --color=yes -p ${{ env.NPROC }} literate.jl
     - name: Build website
       run: jupyter-book build docs/
