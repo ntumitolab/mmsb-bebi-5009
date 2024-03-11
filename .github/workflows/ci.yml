@@ -12,12 +12,13 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NPROC: '2' # Number of Julia processes to run the notebooks
-  CACHE_NUM: '2'
+  NPROC: '3' # Number of Julia processes to run the notebooks
+  CACHE_NUM: '1'
   JULIA_CONDAPKG_BACKEND: 'Null'
   JULIA_CI: 'true'
   JULIA_NUM_THREADS: '2'
-  JULIA_CPU_TARGET: 'generic;znver3'
+  JULIA_DEPOT_PATH: '/tmp/juliapkgs'
+  # JULIA_CPU_TARGET: 'generic;znver3'
 
 jobs:
   CI:
@@ -55,9 +56,9 @@ jobs:
       id: cache-julia
       with:
         path: |
-          ~/.julia
-          !~/.julia/registries
-        key: ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml' )}}
+          ${{ env.JULIA_DEPOT_PATH }}
+          !${{ env.JULIA_DEPOT_PATH }}/registries
+        key: ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml')}}
         restore-keys: |
           ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-
     - name: Install Julia packages
@@ -70,8 +71,8 @@ jobs:
       if: ${{ steps.cache-julia.outputs.cache-hit != 'true' }}
       with:
         path: |
-          ~/.julia
-          !~/.julia/registries
+          ${{ env.JULIA_DEPOT_PATH }}
+          !${{ env.JULIA_DEPOT_PATH }}/registries
         key: ${{ steps.cache-julia.outputs.cache-primary-key }}
     - name: Cache literate notebooks
       uses: actions/cache@v4
