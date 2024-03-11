@@ -46,18 +46,18 @@ jobs:
       env:
         PYTHON: ${{ env.pythonLocation }}/python
       run: julia --color=yes instantiate.jl
-    # - name: Cache literate notebooks
-    #   uses: actions/cache@v4
-    #   id: cache-nb
-    #   with:
-    #     path: |
-    #       docs/**/*.ipynb
-    #       docs/**/*.sha
-    #     key: ${{ hashFiles('**/*.toml', 'src/*') }}-nb-${{ hashFiles('docs/**/*.jl') }}
-    #     restore-keys: |
-    #       ${{ hashFiles('**/*.toml', 'src/*') }}-nb-
+    - name: Cache literate notebooks
+      uses: actions/cache@v4
+      id: cache-nb
+      with:
+        path: |
+          docs/**/*.ipynb
+          docs/**/*.sha
+        key: ${{ hashFiles('**/*.toml', 'scr/*') }}-nb-${{ hashFiles('docs/**/*.jl') }}
+        restore-keys: |
+          ${{ hashFiles('**/*.toml', 'scr/*') }}-nb-
     - name: Run literate notebooks
-    # if: ${{ steps.cache-nb.outputs.cache-hit != 'true' }}
+      if: ${{ steps.cache-nb.outputs.cache-hit != 'true' }}
       run: julia --color=yes -p ${{ env.NPROC }} literate.jl
     - name: Build website
       run: jupyter-book build docs/
