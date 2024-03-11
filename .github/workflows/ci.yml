@@ -16,7 +16,7 @@ env:
   CACHE_NUM: '1'
   JULIA_CONDAPKG_BACKEND: 'Null'
   JULIA_CI: 'true'
-  JULIA_NUM_THREADS: '2'
+  JULIA_NUM_THREADS: '4'
   JULIA_DEPOT_PATH: '/tmp/juliapkgs'
   # JULIA_CPU_TARGET: 'generic;znver3'
 
