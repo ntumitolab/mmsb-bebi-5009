@@ -1,10 +1,6 @@
-using Distributed
-using PrettyTables
-using SHA
-
 @everywhere begin
     ENV["GKSwstype"] = "100"
-    using Literate, Pkg
+    using Literate, Pkg, PrettyTables, SHA
     Pkg.activate(Base.current_project())
 end
 

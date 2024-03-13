@@ -13,15 +13,15 @@ concurrency:
 
 env:
   NPROC: '2' # Number of Julia processes to run the notebooks
-  CACHE_NUM: '2'
+  CACHE_NUM: '1'
   JULIA_CONDAPKG_BACKEND: 'Null'
   JULIA_CI: 'true'
   JULIA_NUM_THREADS: '2'
-  JULIA_CPU_TARGET: 'generic;znver3'
+# JULIA_CPU_TARGET: 'generic'
 
 jobs:
   CI:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -30,15 +30,15 @@ jobs:
       id: cp
       with:
         python-version: '3.x'
-    - name: Cache pip dependencies
-      uses: actions/cache@v4
-      id: cache-py
-      with:
-        save-always: 'true'
-        path: ${{ env.pythonLocation }}
-        key:  ${{ runner.os }}-pip-${{ steps.cp.outputs.python-version }}-${{ hashFiles('requirements.txt') }}
+    # - name: Cache pip dependencies
+    #   uses: actions/cache@v4
+    #   id: cache-py
+    #   with:
+    #     save-always: 'true'
+    #     path: ${{ env.pythonLocation }}
+    #     key:  ${{ runner.os }}-pip-${{ steps.cp.outputs.python-version }}-${{ hashFiles('requirements.txt') }}
     - name: Install pip dependencies if cache miss
-      if: ${{ steps.cache-py.outputs.cache-hit != 'true' }}
+    # if: ${{ steps.cache-py.outputs.cache-hit != 'true' }}
       run: pip install -r requirements.txt
     - name: Read Julia version
       uses: SebRollen/toml-action@v1.2.0
@@ -50,29 +50,29 @@ jobs:
       uses: julia-actions/setup-julia@v1
       with:
         version: ${{ steps.read_toml.outputs.value }}
-    - name: Restore Julia packages
-      uses: actions/cache/restore@v4
-      id: cache-julia
-      with:
-        path: |
-          ~/.julia
-          !~/.julia/registries
-        key: ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml' )}}
-        restore-keys: |
-          ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-
+    # - name: Restore Julia packages
+    #   uses: actions/cache/restore@v4
+    #   id: cache-julia
+    #   with:
+    #     path: |
+    #       ~/.julia
+    #       !~/.julia/registries
+    #     key: ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml' )}}
+    #     restore-keys: |
+    #       ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-
     - name: Install Julia packages
-      if: ${{ steps.cache-julia.outputs.cache-hit != 'true' }}
+    # if: ${{ steps.cache-julia.outputs.cache-hit != 'true' }}
       env:
         PYTHON: ${{ env.pythonLocation }}/python
       run: julia --color=yes instantiate.jl
-    - name: Save Julia packages
-      uses: actions/cache/save@v4
-      if: ${{ steps.cache-julia.outputs.cache-hit != 'true' }}
-      with:
-        path: |
-          ~/.julia
-          !~/.julia/registries
-        key: ${{ steps.cache-julia.outputs.cache-primary-key }}
+    # - name: Save Julia packages
+    #   uses: actions/cache/save@v4
+    #   if: ${{ steps.cache-julia.outputs.cache-hit != 'true' }}
+    #   with:
+    #     path: |
+    #       ~/.julia
+    #       !~/.julia/registries
+    #     key: ${{ steps.cache-julia.outputs.cache-primary-key }}
     - name: Cache literate notebooks
       uses: actions/cache@v4
       id: cache-nb
@@ -80,9 +80,9 @@ jobs:
         path: |
           docs/**/*.ipynb
           docs/**/*.sha
-        key: ${{ steps.cache-julia.outputs.cache-primary-key }}-nb-${{ hashFiles('docs/**/*.jl') }}
+        key: ${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml' )}}-nb-${{ hashFiles('docs/**/*.jl') }}
         restore-keys: |
-          ${{ steps.cache-julia.outputs.cache-primary-key }}-nb-
+          ${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml' )}}-nb-
     - name: Run literate notebooks
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' }}
       run: julia --color=yes -p ${{ env.NPROC }} literate.jl
