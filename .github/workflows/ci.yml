@@ -13,7 +13,7 @@ concurrency:
 
 env:
   NPROC: '2' # Number of Julia processes to run the notebooks
-  CACHE_NUM: '2'
+  CACHE_NUM: '1'
   JULIA_CONDAPKG_BACKEND: 'Null'
   JULIA_CI: 'true'
   JULIA_NUM_THREADS: '2'
