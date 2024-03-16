@@ -57,9 +57,9 @@ jobs:
         path: |
           ~/.julia
           !~/.julia/registries
-        key: ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml' )}}
+        key: ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-${{ hashFiles('Project.toml', 'Manifest.toml')}}-${{ hashFiles('src/**')}}
         restore-keys: |
-          ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-
+          ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-${{ hashFiles('Project.toml', 'Manifest.toml')}}
     - name: Install Julia packages
       if: ${{ steps.cache-julia.outputs.cache-hit != 'true' }}
       env:
@@ -80,9 +80,9 @@ jobs:
         path: |
           docs/**/*.ipynb
           docs/**/*.sha
-        key: ${{ steps.cache-julia.outputs.cache-primary-key }}-nb-${{ hashFiles('docs/**/*.jl') }}
+        key: nb-${{ steps.cache-julia.outputs.cache-primary-key }}-${{ hashFiles('docs/**/*.jl') }}
         restore-keys: |
-          ${{ steps.cache-julia.outputs.cache-primary-key }}-nb-
+          nb-${{ steps.cache-julia.outputs.cache-primary-key }}-
     - name: Run literate notebooks
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' }}
       run: julia --color=yes -p ${{ env.NPROC }} literate.jl
