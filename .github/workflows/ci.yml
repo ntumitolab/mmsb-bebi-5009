@@ -64,7 +64,9 @@ jobs:
       if: ${{ steps.cache-julia.outputs.cache-hit != 'true' }}
       env:
         PYTHON: ${{ env.pythonLocation }}/python
-      run: julia --color=yes instantiate.jl
+      run: |
+        julia --color=yes -e 'using Pkg; Pkg.add(["PrettyTables", "Literate"])'
+        julia --color=yes --project=@. -e 'using Pkg; Pkg.instantiate(); Pkg.precompile()'
     - name: Save Julia packages
       uses: actions/cache/save@v4
       if: ${{ steps.cache-julia.outputs.cache-hit != 'true' }}
