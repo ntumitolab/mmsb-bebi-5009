@@ -17,7 +17,7 @@ env:
   JULIA_CONDAPKG_BACKEND: 'Null'
   JULIA_CI: 'true'
   JULIA_NUM_THREADS: '2'
-  JULIA_CPU_TARGET: 'generic;znver3'
+  # JULIA_CPU_TARGET: 'generic;znver3'
 
 jobs:
   CI:
