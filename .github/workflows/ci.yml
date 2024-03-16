@@ -57,16 +57,16 @@ jobs:
         path: |
           ~/.julia
           !~/.julia/registries
-        key: ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-${{ hashFiles('Project.toml', 'Manifest.toml')}}-${{ hashFiles('src/**')}}
+        key: ${{ runner.os }}-julia-${{ hashFiles('Project.toml', 'Manifest.toml', 'src/**')}}
         restore-keys: |
-          ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-${{ hashFiles('Project.toml', 'Manifest.toml')}}
+          ${{ runner.os }}-julia-
     - name: Install Julia packages
       if: ${{ steps.cache-julia.outputs.cache-hit != 'true' }}
       env:
         PYTHON: ${{ env.pythonLocation }}/python
       run: |
         julia --color=yes -e 'using Pkg; Pkg.add(["PrettyTables", "Literate"])'
-        julia --color=yes --project=@. -e 'using Pkg; Pkg.instantiate(); Pkg.precompile()'
+        julia --color=yes --project=@. -e 'using Pkg, Dates; Pkg.instantiate(); Pkg.precompile(); Pkg.gc(collect_delay=Day(0))'
     - name: Save Julia packages
       uses: actions/cache/save@v4
       if: ${{ steps.cache-julia.outputs.cache-hit != 'true' }}
