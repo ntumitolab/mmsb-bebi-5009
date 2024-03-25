@@ -71,7 +71,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-
     - name: Install Julia packages
-      if: ${{ contains(runner.name, 'GitHub Actions') && steps.cache-julia.outputs.cache-hit != 'true' }}
+      if: ${{ !contains(runner.name, 'GitHub Actions') || steps.cache-julia.outputs.cache-hit != 'true' }}
       env:
         PYTHON: ${{ env.pythonLocation }}/python
       run: julia --color=yes instantiate.jl
