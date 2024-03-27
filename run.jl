@@ -2,6 +2,7 @@
 using PrettyTables
 using SHA
 using IJulia
+using Literate
 
 basedir = get(ENV, "DOCDIR", "docs") # Defaults to docs/
 cachedir = get(ENV, "NBCACHE", ".cache") # Defaults to .cache/
