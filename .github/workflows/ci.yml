@@ -88,7 +88,7 @@ jobs:
           !~/.julia/registries
         key: ${{ steps.cache-julia.outputs.cache-primary-key }}
     - name: Run notebooks
-      run: julia --color=yes -p ${{ env.LITERATE_PROC }} --heap-size-hint=4G run.jl
+      run: julia --color=yes run.jl
     - name: Copy back built notebooks
       run: cp --verbose -rf ${{ env.NBCACHE }}/docs/* docs/
     - name: Build website

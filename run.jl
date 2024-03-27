@@ -10,11 +10,9 @@ using IJulia
     Pkg.activate(Base.current_project())
 end
 
-outfile = "ipynbs.txt"
 basedir = get(ENV, "DOCDIR", "docs") # Defaults to docs/
 cachedir = get(ENV, "NBCACHE", ".cache") # Defaults to .cache/
 ipynbs = String[]
-litnbs = String[]
 
 # Collect the list of notebooks
 for (root, dirs, files) in walkdir(basedir)
@@ -35,7 +33,8 @@ for (root, dirs, files) in walkdir(basedir)
                 if endswith(file, ".ipynb")
                     push!(ipynbs, nb)
                 elseif endswith(file, ".jl")
-                    push!(litnbs, nb)
+                    Literate.notebook(nb, dirname(nb); mdstrings=true, execute=false)
+                    push!(ipynbs, splitext(nb)[1] * ".ipynb")
                 end
             end
         end
@@ -57,34 +56,6 @@ for (root, dirs, files) in walkdir(cachedir)
         end
     end
 end
-
-# Execute literate notebooks in worker process(es)
-ts = pmap(litnbs; on_error=ex->NaN) do nb
-    outdir = joinpath(cachedir, dirname(nb))
-    @elapsed Literate.notebook(nb, outdir; mdstrings=true)
-end
-
-# Show literate notebook execution results
-pretty_table([litnbs ts], header=["Notebook", "Elapsed (s)"])
-
-# Remove worker processes in Distributed.jl
-rmprocs(workers())
-
-# Debug notebooks one by one if there are errors
-for (nb, t) in zip(litnbs, ts)
-    if isnan(t)
-        println("Debugging notebook: ", nb)
-        try
-            withenv("JULIA_DEBUG" => "Literate") do
-                Literate.notebook(nb, dirname(nb); mdstrings=true)
-            end
-        catch e
-            println(e)
-        end
-    end
-end
-
-any(isnan, ts) && error("Please check literate notebook error(s).")
 
 # Install IJulia kernel
 IJulia.installkernel("Julia", "--project=@.", "--heap-size-hint=3G")
