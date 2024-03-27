@@ -19,6 +19,7 @@ jobs:
   linkcheck:
     env:
       DIR: 'docs'
+      VENV: '.venv'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -27,11 +28,12 @@ jobs:
         uses: julia-actions/setup-julia@v1
       - name: Convert literate notebooks to ipynb files
         shell: julia --color=yes {0}
+        working-directory: ${{ env.DIR }}
         run: |
           import Pkg
           Pkg.add("Literate")
           using Literate
-          for (root, dirs, files) in walkdir("docs")
+          for (root, dirs, files) in walkdir(pwd())
             for file in files
               if endswith(file, ".jl")
                 nb = joinpath(root, file)
@@ -41,18 +43,24 @@ jobs:
           end
       - name: Setup Python
         uses: actions/setup-python@v5
-        id: cp
+        id: setup-python
         with:
           python-version: '3.x'
-      - name: Cache pip dependencies
+      - name: Cache virtualenv
         uses: actions/cache@v4
-        id: cache-py
+        id: cache-venv
         with:
-          save-always: 'true'
-          path: ${{ env.pythonLocation }}
-          key:  ${{ runner.os }}-pip-${{ steps.cp.outputs.python-version }}-${{ hashFiles('requirements.txt') }}
-      - name: Install pip dependencies if cache miss
-        if: ${{ steps.cache-py.outputs.cache-hit != 'true' }}
-        run: pip install -r requirements.txt
+          key: ${{ runner.os }}-venv-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('requirements.txt') }}
+          path: ${{ env.VENV }}
+      - name: Install Python dependencies
+        if: ${{ steps.cache-venv.outputs.cache-hit != 'true' }}
+        run: |
+          python -m venv ${{ env.VENV }}
+          source ${{ env.VENV }}/bin/activate
+          python -m pip install -r requirements.txt
+      - name: Add venv to PATH
+        run: |
+          echo "${{ env.VENV }}/bin" >> $GITHUB_PATH
+          echo "VIRTUAL_ENV=${{ env.VENV }}" >> $GITHUB_ENV
       - name: Build website
         run: jupyter-book build ${DIR} --builder linkcheck
