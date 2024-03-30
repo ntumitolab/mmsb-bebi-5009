@@ -19,7 +19,6 @@ env:
   JULIA_CONDAPKG_BACKEND: 'Null'
   JULIA_CI: 'true'
   NBCACHE: '.cache'
-  VENV: '.venv'
 
 jobs:
   CI:
@@ -32,22 +31,15 @@ jobs:
       id: setup-python
       with:
         python-version: '3.x'
-    - name: Cache virtualenv
+    - name: Cache python
       uses: actions/cache@v4
-      id: cache-venv
+      id: cache-py
       with:
-        key: ${{ runner.os }}-venv-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('requirements.txt') }}
-        path: ${{ env.VENV }}
+        key: ${{ runner.os }}-py-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('requirements.txt') }}
+        path: ${{ env.pythonLocation }}
     - name: Install Python dependencies
-      if: ${{ steps.cache-venv.outputs.cache-hit != 'true' }}
-      run: |
-        python -m venv ${{ env.VENV }}
-        source ${{ env.VENV }}/bin/activate
-        python -m pip install -r requirements.txt
-    - name: Add venv to PATH
-      run: |
-        echo "${{ env.VENV }}/bin" >> $GITHUB_PATH
-        echo "VIRTUAL_ENV=${{ env.VENV }}" >> $GITHUB_ENV
+      if: ${{ steps.cache-py.outputs.cache-hit != 'true' }}
+      run: pip install -r requirements.txt
     - name: Cache executed notebooks
       uses: actions/cache@v4
       id: cache-nb
@@ -78,7 +70,14 @@ jobs:
       if: ${{ !contains(runner.name, 'GitHub Actions') || steps.cache-julia.outputs.cache-hit != 'true' }}
       env:
         PYTHON: ${{ steps.setup-python.outputs.python-path }}
-      run: julia --color=yes instantiate.jl
+      shell: julia --color=yes {0}
+      run: |
+        using Pkg, Dates
+        Pkg.add(["IJulia", "Literate", "PrettyTables"])
+        Pkg.activate(".")
+        Pkg.instantiate()
+        Pkg.precompile()
+        Pkg.gc(collect_delay=Day(0))
     - name: Save Julia packages
       uses: actions/cache/save@v4
       if: ${{ contains(runner.name, 'GitHub Actions') && steps.cache-julia.outputs.cache-hit != 'true' }}

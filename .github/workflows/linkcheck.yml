@@ -46,21 +46,14 @@ jobs:
         id: setup-python
         with:
           python-version: '3.x'
-      - name: Cache virtualenv
+      - name: Cache python
         uses: actions/cache@v4
-        id: cache-venv
+        id: cache-py
         with:
-          key: ${{ runner.os }}-venv-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('requirements.txt') }}
-          path: ${{ env.VENV }}
+          key: ${{ runner.os }}-py-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('requirements.txt') }}
+          path: ${{ env.pythonLocation }}
       - name: Install Python dependencies
-        if: ${{ steps.cache-venv.outputs.cache-hit != 'true' }}
-        run: |
-          python -m venv ${{ env.VENV }}
-          source ${{ env.VENV }}/bin/activate
-          python -m pip install -r requirements.txt
-      - name: Add venv to PATH
-        run: |
-          echo "${{ env.VENV }}/bin" >> $GITHUB_PATH
-          echo "VIRTUAL_ENV=${{ env.VENV }}" >> $GITHUB_ENV
+        if: ${{ steps.cache-py.outputs.cache-hit != 'true' }}
+        run: pip install -r requirements.txt
       - name: Build website
         run: jupyter-book build ${DIR} --builder linkcheck
