@@ -19,7 +19,6 @@ jobs:
   linkcheck:
     env:
       DIR: 'docs'
-      VENV: '.venv'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
