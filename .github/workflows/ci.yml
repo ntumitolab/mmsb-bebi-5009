@@ -52,7 +52,7 @@ jobs:
       id: read_toml
       run: echo "value=$(python -c 'import tomllib; from pathlib import Path; print(tomllib.loads(Path("Manifest.toml").read_text())["julia_version"])')" >> "$GITHUB_OUTPUT"
     - name: Setup Julia
-      uses: julia-actions/setup-julia@v1
+      uses: julia-actions/setup-julia@v2
       with:
         version: ${{ steps.read_toml.outputs.value }}
     - name: Restore Julia packages
