@@ -13,7 +13,7 @@ concurrency:
 
 env:
   NBCONVERT_JOBS: '4'
-  LITERATE_PROC: '2'
+  LITERATE_PROC: '3'
   ALLOWERRORS: 'false'
   CACHE_NUM: '1'
   JULIA_CONDAPKG_BACKEND: 'Null'
@@ -33,12 +33,15 @@ jobs:
         python-version: '3.x'
     - name: Cache python
       uses: actions/cache@v4
+      if: ${{ contains(runner.name, 'GitHub Actions') }}
       id: cache-py
       with:
-        key: ${{ runner.os }}-py-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('requirements.txt') }}
-        path: ${{ env.pythonLocation }}
+        key: ${{ runner.os }}-pip-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('requirements.txt') }}
+        path: |
+          ${{ env.pythonLocation }}/lib
+          ${{ env.pythonLocation }}/bin
     - name: Install Python dependencies
-      if: ${{ steps.cache-py.outputs.cache-hit != 'true' }}
+      if: ${{ !contains(runner.name, 'GitHub Actions') || steps.cache-py.outputs.cache-hit != 'true' }}
       run: pip install -r requirements.txt
     - name: Cache executed notebooks
       uses: actions/cache@v4
