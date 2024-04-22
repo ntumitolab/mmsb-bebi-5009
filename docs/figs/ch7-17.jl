@@ -10,9 +10,6 @@ using DifferentialEquations
 using Plots
 Plots.default(linewidth=2)
 
-# PNG output in Literate.jl
-PNG(fig) = display("image/png", fig)
-
 #---
 rn = @reaction_network begin
     (a / (k^n + Z^n), b), 0 <--> X
@@ -42,11 +39,7 @@ prob = ODEProblem(rn, u0, tend, ps)
 sol = solve(prob)
 
 #---
-fig = plot(sol, title="Fig 7.17 (A)", xlabel="Time", ylabel="Concentration")
-
-fig |> PNG
+plot(sol, title="Fig 7.17 (A)", xlabel="Time", ylabel="Concentration")
 
 #---
-fig = plot(sol, idxs=(1, 2, 3), title="Fig 7.17 (B)", legend=false, size=(600, 600))
-
-fig |> PNG
+plot(sol, idxs=(1, 2, 3), title="Fig 7.17 (B)", legend=false, size=(600, 600))

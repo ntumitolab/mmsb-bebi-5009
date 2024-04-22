@@ -10,9 +10,6 @@ using ForwardDiff
 using Plots
 Plots.default(linewidth=2)
 
-# PNG output in Literate.jl
-PNG(fig) = display("image/png", fig)
-
 # The curve
 f = x -> 3 / (x-2)
 
@@ -29,5 +26,3 @@ plot!(fig, g, 2.7, 5.3, lab="Tangent line")
 plot!(fig, xlabel="Reaction rate", ylabel="Inhibitor concentration",
       xlims=(2., 8.), ylims=(0., 4.)
 )
-
-fig |> PNG

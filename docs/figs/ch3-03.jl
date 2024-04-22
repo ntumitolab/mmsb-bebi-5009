@@ -9,9 +9,6 @@ using Catalyst
 using Plots
 Plots.default(linewidth=2)
 
-# PNG output in Literate.jl
-PNG(fig) = display("image/png", fig)
-
 # Reaction neetwork
 rn = @reaction_network begin
     (k1, km1), S + E <--> ES
@@ -19,7 +16,6 @@ rn = @reaction_network begin
 end
 
 #---
-
 setdefaults!(rn, [
     :S=>5.,
     :ES=>0.,
@@ -43,9 +39,7 @@ sol = solve(prob)
 
 #---
 @unpack S, ES, E, P = osys
-fig = plot(sol, idxs=[S, ES, E, P], xlabel="Time (AU)", ylabel="Concentration (AU)", legend=:right, title="Fig 3.03")
-
-fig |> PNG
+plot(sol, idxs=[S, ES, E, P], xlabel="Time (AU)", ylabel="Concentration (AU)", legend=:right, title="Fig 3.03")
 
 #---
 rn303mm = @reaction_network begin
@@ -77,5 +71,3 @@ plot!(fig, title="Fig. 3.03",
     xlabel="Time (AU)", ylabel="Concentration (AU)",
     xlims=(0., tend), ylims=(0., 5.), legend=:right
 )
-
-fig |> PNG

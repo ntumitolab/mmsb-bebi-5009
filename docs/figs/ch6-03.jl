@@ -9,9 +9,6 @@ using DifferentialEquations
 using Plots
 Plots.default(linewidth=2)
 
-# PNG output in Literate.jl
-PNG(fig) = display("image/png", fig)
-
 #---
 rn = @reaction_network begin
     (k1 * L, km1), R <--> RL
@@ -53,8 +50,6 @@ fig = plot(sol, idxs=[RL, Ps], labels= ["RL" "P*"])
 plot!(fig, t -> 3 * (1<=t<=3), label="Ligand", line=(:black, :dash), linealpha=0.7)
 plot!(fig, title="Fig. 6.3 (A)", xlabel="Time", ylabel="Concentration")
 
-fig |> PNG
-
 # ## Fig 6.3 B
 
 lrange = 0:0.01:1
@@ -75,7 +70,5 @@ sim = solve(eprob, alg; save_everystep=false, trajectories, callback)
 
 pstar = map(s->s[Ps][end], sim)
 rl = map(s->s[RL][end], sim)
-fig = plot(lrange, [pstar rl], label=["P*" "RL"], title="Fig. 6.3 (B)",
+plot(lrange, [pstar rl], label=["P*" "RL"], title="Fig. 6.3 (B)",
 xlabel="Ligand", ylabel="Steady-state concentration", xlims=(0, 1), ylims=(0, 8))
-
-fig |> PNG

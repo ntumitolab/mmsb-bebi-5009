@@ -7,15 +7,10 @@
 - [Makie.jl](https://github.com/MakieOrg/Makie.jl): a data visualization ecosystem for the Julia programming language, with high performance and extensibility. See also [Makie.jl docs](https://docs.makie.org/stable/)
 
 ===#
-
 using Plots
-# PNG output in Literate.jl
-PNG(fig) = display("image/png", fig)
 
-#---
+# Prepare data then plot
 f(x) = sin(sin(x) + 1)
-
-# Prepare data
 xs = 0.0:0.1:4pi
 ys = f.(xs)
 

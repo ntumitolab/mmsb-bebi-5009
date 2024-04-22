@@ -11,9 +11,6 @@ using ModelingToolkit
 using Plots
 Plots.default(linewidth=2)
 
-# PNG output in Literate.jl
-PNG(fig) = display("image/png", fig)
-
 # Convenience functions
 hil(x, k) = x / (x + k)
 hil(x, k, n) = hil(x^n, k^n)
@@ -57,5 +54,4 @@ prob = ODEProblem(sys, [], tspan, [])
 sol = solve(prob, tstops=10:10:40)
 
 # Visual
-fig = plot(sol, legend=:right, xlabel = "Time", ylabel="Concentration", title="Fig 1.7")
-fig |> PNG
+plot(sol, legend=:right, xlabel = "Time", ylabel="Concentration", title="Fig 1.7")

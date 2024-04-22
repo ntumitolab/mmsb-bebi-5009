@@ -9,9 +9,6 @@ using SimpleUnPack
 using Plots
 Plots.default(linewidth=2)
 
-# PNG output in Literate.jl
-PNG(fig) = display("image/png", fig)
-
 #---
 hil(x, k=one(x)) = x / (x + k)
 hil(x, k, n) = hil(x^n, k^n)
@@ -61,13 +58,9 @@ u0 = [10., 10.]
 
 prob = ODEProblem(metmodel!, u0, tend, ps)
 sol = solve(prob)
-
-fig = plot(sol, title="Figure 5.10", xlabel="Time (hr)", ylabel="Concentration (μM)", xlims=(0, 1), legend=:right, label=["AdoMet" "AdoHcy"])
-
-fig |> PNG
+plot(sol, title="Figure 5.10", xlabel="Time (hr)", ylabel="Concentration (μM)", xlims=(0, 1), legend=:right, label=["AdoMet" "AdoHcy"])
 
 # ## Figure 5.11 A
-
 rx = range(0, 1200, 101)
 ry = range(0, 6, 101)
 
@@ -104,8 +97,6 @@ for sol in sols
 end
 
 plot!(fig, xlims=(0, 1200), ylims=(0, 6), xlabel="AdoMet (μM)", ylabel="AdoHcy (μM)", legend=:bottomright)
-
-fig |> PNG
 
 # ## Figure 5.11 B
 # Increase methionine level
@@ -146,4 +137,4 @@ end
 
 plot!(fig, xlims=(0, 1200), ylims=(0, 6), xlabel="AdoMet (μM)", ylabel="AdoHcy (μM)", legend=:bottomright)
 
-fig |> PNG
+fig

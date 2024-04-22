@@ -8,11 +8,7 @@ using DifferentialEquations
 using Plots
 Plots.default(linewidth=2)
 
-# PNG output in Literate.jl
-PNG(fig) = display("image/png", fig)
-
 #---
-
 function model711(u, p, t)
     r, c = u
     rd = r / 2 ## r Dimer
@@ -34,7 +30,6 @@ function model711!(D, u, p, t)
 end
 
 # ## Fig 7.11 (A)
-
 ps1 = (K1=1, K2=0.1, K3=5, K4=0.5 , delta_r=0.02, delta_c=0.02, a=5, b=50)
 tend = 6000.
 
@@ -62,10 +57,7 @@ quiver!(fig, xx, yy, quiver=∂F, line=(:lightblue), arrow=(:closed))
 
 plot!(fig, xlims=(0, 250), ylims=(0, 250), xlabel="[cI] (nM)", ylabel="[cro] (nM)", aspect_ratio=:equal, legend=:top, size=(600, 600))
 
-fig |> PNG
-
 # ## Fig 7.11 (B)
-
 ps2 = merge(ps1, (; delta_r=ps1.delta_r * 10))
 
 rx = range(0, 250, 201)
@@ -91,5 +83,3 @@ plot!(fig, Float64[], Float64[], line=(:black, :dash), label="C nullcline")
 quiver!(fig, xx, yy, quiver=∂F, line=(:lightblue), arrow=(:closed))
 
 plot!(fig, xlims=(0, 250), ylims=(0, 250), xlabel="[cI] (nM)", ylabel="[cro] (nM)", aspect_ratio=:equal, legend=:top, size=(600, 600))
-
-fig |> PNG

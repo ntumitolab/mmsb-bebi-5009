@@ -10,9 +10,6 @@ using DifferentialEquations
 using Plots
 Plots.default(linewidth=2)
 
-# PNG output in Literate.jl
-PNG(fig) = display("image/png", fig)
-
 #---
 rn = @reaction_network begin
     a1 / (1 + RToverK1 * (K2 / (K2 + L))^4), 0 --> M
@@ -24,7 +21,6 @@ rn = @reaction_network begin
 end
 
 #---
-
 setdefaults!(rn, [
     :δM => 0.48,
     :δY => 0.03,
@@ -44,11 +40,9 @@ setdefaults!(rn, [
 ])
 
 osys = convert(ODESystem, rn; remove_conserved=true)
-
 equations(osys)
 
 # ## Fig 7.07 (A)
-
 @unpack Le = osys
 idx = findfirst(isequal(Le), parameters(osys))
 
@@ -88,8 +82,6 @@ lac = function (t)
 end
 
 plot!(fig, lac, 0, 2500, label="External lactose (μM)")
-
-fig |> PNG
 
 # ## Fig 7.07 (B)
 # Compare the original model and the modified model
@@ -165,5 +157,3 @@ fig = plot!(fig,
     ylabel="β-galactosidase",
     title="Fig 7.7 (B)"
 )
-
-fig |> PNG
