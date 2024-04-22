@@ -37,9 +37,6 @@ using DifferentialEquations
 using Plots
 Plots.default(linewidth=2)
 
-# PNG output in Literate.jl
-PNG(fig) = display("image/png", fig)
-
 # Model function, in the out-of-place form `f(u, p, t)`
 expdecay(u, p, t) = p * u
 
@@ -54,9 +51,7 @@ prob = ODEProblem(expdecay, u0, tspan, p)
 sol = solve(prob)
 
 # Visualize the solution
-fig = plot(sol, legend=:right)
-
-fig |> PNG
+plot(sol, legend=:right)
 
 # Solution at time t=1.0 (with interpolation)
 sol(1.0)
@@ -118,9 +113,7 @@ prob = ODEProblem(sir!, u0, tspan, p)
 sol = solve(prob)
 
 # Visualize the solution
-fig = plot(sol, label=["S" "I" "R"], legend=:right)
-
-fig |> PNG
+plot(sol, label=["S" "I" "R"], legend=:right)
 
 #===
 
@@ -150,9 +143,7 @@ tspan = (0.0, 2.0)
 
 prob = ODEProblem(expdecaySys, u0, tspan, p)
 sol = solve(prob)
-
-fig = plot(sol)
-fig |> PNG
+plot(sol)
 
 #===
 ### Lorenz system
@@ -205,16 +196,13 @@ prob = ODEProblem(sys,[],tspan, [])
 sol = solve(prob)
 
 # x-y-z time-series
-fig = plot(sol)
-fig |> PNG
+plot(sol)
 
 #---
-fig = plot(sol, idxs=[sys.y])
-fig |> PNG
+plot(sol, idxs=[sys.y])
 
 # `idxs=(sys.x, sys.y, sys.z)` makes a phase plot with 1st, 2nd, and the 3rd state variable.
-fig = plot(sol, idxs=(sys.x, sys.y, sys.z), label=false, size=(600,600))
-fig |> PNG
+plot(sol, idxs=(sys.x, sys.y, sys.z), label=false, size=(600,600))
 
 # ## Saving simulation results
 using DataFrames
@@ -249,8 +237,7 @@ tspan = (0.0, 20.0)
 prob = ODEProblem(sirSys, u0, tspan, p)
 sol = solve(prob)
 
-fig = plot(sol)
-fig |> PNG
+plot(sol)
 
 #===
 ## Using Catalyst.jl for chemical reaction networks
@@ -276,8 +263,7 @@ tspan = (0., 2.)
 prob = ODEProblem(decay_rn, u0, tspan, p)
 sol = solve(prob)
 
-fig = plot(sol, title="Exponential Decay")
-fig |> PNG
+plot(sol, title="Exponential Decay")
 
 # ### SIR model
 
@@ -295,5 +281,4 @@ tspan = (0., 20.)
 prob = ODEProblem(sir_rn, u0, tspan, p)
 sol = solve(prob)
 
-fig = plot(sol, legend=:right, title = "SIR Model")
-fig |> PNG
+plot(sol, legend=:right, title = "SIR Model")

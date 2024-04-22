@@ -6,9 +6,6 @@ Exponential decay
 using Plots
 Plots.default(linewidth=2)
 
-# PNG output in Literate.jl
-PNG(fig) = display("image/png", fig)
-
 #---
 fig = plot(title= "Fig 2.4")
 for k in 1:3
@@ -16,5 +13,3 @@ for k in 1:3
 end
 
 plot!(fig, xlim = (0, 5), ylim=(0, 3.2), xlabel="Time", ylabel="Concentration")
-
-fig |> PNG

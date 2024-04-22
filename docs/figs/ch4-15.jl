@@ -1,20 +1,12 @@
-#===
-# Fig 4.15, 4.16, 4.17
-
-Oscillatory networks.
-
-## Figure 4.15 (A)
-===#
+# # Fig 4.15, 4.16, 4.17
+# Oscillatory networks.
+# ## Figure 4.15 (A)
 
 using DifferentialEquations
 using Plots
 Plots.default(linewidth=2)
 
-# PNG output in Literate.jl
-PNG(fig) = display("image/png", fig)
-
 #---
-
 function dA415(u, p, t)
     a, b = u
     k0, k1, k2, n = p
@@ -47,9 +39,7 @@ sols = map(u0s) do u0
     solve(ODEProblem(model415!, u0, tend, ps1))
 end
 
-fig = plot(sols[1], xlabel="Time", ylabel="Concentration", title ="Fig 4.15 (A)", xlims=(0., 8.))
-
-fig |> PNG
+plot(sols[1], xlabel="Time", ylabel="Concentration", title ="Fig 4.15 (A)", xlims=(0., 8.))
 
 # ## Fig 4.15 (B)
 
@@ -85,8 +75,6 @@ for sol in sols
 end
 plot!(fig, xlim=(0, 4), ylim=(0, 4), legend=:topright, size=(600, 600), xlabel="[A]", ylabel="[B]")
 
-fig |> PNG
-
 #===
 ## Fig 4.16 A
 
@@ -106,9 +94,7 @@ sols = map(u0s) do u0
     solve(ODEProblem(model415!, u0, tend, ps2))
 end;
 
-fig = plot(sols[1], xlabel="Time", ylabel="Concentration", title ="Fig 4.16(A)", xlims=(0., 8.))
-
-fig |> PNG
+plot(sols[1], xlabel="Time", ylabel="Concentration", title ="Fig 4.16(A)", xlims=(0., 8.))
 
 # ## Fig 4.16 b
 ∂F416 = function (x, y; scale=20)
@@ -142,8 +128,6 @@ for sol in sols
 end
 plot!(fig, xlim=(0, 4), ylim=(0, 4), legend=:topright, size=(600, 600), xlabel="[A]", ylabel="[B]")
 
-fig |> PNG
-
 # ## Fig 4.17
 
 sol = solve(ODEProblem(model415!, [2.0, 1.5], 10.0, ps2))
@@ -156,5 +140,3 @@ plot!(fig, identity, 0, 0, line=(:black), label="A nullcline")
 contour!(fig, 1:0.01:3, 1:0.01:3, ∂B, levels=[0], cbar=false, line=(:black, :dash))
 plot!(fig, identity, 0, 0, line=(:black, :dash), label="B nullcline")
 plot!(fig, xlims=(1, 3), ylims=(1, 3), legend=:topright, size=(600, 600), xlabel="[A]", ylabel="[B]")
-
-fig |> PNG

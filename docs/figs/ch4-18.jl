@@ -10,9 +10,6 @@ using DifferentialEquations
 using Plots
 Plots.default(linewidth=2)
 
-# PNG output in Literate.jl
-PNG(fig) = display("image/png", fig)
-
 #---
 hil(x, k) = x / (x + k)
 hil(x, k, n) = hil(x^n, k^n)
@@ -34,11 +31,9 @@ function ainf(k1)
 end
 
 #---
-fig = plot(
+plot(
     ainf, 0., 1000.,
     title = "Fig 4.18",
     xlabel = "K1" , ylabel= "Steady state [A]",
     legend=nothing, ylim=(0, 4), xlim=(0, 1000)
 )
-
-fig |> PNG
