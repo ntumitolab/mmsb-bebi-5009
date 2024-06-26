@@ -31,29 +31,36 @@ jobs:
       id: setup-python
       with:
         python-version: '3.x'
-    - name: Cache python
+    - name: Cache python venv
       uses: actions/cache@v4
       if: ${{ contains(runner.name, 'GitHub Actions') }}
-      id: cache-py
+      id: cache-venv
       with:
-        key: ${{ runner.os }}-pip-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('requirements.txt') }}
-        path: |
-          ${{ env.pythonLocation }}/lib
-          ${{ env.pythonLocation }}/bin
+        key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('requirements.txt') }}
+        path: .venv
     - name: Install Python dependencies
-      if: ${{ !contains(runner.name, 'GitHub Actions') || steps.cache-py.outputs.cache-hit != 'true' }}
-      run: pip install -r requirements.txt
+      run: |
+        python -m venv .venv
+        source .venv/bin/activate
+        python -m pip install -r requirements.txt
+        echo "${VIRTUAL_ENV}/bin" >> $GITHUB_PATH
+        echo "VIRTUAL_ENV=${VIRTUAL_ENV}" >> $GITHUB_ENV
+        echo "PYTHON=${VIRTUAL_ENV}/bin/python" >> $GITHUB_ENV
+        echo "JULIA_PYTHONCALL_EXE=${VIRTUAL_ENV}/bin/python">> $GITHUB_ENV
     - name: Cache executed notebooks
       uses: actions/cache@v4
       id: cache-nb
       with:
         path: ${{ env.NBCACHE }}
-        key: ${{ runner.os }}-nb-${{ env.CACHE_NUM }}-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml') }}-${{ hashFiles('docs/**/*.ipynb', 'docs/**/*.jl') }}
+        key: ${{ runner.os }}-nb-${{ env.CACHE_NUM }}-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml', 'requirements.txt') }}-${{ hashFiles('docs/**/*.ipynb', 'docs/**/*.jl') }}
         restore-keys: |
-          ${{ runner.os }}-nb-${{ env.CACHE_NUM }}-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml') }}-
+          ${{ runner.os }}-nb-${{ env.CACHE_NUM }}-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml', 'requirements.txt') }}-
     - name: Read Julia version
+      uses: SebRollen/toml-action@v1.2.0
       id: read_toml
-      run: echo "value=$(python -c 'import tomllib; from pathlib import Path; print(tomllib.loads(Path("Manifest.toml").read_text())["julia_version"])')" >> "$GITHUB_OUTPUT"
+      with:
+        file: 'Manifest.toml'
+        field: 'julia_version'
     - name: Setup Julia
       uses: julia-actions/setup-julia@v2
       with:
@@ -66,13 +73,11 @@ jobs:
         path: |
           ~/.julia
           !~/.julia/registries
-        key: ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml') }}
+        key: ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-${{ steps.read_toml.outputs.value }}-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml') }}
         restore-keys: |
-          ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-
+          ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-${{ steps.read_toml.outputs.value }}-
     - name: Install Julia packages
       if: ${{ !contains(runner.name, 'GitHub Actions') || steps.cache-julia.outputs.cache-hit != 'true' }}
-      env:
-        PYTHON: ${{ steps.setup-python.outputs.python-path }}
       shell: julia --color=yes {0}
       run: |
         using Pkg, Dates
