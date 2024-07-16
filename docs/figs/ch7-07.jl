@@ -3,7 +3,6 @@
 
 model of lac operon in E. coli
 ===#
-
 using Catalyst
 using ModelingToolkit
 using DifferentialEquations
@@ -39,27 +38,26 @@ setdefaults!(rn, [
     :L => 0.0
 ])
 
-osys = convert(ODESystem, rn; remove_conserved=true)
+osys = convert(ODESystem, rn; remove_conserved=true) |> structural_simplify
 equations(osys)
 
 # ## Fig 7.07 (A)
 @unpack Le = osys
-idx = findfirst(isequal(Le), parameters(osys))
 
 cb1 = PresetTimeCallback([500.0], i -> begin
-    i.p[idx] = 50.0
+    i.ps[Le] = 50.0
     set_proposed_dt!(i, 0.01)
 end)
 cb2 = PresetTimeCallback([1000.0], i -> begin
-    i.p[idx] = 100.0
+    i.ps[Le] = 100.0
     set_proposed_dt!(i, 0.01)
 end)
 cb3 = PresetTimeCallback([1500.0], i -> begin
-    i.p[idx] = 150.0
+    i.ps[Le] = 150.0
     set_proposed_dt!(i, 0.01)
 end)
 cb4 = PresetTimeCallback([2000.0], i -> begin
-    i.p[idx] = 0.0
+    i.ps[Le] = 0.0
     set_proposed_dt!(i, 0.01)
 end)
 
@@ -85,7 +83,6 @@ plot!(fig, lac, 0, 2500, label="External lactose (μM)")
 
 # ## Fig 7.07 (B)
 # Compare the original model and the modified model
-
 rn_mod = @reaction_network begin
     a1 / (1 + RToverK1 * (K2 / (K2 + L))^4), 0 --> M
     δM, M --> 0
@@ -115,34 +112,26 @@ setdefaults!(rn_mod, [
     :Enz => 40.0
 ])
 
-osys_mod = convert(ODESystem, rn_mod; remove_conserved=true)
+osys_mod = convert(ODESystem, rn_mod; remove_conserved=true) |> structural_simplify
 equations(osys_mod)
 
 #---
 prob = SteadyStateProblem(rn, [])
 prob_mod = SteadyStateProblem(rn_mod, [])
 
-@unpack Le = prob.f.sys
-idx = findfirst(isequal(Le), parameters(prob.f.sys))
-
-@unpack Le = prob_mod.f.sys
-idx_mod = findfirst(isequal(Le), parameters(prob_mod.f.sys))
-
-@unpack Y = prob.f.sys
+@unpack Le, Y = prob.f.sys
 lerange = range(0, 100, 101)
 
 eprob = EnsembleProblem(prob;
     prob_func=(prob, i, repeat) -> begin
-        prob.p[idx] = lerange[i]
-        prob
+        remake(prob, p=[Le=>lerange[i]])
     end,
     output_func=(sol, i) -> (sol[Y] / 4, false)
 )
 
 eprob_mod = EnsembleProblem(prob_mod;
     prob_func=(prob, i, repeat) -> begin
-        prob.p[idx_mod] = lerange[i]
-        prob
+        remake(prob, p=[Le=>lerange[i]])
     end,
     output_func=(sol, i) -> (sol[Y] / 4, false)
 )

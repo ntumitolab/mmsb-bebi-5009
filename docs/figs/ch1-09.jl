@@ -64,7 +64,7 @@ function build_hh(;name)
         D(n) ~ -(nα + nβ) * n + nα,
     ]
 
-    sys = ODESystem(eqs; name)
+    sys = ODESystem(eqs, t; name)
     return structural_simplify(sys)
 end
 

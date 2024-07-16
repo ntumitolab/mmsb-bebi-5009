@@ -2,7 +2,6 @@
 # Fig 2.04
 Exponential decay
 ===#
-
 using Plots
 Plots.default(linewidth=2)
 
