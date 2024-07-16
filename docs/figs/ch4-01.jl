@@ -3,7 +3,6 @@
 
 Steady states and phase plots in an asymmetric network.
 ===#
-
 using DifferentialEquations
 using SimpleUnPack
 using Plots

@@ -3,7 +3,6 @@
 
 Michaelis-Menten kinetics
 ===#
-
 using DifferentialEquations
 using Catalyst
 using Plots
@@ -26,10 +25,11 @@ setdefaults!(rn, [
     :k2 => 10.,
 ])
 
-osys = convert(ODESystem, rn; remove_conserved = true)
+osys = convert(ODESystem, rn; remove_conserved = true) |> structural_simplify
 
 #---
 observed(osys)
+
 #---
 tend = 1.0
 
@@ -56,7 +56,7 @@ setdefaults!(rn303mm, [
     :k2 => 10.,
 ])
 
-osysmm = convert(ODESystem, rn303mm; remove_conserved = true)
+osysmm = convert(ODESystem, rn303mm; remove_conserved = true) |> structural_simplify
 
 #---
 tend = 1.0

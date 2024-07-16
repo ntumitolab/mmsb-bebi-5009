@@ -3,7 +3,6 @@
 
 Model of apoptosis signalling pathway
 ===#
-
 using Catalyst
 using ModelingToolkit
 using DifferentialEquations
@@ -58,16 +57,15 @@ setdefaults!(rn, [
     :C3sIAP => 0.0
 ])
 
-osys = convert(ODESystem, rn; remove_conserved = true)
+osys = convert(ODESystem, rn; remove_conserved = true) |> structural_simplify
 equations(osys)
 
 #---
 @unpack I = osys
-idx = findfirst(isequal(I), parameters(osys))
 
 #---
-cb1 = PresetTimeCallback([100.0], i -> begin i.p[idx] = 200; set_proposed_dt!(i, 0.01) end)
-cb2 = PresetTimeCallback([1200.0], i -> begin i.p[idx] = 0; set_proposed_dt!(i, 0.01) end)
+cb1 = PresetTimeCallback([100.0], i -> begin i.ps[I] = 200; set_proposed_dt!(i, 0.01) end)
+cb2 = PresetTimeCallback([1200.0], i -> begin i.ps[I] = 0; set_proposed_dt!(i, 0.01) end)
 cbs = CallbackSet(cb1, cb2)
 prob = ODEProblem(osys, [], (0., 1800.))
 

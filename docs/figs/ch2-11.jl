@@ -3,7 +3,6 @@
 
 Model reduction of ODE metabolic networks.
 ===#
-
 using DifferentialEquations
 using Catalyst
 using ModelingToolkit
@@ -45,7 +44,7 @@ function make_212(;name)
         B ~ C * k1 / (km1 + k1)
         D(C) ~ k0 - k2 * B
     ]
-    sys = ODESystem(eqs; name)
+    sys = ODESystem(eqs, t; name)
     structural_simplify(sys)
 end
 
@@ -53,7 +52,7 @@ end
 @named model212 = make_212()
 
 #---
-states(model212)
+unknowns(model212)
 
 #---
 observed(model212)
@@ -121,7 +120,7 @@ function make_214(;name)
         A ~ (k0 + km1 * B)/k1
         D(B) ~ k1 * A - (km1 + k2) * B
     ]
-    sys = ODESystem(eqs; name)
+    sys = ODESystem(eqs, t; name)
     structural_simplify(sys)
 end
 

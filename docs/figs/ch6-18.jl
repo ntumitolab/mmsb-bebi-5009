@@ -3,7 +3,6 @@
 
 Model of calcium-induced calcium release in hepatocytes
 ===#
-
 using Catalyst
 using ModelingToolkit
 using DifferentialEquations
@@ -41,7 +40,7 @@ setdefaults!(rn, [
     :RICC => 0
 ])
 
-osys = convert(ODESystem, rn; remove_conserved = true)
+osys = convert(ODESystem, rn; remove_conserved = true) |> structural_simplify
 equations(osys)
 
 # ## Fig 6.18 (A)
@@ -53,15 +52,12 @@ sol = solve(prob)
 plot(sol, idxs=[C, RIC, RICC], title="Fig 6.18 (A)", xlabel="Time", ylabel="Abundance", legend=:topright)
 
 # ## Fig 6.18 (B)
-
-idx = findfirst(isequal(I), parameters(osys))
-cb1 = PresetTimeCallback([20.0], i -> begin i.p[idx] = 0.7; set_proposed_dt!(i, 0.01) end)
-cb2 = PresetTimeCallback([60.0], i -> begin i.p[idx] = 1.2; set_proposed_dt!(i, 0.01) end)
-cb3 = PresetTimeCallback([90.0], i -> begin i.p[idx] = 4.0; set_proposed_dt!(i, 0.01) end)
+cb1 = PresetTimeCallback([20.0], i -> begin i.ps[I] = 0.7; set_proposed_dt!(i, 0.01) end)
+cb2 = PresetTimeCallback([60.0], i -> begin i.ps[I] = 1.2; set_proposed_dt!(i, 0.01) end)
+cb3 = PresetTimeCallback([90.0], i -> begin i.ps[I] = 4.0; set_proposed_dt!(i, 0.01) end)
 cbs = CallbackSet(cb1, cb2, cb3)
 
 prob = ODEProblem(osys, [], (0., 120.))
 sol = solve(prob, callback=cbs)
 
-@unpack C = osys
-plot(sol, idxs=[C], title="Fig 6.18 (B)", xlabel="Time", ylabel="Ca concentration", legend=false, ylim=(0, 2.5))
+plot(sol, idxs=[osys.C], title="Fig 6.18 (B)", xlabel="Time", ylabel="Ca concentration", legend=false, ylim=(0, 2.5))

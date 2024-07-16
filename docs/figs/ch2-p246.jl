@@ -1,5 +1,4 @@
 # # Prob 2.4.6
-
 using DifferentialEquations
 using Plots
 Plots.default(linewidth=2)
