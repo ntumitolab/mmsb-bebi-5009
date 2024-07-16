@@ -3,7 +3,6 @@
 
 Model of G-protein signalling pathway
 ===#
-
 using ModelingToolkit
 using Catalyst
 using DifferentialEquations
@@ -34,19 +33,17 @@ setdefaults!(rn, [
     :L => 0.
 ])
 
-osys = convert(ODESystem, rn; remove_conserved = true)
+osys = convert(ODESystem, rn; remove_conserved = true) |> structural_simplify
 
 #---
 observed(osys)
 
 #---
 @unpack L = osys
-idx = findfirst(isequal(L), parameters(osys))
 
 # ## Fig 6.5 A
-
-cb1 = PresetTimeCallback([200.0], i -> begin i.p[idx] = 1e-9; set_proposed_dt!(i, 0.01) end)
-cb2 = PresetTimeCallback([800.0], i -> begin i.p[idx] = 0.0; set_proposed_dt!(i, 0.01) end)
+cb1 = PresetTimeCallback([200.0], i -> begin i.ps[L] = 1e-9; set_proposed_dt!(i, 0.01) end)
+cb2 = PresetTimeCallback([800.0], i -> begin i.ps[L] = 0.0; set_proposed_dt!(i, 0.01) end)
 cbs = CallbackSet(cb1, cb2)
 prob = ODEProblem(osys, [], (0., 1200.))
 
@@ -59,9 +56,7 @@ plot(sol, idxs=[RL, Ga], title="Fig 6.05 (A)", xlabel="Time", ylabel="Abundance"
 lrange = range(0, 20 * 1e-9, 101)
 
 prob_func = function(prob, i, repeat)
-    p = copy(prob.p)
-    p[idx] = lrange[i]
-    remake(prob, p=p)
+    remake(prob, p=[L => lrange[i]])
 end
 
 prob = ODEProblem(osys, [], Inf, [])

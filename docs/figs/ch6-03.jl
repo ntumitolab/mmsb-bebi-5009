@@ -2,7 +2,6 @@
 # Fig 6.3
 Two component pathway
 ===#
-
 using ModelingToolkit
 using Catalyst
 using DifferentialEquations
@@ -33,7 +32,7 @@ setdefaults!(rn, [
 @unpack L = rn
 discrete_events = [(t==1.0) => [L~3.0], (t==3.0) => [L~0.0]]
 
-osys = convert(ODESystem, rn; discrete_events, remove_conserved = true)
+osys = convert(ODESystem, rn; discrete_events, remove_conserved = true) |> structural_simplify
 
 #---
 observed(osys)
@@ -51,14 +50,11 @@ plot!(fig, t -> 3 * (1<=t<=3), label="Ligand", line=(:black, :dash), linealpha=0
 plot!(fig, title="Fig. 6.3 (A)", xlabel="Time", ylabel="Concentration")
 
 # ## Fig 6.3 B
-
+@unpack RL, Ps = osys
 lrange = 0:0.01:1
-idx = findfirst(isequal(L), parameters(osys))
 
 prob_func = function(prob, i, repeat)
-    p = copy(prob.p)
-    p[idx] = lrange[i]
-    remake(prob, p=p)
+    remake(prob, p=[L => lrange[i]])
 end
 
 prob = ODEProblem(osys, [], Inf, [])

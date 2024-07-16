@@ -3,7 +3,6 @@
 
 Model of E. coli chemotaxis signalling pathway
 ===#
-
 using ModelingToolkit
 using Catalyst
 using DifferentialEquations
@@ -11,7 +10,6 @@ using Plots
 Plots.default(linewidth=2)
 
 #---
-
 rn = @reaction_network begin
     mm(Am, k1 * BP, KM1), Am ⇒ A
     mm(AmL, k2 * BP, KM2), AmL ⇒ AL
@@ -23,7 +21,6 @@ rn = @reaction_network begin
 end
 
 #---
-
 setdefaults!(rn, [
     :Am => 0.0360,
     :AmL => 1.5593,
@@ -47,7 +44,7 @@ setdefaults!(rn, [
     :L => 20
 ])
 
-osys = convert(ODESystem, rn; remove_conserved = true)
+osys = convert(ODESystem, rn; remove_conserved = true) |> structural_simplify
 
 #---
 observed(osys)
@@ -57,11 +54,10 @@ equations(osys)
 
 #---
 @unpack L = osys
-idx = findfirst(isequal(L), parameters(osys))
 
 #---
-cb1 = PresetTimeCallback([10.0], i -> begin i.p[idx] = 40; set_proposed_dt!(i, 0.01) end)
-cb2 = PresetTimeCallback([30.0], i -> begin i.p[idx] = 80; set_proposed_dt!(i, 0.01) end)
+cb1 = PresetTimeCallback([10.0], i -> begin i.ps[L] = 40; set_proposed_dt!(i, 0.01) end)
+cb2 = PresetTimeCallback([30.0], i -> begin i.ps[L] = 80; set_proposed_dt!(i, 0.01) end)
 cbs = CallbackSet(cb1, cb2)
 
 prob = ODEProblem(osys, [], (0., 50.))
@@ -69,5 +65,4 @@ prob = ODEProblem(osys, [], (0., 50.))
 #---
 sol = solve(prob, callback=cbs)
 
-@unpack Am = osys
-plot(sol, idxs=[Am], title="Fig 6.14", xlabel="Time", ylabel="Active CheA ([Am])", ylims=(0.01, 0.04), legend=false)
+plot(sol, idxs=[osys.Am], title="Fig 6.14", xlabel="Time", ylabel="Active CheA ([Am])", ylims=(0.01, 0.04), legend=false)

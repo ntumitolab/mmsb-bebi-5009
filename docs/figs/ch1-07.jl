@@ -36,12 +36,12 @@ function build_collins(;name)
     D = Differential(t)
 
     eqs = [
-        D(s1) ~ a1 * hil(1 + i2, s2, β) - s1
-        D(s2) ~ a2 * hil(1 + i1, s1, γ) - s2
-        i2 ~ 10 * (10 < t) * (t < 20)
-        i1 ~ 10 * (30 < t) * (t < 40)
+        D(s1) ~ a1 * hil(1 + i2, s2, β) - s1,
+        D(s2) ~ a2 * hil(1 + i1, s1, γ) - s2,
+        i2 ~ 10 * (10 < t) * (t < 20),
+        i1 ~ 10 * (30 < t) * (t < 40),
     ]
-    sys = ODESystem(eqs; name)
+    sys = ODESystem(eqs, t; name)
     return structural_simplify(sys)
 end
 

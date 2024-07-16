@@ -134,7 +134,8 @@ Plots.default(linewidth=2)
 D = Differential(t) ## Differential operator
 
 # Define an ODE with equations
-@mtkbuild expdecaySys = ODESystem([D(C) ~ -λ*C])
+eqs = [D(C) ~ -λ*C]
+@mtkbuild expdecaySys = ODESystem(eqs, t)
 
 #---
 u0 = [C => 1.0]
@@ -185,7 +186,7 @@ function build_lorentz(; name)
         D(z) ~ x * y - β * z
     ]
 
-    sys = ODESystem(eqs; name)
+    sys = ODESystem(eqs, t; name)
     return sys
 end
 
@@ -210,6 +211,7 @@ using CSV
 
 df = DataFrame(sol)
 CSV.write("lorenz.csv", df)
+rm("lorenz.csv")
 
 # ### SIR model
 
@@ -228,7 +230,7 @@ eqs = [
     D(r) ~ γ * i
 ]
 
-@mtkbuild sirSys = ODESystem(eqs)
+@mtkbuild sirSys = ODESystem(eqs, t)
 
 p = [β => 1.0, γ => 0.3]
 u0 = [s => 0.99, i => 0.01, r => 0.00]
