@@ -15,7 +15,7 @@ env:
   NBCONVERT_JOBS: '4'
   LITERATE_PROC: '3'
   ALLOWERRORS: 'false'
-  CACHE_NUM: '1'
+  CACHE_NUM: '2'
   JULIA_CONDAPKG_BACKEND: 'Null'
   JULIA_CI: 'true'
   NBCACHE: '.cache'
