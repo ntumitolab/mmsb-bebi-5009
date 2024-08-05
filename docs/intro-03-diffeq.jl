@@ -66,7 +66,7 @@ sol.u
 
 ### SIR model
 
-This 3-variable model describes the spreading of an contagious disease can be described by the [SIR model](https://www.maa.org/press/periodicals/loci/joma/the-sir-model-for-spread-of-disease-the-differential-equation-model):
+This 3-variable model describes the spreading of an contagious disease can be described by the [SIR model](https://en.wikipedia.org/wiki/Compartmental_models_in_epidemiology):
 
 $$
 \begin{align}
