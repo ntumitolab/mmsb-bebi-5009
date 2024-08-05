@@ -30,7 +30,7 @@ setdefaults!(rn, [
 
 @variables t
 @unpack L = rn
-discrete_events = [(t==1.0) => [L~3.0], (t==3.0) => [L~0.0]]
+discrete_events = [[1.0] => [L~3.0], [3.0] => [L~0.0]]
 
 osys = convert(ODESystem, rn; discrete_events, remove_conserved = true) |> structural_simplify
 
@@ -40,8 +40,7 @@ observed(osys)
 # ## Fig. 6.3 A
 tspan = (0., 10.)
 prob = ODEProblem(osys, [], tspan, [])
-
-sol = solve(prob; tstops=[1.0, 3.0]);
+sol = solve(prob)
 
 #---
 @unpack RL, Ps = osys
