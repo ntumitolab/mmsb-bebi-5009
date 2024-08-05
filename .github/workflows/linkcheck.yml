@@ -45,17 +45,19 @@ jobs:
         id: setup-python
         with:
           python-version: '3.x'
-      - name: Cache python
+      - name: Cache python venv
         uses: actions/cache@v4
         if: ${{ contains(runner.name, 'GitHub Actions') }}
-        id: cache-py
+        id: cache-venv
         with:
-          key: ${{ runner.os }}-pip-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('requirements.txt') }}
-          path: |
-            ${{ env.pythonLocation }}/lib
-            ${{ env.pythonLocation }}/bin
+          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('requirements.txt') }}
+          path: .venv
       - name: Install Python dependencies
-        if: ${{ !contains(runner.name, 'GitHub Actions') || steps.cache-py.outputs.cache-hit != 'true' }}
-        run: pip install -r requirements.txt
+        run: |
+          python -m venv .venv
+          source .venv/bin/activate
+          python -m pip install -r requirements.txt
+          echo "${VIRTUAL_ENV}/bin" >> $GITHUB_PATH
+          echo "VIRTUAL_ENV=${VIRTUAL_ENV}" >> $GITHUB_ENV
       - name: Build website
         run: jupyter-book build ${DIR} --builder linkcheck
