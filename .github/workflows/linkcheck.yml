@@ -19,6 +19,7 @@ jobs:
   linkcheck:
     env:
       DIR: 'docs'
+      UV_SYSTEM_PYTHON: 1
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -45,19 +46,9 @@ jobs:
         id: setup-python
         with:
           python-version: '3.x'
-      - name: Cache python venv
-        uses: actions/cache@v4
-        if: ${{ contains(runner.name, 'GitHub Actions') }}
-        id: cache-venv
-        with:
-          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('requirements.txt') }}
-          path: .venv
+      - name: Install uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
       - name: Install Python dependencies
-        run: |
-          python -m venv .venv
-          source .venv/bin/activate
-          python -m pip install -r requirements.txt
-          echo "${VIRTUAL_ENV}/bin" >> $GITHUB_PATH
-          echo "VIRTUAL_ENV=${VIRTUAL_ENV}" >> $GITHUB_ENV
+        run: uv pip install -r requirements.txt
       - name: Build website
         run: jupyter-book build ${DIR} --builder linkcheck
