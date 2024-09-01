@@ -33,7 +33,7 @@ jobs:
       - name: Update Julia dependencies
         env:
           JULIA_PKG_PRECOMPILE_AUTO: '0'
-        run: julia --project=@. --color=yes -e 'import Pkg; Pkg.update()'
+        run: julia --project=@. --color=yes -e 'using Pkg; Pkg.update()'
       # Authenticate with a custom GitHub APP
       # https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#authenticating-with-github-app-generated-tokens
       - name: Generate token for PR
