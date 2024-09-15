@@ -6,7 +6,6 @@ using IJulia
 @everywhere begin
     ENV["GKSwstype"] = "100"
     using Literate, Pkg, JSON
-    Pkg.activate(Base.current_project())
 end
 
 # Strip SVG output from a Jupyter notebook
@@ -100,9 +99,7 @@ function main(;
     ts_lit = pmap(litnbs; on_error=ex -> NaN) do nb
         @elapsed run_literate(nb, cachedir; rmsvg)
     end
-
-    # Remove worker processes to release some memory
-    rmprocs(workers())
+    rmprocs(workers()) # Remove worker processes to release some memory
 
     # Debug notebooks one by one if there are errors
     for (nb, t) in zip(litnbs, ts_lit)
