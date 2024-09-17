@@ -12,6 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
+  JULIA_CPU_TARGET: 'generic;sandybridge,-xsaveopt,clone_all;haswell,-rdrnd,base(1);znver3,clone_all'
   NBCONVERT_JOBS: '3'
   LITERATE_PROC: '3'
   ALLOWERRORS: 'false'
