@@ -12,8 +12,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  JULIA_CPU_TARGET: 'generic;sandybridge,-xsaveopt,clone_all;haswell,-rdrnd,base(1);znver3,clone_all'
-  NBCONVERT_JOBS: '2'
+  NBCONVERT_JOBS: '6'
+  JULIA_NUM_THREADS: '6'
   LITERATE_PROC: '2'
   ALLOWERRORS: 'false'
   JULIA_CONDAPKG_BACKEND: 'Null'
@@ -23,7 +23,7 @@ env:
 
 jobs:
   CI:
-    runs-on: ubuntu-latest
+    runs-on: selh-hosted
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -32,10 +32,8 @@ jobs:
       id: setup-python
       with:
         python-version: '3.x'
-    - name: Install uv
-      run: curl -LsSf https://astral.sh/uv/install.sh | sh
     - name: Install Python dependencies
-      run: uv pip install -r requirements.txt
+      run: pip install -r requirements.txt
     - name: Read Julia version
       uses: SebRollen/toml-action@v1.2.0
       id: read_toml
