@@ -95,41 +95,45 @@ function main(;
 
     (; ipynbs, litnbs) = list_notebooks(basedir, cachedir)
 
-    # Execute literate notebooks in worker process(es)
-    ts_lit = pmap(litnbs; on_error=ex -> NaN) do nb
-        @elapsed run_literate(nb, cachedir; rmsvg)
-    end
-    rmprocs(workers()) # Remove worker processes to release some memory
+    if length(litnbs) > 0
+        # Execute literate notebooks in worker process(es)
+        ts_lit = pmap(litnbs; on_error=ex -> NaN) do nb
+            @elapsed run_literate(nb, cachedir; rmsvg)
+        end
+        rmprocs(workers()) # Remove worker processes to release some memory
 
-    # Debug notebooks one by one if there are errors
-    for (nb, t) in zip(litnbs, ts_lit)
-        if isnan(t)
-            println("Debugging notebook: ", nb)
-            try
-                withenv("JULIA_DEBUG" => "Literate") do
-                    run_literate(nb, cachedir; rmsvg)
+        # Debug notebooks one by one if there are errors
+        for (nb, t) in zip(litnbs, ts_lit)
+            if isnan(t)
+                println("Debugging notebook: ", nb)
+                try
+                    withenv("JULIA_DEBUG" => "Literate") do
+                        run_literate(nb, cachedir; rmsvg)
+                    end
+                catch e
+                    println(e)
                 end
-            catch e
-                println(e)
             end
         end
+        any(isnan, ts_lit) && error("Please check literate notebook error(s).")
     end
 
-    any(isnan, ts_lit) && error("Please check literate notebook error(s).")
+    if length(ipynbs) > 0
+        # Install IJulia kernel
+        IJulia.installkernel("Julia", "--project=@.", "--heap-size-hint=6G")
 
-    # Install IJulia kernel
-    IJulia.installkernel("Julia", "--project=@.", "--heap-size-hint=3G")
+        # nbconvert command array
+        ntasks = parse(Int, get(ENV, "NBCONVERT_JOBS", "1"))
+        kernelname = "--ExecutePreprocessor.kernel_name=julia-1.$(VERSION.minor)"
+        execute = ifelse(get(ENV, "ALLOWERRORS", " ") == "true", "--execute --allow-errors", "--execute")
+        timeout = "--ExecutePreprocessor.timeout=" * get(ENV, "TIMEOUT", "-1")
+        cmds = [`jupyter nbconvert --to notebook $(execute) $(timeout) $(kernelname) --output $(joinpath(abspath(pwd()), cachedir, nb)) $(nb)` for nb in ipynbs]
 
-    # nbconvert command array
-    ntasks = parse(Int, get(ENV, "NBCONVERT_JOBS", "1"))
-    kernelname = "--ExecutePreprocessor.kernel_name=julia-1.$(VERSION.minor)"
-    execute = ifelse(get(ENV, "ALLOWERRORS", " ") == "true", "--execute --allow-errors", "--execute")
-    timeout = "--ExecutePreprocessor.timeout=" * get(ENV, "TIMEOUT", "-1")
-    cmds = [`jupyter nbconvert --to notebook $(execute) $(timeout) $(kernelname) --output $(joinpath(abspath(pwd()), cachedir, nb)) $(nb)` for nb in ipynbs]
+        # Run the nbconvert commands in parallel
+        ts_ipynb = asyncmap(cmds; ntasks) do cmd
+            @elapsed run(cmd)
+        end
 
-    # Run the nbconvert commands in parallel
-    ts_ipynb = asyncmap(cmds; ntasks) do cmd
-        @elapsed run(cmd)
     end
 
     # Print execution result

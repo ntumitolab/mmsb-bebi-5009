@@ -33,7 +33,7 @@ jobs:
       with:
         python-version: '3.x'
     - name: Install uv
-      run: curl -LsSf https://astral.sh/uv/install.sh | sh
+      run: pip install uv
     - name: Install Python dependencies
       run: uv pip install -r requirements.txt
     - name: Read Julia version
@@ -87,10 +87,7 @@ jobs:
         key: ${{ steps.cache-julia.outputs.cache-primary-key }}
     - name: Run notebooks
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' }}
-      run: |
-        mkdir -p ${{ env.NBCACHE }}/docs
-        cp --verbose -rf data/ ${{ env.NBCACHE }}/docs/ || true
-        julia --project=@. --color=yes -p ${{ env.LITERATE_PROC }} run.jl
+      run: julia --project=@. --color=yes -p ${{ env.LITERATE_PROC }} run.jl
     - name: Copy back built notebooks
       run: cp --verbose -rf ${{ env.NBCACHE }}/docs/* docs/
     - name: Build website
