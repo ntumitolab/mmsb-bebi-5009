@@ -94,6 +94,8 @@ function main(;
     clean_cache(cachedir)
 
     (; ipynbs, litnbs) = list_notebooks(basedir, cachedir)
+    ts_lit = []
+    ts_ipynb = []
 
     if length(litnbs) > 0
         # Execute literate notebooks in worker process(es)
@@ -116,6 +118,8 @@ function main(;
             end
         end
         any(isnan, ts_lit) && error("Please check literate notebook error(s).")
+    else
+        ts_lit = []
     end
 
     if length(ipynbs) > 0
@@ -133,7 +137,8 @@ function main(;
         ts_ipynb = asyncmap(cmds; ntasks) do cmd
             @elapsed run(cmd)
         end
-
+    else
+        ts_ipynb = []
     end
 
     # Print execution result
