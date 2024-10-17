@@ -78,6 +78,12 @@ jobs:
         Pkg.activate(".")
         Pkg.instantiate()
         Pkg.precompile()
+    - name: Clean Julia package directory
+      if: ${{ runner.environment == 'github-hosted' && steps.cache-julia.outputs.cache-hit != 'true' }}
+      shell: julia --color=yes {0}
+      run: |
+        using Pkg, Dates
+        Pkg.gc(Day(0))
     - name: Save Julia packages
       uses: actions/cache/save@v4
       if: ${{ runner.environment == 'github-hosted' && steps.cache-julia.outputs.cache-hit != 'true' }}
