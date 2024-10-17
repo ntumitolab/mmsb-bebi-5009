@@ -1,0 +1,7 @@
+[BoundaryValueDiffEq]
+PrecompileShooting = false
+PrecompileMIRK = false
+PrecompileMIRKNLLS = false
+PrecompileMultipleShooting = false
+PrecompileMultipleShootingNLLS = false
+PrecompileShootingNLLS = false
