@@ -4,8 +4,7 @@
 Hodgkin-Huxley model
 
 ===#
-
-using DifferentialEquations
+using OrdinaryDiffEq
 using ModelingToolkit
 using Plots
 Plots.default(linewidth=2)
@@ -27,8 +26,9 @@ function build_hh(;name)
         C_M = 1.0        ## membrane capacitance (uF/cm^2))
     end
 
+    @independent_variables t
+
     @variables begin
-        t
         mα(t)
         mβ(t)
         hα(t)
@@ -64,13 +64,12 @@ function build_hh(;name)
         D(n) ~ -(nα + nβ) * n + nα,
     ]
 
-    sys = ODESystem(eqs, t; name)
-    return structural_simplify(sys)
+    return ODESystem(eqs, t; name)
 end
 
 #---
 tend = 100.0
-@named sys = build_hh()
+@mtkbuild sys = build_hh()
 prob = ODEProblem(sys, [], tend, [])
 
 #---

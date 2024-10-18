@@ -12,13 +12,13 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NBCONVERT_JOBS: '3'
-  LITERATE_PROC: '3'
+  NBCONVERT_JOBS: '2'
+  LITERATE_PROC: '2'
+  JULIA_NUM_THREADS: '2'
   ALLOWERRORS: 'false'
   JULIA_CONDAPKG_BACKEND: 'Null'
   JULIA_CI: 'true'
   NBCACHE: '.cache'
-  UV_SYSTEM_PYTHON: 1
 
 jobs:
   CI:
@@ -34,13 +34,10 @@ jobs:
     - name: Install Python dependencies
       run: |
         pip install uv
-        uv pip install -r requirements.txt
+        uv pip install --system -r requirements.txt
     - name: Read Julia version
-      uses: SebRollen/toml-action@v1.2.0
       id: read_toml
-      with:
-        file: 'Manifest.toml'
-        field: 'julia_version'
+      run: echo value=$(python -c 'import tomllib; from pathlib import Path; print(tomllib.loads(Path("Manifest.toml").read_text())["julia_version"])') >> "$GITHUB_OUTPUT"
     - name: Get environment hash
       id: hash
       run: |

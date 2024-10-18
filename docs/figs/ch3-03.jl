@@ -3,12 +3,13 @@
 
 Michaelis-Menten kinetics
 ===#
-using DifferentialEquations
+using OrdinaryDiffEq
+using ModelingToolkit
 using Catalyst
 using Plots
 Plots.default(linewidth=2)
 
-# Reaction neetwork
+# Reaction network
 rn = @reaction_network begin
     (k1, km1), S + E <--> ES
     k2, ES --> E + P

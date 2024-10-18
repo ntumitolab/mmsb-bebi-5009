@@ -19,7 +19,6 @@ jobs:
   linkcheck:
     env:
       DIR: 'docs'
-      UV_SYSTEM_PYTHON: 1
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -46,9 +45,9 @@ jobs:
         id: setup-python
         with:
           python-version: '3.x'
-      - name: Install uv
-        run: curl -LsSf https://astral.sh/uv/install.sh | sh
       - name: Install Python dependencies
-        run: uv pip install -r requirements.txt
+        run: |
+          pip install uv
+          uv pip install --system -r requirements.txt
       - name: Build website
         run: jupyter-book build ${DIR} --builder linkcheck

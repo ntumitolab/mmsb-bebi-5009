@@ -5,8 +5,7 @@ Collins toggle switch
 
 For Figures 1.7, 7.13, 7.14, 7.15
 ===#
-
-using DifferentialEquations
+using OrdinaryDiffEq
 using ModelingToolkit
 using Plots
 Plots.default(linewidth=2)
@@ -25,8 +24,8 @@ function build_collins(;name)
         γ=4.0
     end
 
+    @independent_variables t
     @variables begin
-        t
         s1(t)=0.075
         s2(t)=2.5
         i1(t)
@@ -41,12 +40,11 @@ function build_collins(;name)
         i2 ~ 10 * (10 < t) * (t < 20),
         i1 ~ 10 * (30 < t) * (t < 40),
     ]
-    sys = ODESystem(eqs, t; name)
-    return structural_simplify(sys)
+    return ODESystem(eqs, t; name)
 end
 
 #---
-@named sys = build_collins()
+@mtkbuild sys = build_collins()
 
 # Solve the problem
 tspan = (0.0, 50.0)

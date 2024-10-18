@@ -13,7 +13,7 @@
 - Define a problem (e.g. `ODEProblem`) using the modeling function (`f`), initial conditions (`u0`), simulation time span (`tspan == (tstart, tend)`), and parameter(s) `p`.
 - Solve the problem by calling `solve(prob)`.
 
-## Solve ODEs using DifferentialEquations.jl
+## Solve ODEs using OrdinaryDiffEq.jl
 
 Documentation: <https://docs.sciml.ai/DiffEqDocs/stable/>
 
@@ -33,7 +33,7 @@ $$
 
 ===#
 
-using DifferentialEquations
+using OrdinaryDiffEq
 using Plots
 Plots.default(linewidth=2)
 
@@ -89,7 +89,7 @@ $$
 
 ===#
 
-using DifferentialEquations
+using OrdinaryDiffEq
 using Plots
 Plots.default(linewidth=2)
 
@@ -123,7 +123,7 @@ plot(sol, label=["S" "I" "R"], legend=:right)
 ===#
 
 using ModelingToolkit
-using DifferentialEquations
+using OrdinaryDiffEq
 using Plots
 Plots.default(linewidth=2)
 
@@ -159,7 +159,7 @@ $$
 \end{align}
 $$
 ===#
-using DifferentialEquations
+using OrdinaryDiffEq
 using ModelingToolkit
 using Plots
 Plots.default(linewidth=2)
@@ -171,8 +171,8 @@ function build_lorentz(; name)
         β=8/3
     end
 
+    @independent_variables t
     @variables begin
-        t           ## Independent variable (time)
         x(t)=1.0    ## Independent variable (time)
         y(t)=0.0    ## Independent variable (time)
         z(t)=0.0    ## Independent variable (time)
@@ -214,8 +214,7 @@ CSV.write("lorenz.csv", df)
 rm("lorenz.csv")
 
 # ### SIR model
-
-using DifferentialEquations
+using OrdinaryDiffEq
 using ModelingToolkit
 using Plots
 Plots.default(linewidth=2)
@@ -246,9 +245,8 @@ plot(sol)
 
 [Catalyst.jl](https://github.com/SciML/Catalyst.jl) is a domain-specific language (DSL) package to simulate chemical reaction networks.
 ===#
-
 using Catalyst
-using DifferentialEquations
+using OrdinaryDiffEq
 using Plots
 Plots.default(linewidth=2)
 

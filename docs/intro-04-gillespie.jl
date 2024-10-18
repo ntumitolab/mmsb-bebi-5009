@@ -3,7 +3,6 @@
 
 ## Gillespie Algorithm
 ===#
-
 using StatsBase         ## Weights() and sample()
 using Plots
 using Interpolations
@@ -15,7 +14,6 @@ Random.seed!(2022)
 Stochastic chemical reaction: Gillespie Algorithm (direct method)
 Adapted from: Chemical and Biomedical Enginnering Calculations Using Python Ch.4-3
 ===#
-
 function ssa_direct(model, u0::AbstractArray, tend, p, stoich; tstart=zero(tend))
     t = tstart   ## Current time
     ts = [t]     ## Time points
@@ -132,9 +130,8 @@ fig1 |> display
 
 [Catalyst.jl](https://github.com/SciML/Catalyst.jl) is a domain-specific language (DSL) package to solve law of mass action problems.
 ===#
-
 using Catalyst
-using DifferentialEquations
+using JumpProcesses
 using Plots
 
 rn = @reaction_network begin
