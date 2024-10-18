@@ -242,7 +242,7 @@ str2 = "5009"
 string("The class is ", str1, '-', str2, ".")
 
 # Use string interpolation
-"The class is $str1-$str2."
+"The class is $(str1)-$(str2)."
 
 # concat string using `*`
 str1*"-"*str2

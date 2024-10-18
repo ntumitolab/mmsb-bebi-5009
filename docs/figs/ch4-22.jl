@@ -5,7 +5,6 @@ Tangent line.
 
 Using ForwardDiff to calculate the derivative on a curve.
 ===#
-
 using ForwardDiff
 using Plots
 Plots.default(linewidth=2)

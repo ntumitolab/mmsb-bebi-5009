@@ -3,7 +3,7 @@
 
 Model reduction of ODE metabolic networks.
 ===#
-using DifferentialEquations
+using OrdinaryDiffEq
 using Catalyst
 using ModelingToolkit
 using Plots
@@ -36,7 +36,7 @@ plot(
 
 function make_212(;name)
     @parameters k0 k1 km1 k2
-    @variables t
+    @independent_variables t
     @variables A(t) B(t) C(t)
     D = Differential(t)
     eqs = [
@@ -44,12 +44,11 @@ function make_212(;name)
         B ~ C * k1 / (km1 + k1)
         D(C) ~ k0 - k2 * B
     ]
-    sys = ODESystem(eqs, t; name)
-    structural_simplify(sys)
+    return ODESystem(eqs, t; name)
 end
 
 #---
-@named model212 = make_212()
+@mtkbuild model212 = make_212()
 
 #---
 unknowns(model212)
@@ -113,20 +112,18 @@ Quasi-steady state assumption on species A
 
 function make_214(;name)
     @parameters k0 k1 km1 k2
-    @variables t
+    @independent_variables t
     @variables A(t) B(t)
     D = Differential(t)
     eqs = [
         A ~ (k0 + km1 * B)/k1
         D(B) ~ k1 * A - (km1 + k2) * B
     ]
-    sys = ODESystem(eqs, t; name)
-    structural_simplify(sys)
+    return ODESystem(eqs, t; name)
 end
 
 #---
-
-@named model214 = make_214()
+@mtkbuild model214 = make_214()
 
 # Initial conditions can also be represented in symbols
 sol214 = solve(ODEProblem(model214, [B => (k1 * sum(last.(u0)) - k0) / (k1 + km1)], tend, ps2))

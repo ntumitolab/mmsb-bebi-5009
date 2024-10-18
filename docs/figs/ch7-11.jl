@@ -3,8 +3,7 @@
 
 Model of phage lambda decision switch
 ===#
-
-using DifferentialEquations
+using OrdinaryDiffEq
 using Plots
 Plots.default(linewidth=2)
 

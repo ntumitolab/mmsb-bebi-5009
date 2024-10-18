@@ -4,7 +4,7 @@ Two component pathway
 ===#
 using ModelingToolkit
 using Catalyst
-using DifferentialEquations
+using OrdinaryDiffEq
 using Plots
 Plots.default(linewidth=2)
 
@@ -28,7 +28,7 @@ setdefaults!(rn, [
     :k3 => 2.,
 ])
 
-@variables t
+@independent_variables t
 @unpack L = rn
 discrete_events = [[1.0] => [L~3.0], [3.0] => [L~0.0]]
 
