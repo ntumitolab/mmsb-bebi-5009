@@ -13,7 +13,7 @@
 - Define a problem (e.g. `ODEProblem`) using the modeling function (`f`), initial conditions (`u0`), simulation time span (`tspan == (tstart, tend)`), and parameter(s) `p`.
 - Solve the problem by calling `solve(prob)`.
 
-## Solve ODEs using DifferentialEquations.jl
+## Solve ODEs using OrdinaryDiffEq.jl
 
 Documentation: <https://docs.sciml.ai/DiffEqDocs/stable/>
 
