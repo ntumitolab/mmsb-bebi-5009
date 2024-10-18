@@ -131,7 +131,7 @@ fig1 |> display
 [Catalyst.jl](https://github.com/SciML/Catalyst.jl) is a domain-specific language (DSL) package to solve law of mass action problems.
 ===#
 using Catalyst
-using StochasticDiffEq
+using JumpProcesses
 using Plots
 
 rn = @reaction_network begin

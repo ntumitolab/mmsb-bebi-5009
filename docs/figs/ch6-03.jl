@@ -5,6 +5,7 @@ Two component pathway
 using ModelingToolkit
 using Catalyst
 using OrdinaryDiffEq
+using DiffEqCallbacks
 using Plots
 Plots.default(linewidth=2)
 
