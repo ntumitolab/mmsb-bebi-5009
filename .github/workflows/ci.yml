@@ -12,8 +12,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NBCONVERT_JOBS: '2'
-  LITERATE_PROC: '2'
+  NBCONVERT_JOBS: '6'
+  LITERATE_PROC: '6'
   JULIA_NUM_THREADS: '2'
   ALLOWERRORS: 'false'
   JULIA_CONDAPKG_BACKEND: 'Null'
@@ -22,7 +22,7 @@ env:
 
 jobs:
   CI:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
