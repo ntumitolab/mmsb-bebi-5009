@@ -1,5 +1,6 @@
 using Distributed
-using PrettyTables
+using Tables
+using MarkdownTables
 using SHA
 using IJulia
 
@@ -23,10 +24,7 @@ end
             end
         end
     end
-    rm(ipynb)
-    open(ipynb, "w") do io
-        JSON.print(io, nb, 1)
-    end
+    write(ipynb, JSON.json(nb, 1))
     return ipynb
 end
 
@@ -48,6 +46,7 @@ function clean_cache(cachedir)
     end
 end
 
+"Recursively list Jupyter and Literate notebooks. Also process caching."
 function list_notebooks(basedir, cachedir)
     ipynbs = String[]
     litnbs = String[]
@@ -77,6 +76,7 @@ function list_notebooks(basedir, cachedir)
     return (; ipynbs, litnbs)
 end
 
+# Run a Literate.jl notebook
 @everywhere function run_literate(file, cachedir; rmsvg=true)
     outpath = joinpath(abspath(pwd()), cachedir, dirname(file))
     mkpath(outpath)
@@ -88,16 +88,14 @@ end
 function main(;
     basedir=get(ENV, "DOCDIR", "docs"),
     cachedir=get(ENV, "NBCACHE", ".cache"),
-    printtable=true, rmsvg=true)
+    rmsvg=true)
 
     mkpath(cachedir)
     clean_cache(cachedir)
 
     (; ipynbs, litnbs) = list_notebooks(basedir, cachedir)
-    ts_lit = []
-    ts_ipynb = []
 
-    if length(litnbs) > 0
+    if !isempty(litnbs)
         # Execute literate notebooks in worker process(es)
         ts_lit = pmap(litnbs; on_error=ex -> NaN) do nb
             @elapsed run_literate(nb, cachedir; rmsvg)
@@ -122,27 +120,31 @@ function main(;
         ts_lit = []
     end
 
-    if length(ipynbs) > 0
+    if !isempty(ipynbs)
         # Install IJulia kernel
-        IJulia.installkernel("Julia", "--project=@.", "--heap-size-hint=6G")
+        IJulia.installkernel("Julia", "--project=@.", "--heap-size-hint=4G")
 
         # nbconvert command array
         ntasks = parse(Int, get(ENV, "NBCONVERT_JOBS", "1"))
         kernelname = "--ExecutePreprocessor.kernel_name=julia-1.$(VERSION.minor)"
         execute = ifelse(get(ENV, "ALLOWERRORS", " ") == "true", "--execute --allow-errors", "--execute")
         timeout = "--ExecutePreprocessor.timeout=" * get(ENV, "TIMEOUT", "-1")
-        cmds = [`jupyter nbconvert --to notebook $(execute) $(timeout) $(kernelname) --output $(joinpath(abspath(pwd()), cachedir, nb)) $(nb)` for nb in ipynbs]
 
         # Run the nbconvert commands in parallel
-        ts_ipynb = asyncmap(cmds; ntasks) do cmd
-            @elapsed run(cmd)
+        ts_ipynb = asyncmap(ipynbs; ntasks) do nb
+            @elapsed begin
+                nbout = joinpath(abspath(pwd()), cachedir, nb)
+                cmd = `jupyter nbconvert --to notebook $(execute) $(timeout) $(kernelname) --output $(nbout) $(nb)`
+                run(cmd)
+                rmsvg && strip_svg(nbout)
+            end
         end
     else
         ts_ipynb = []
     end
 
     # Print execution result
-    printtable && pretty_table([litnbs ts_lit; ipynbs ts_ipynb], header=["Notebook", "Elapsed (s)"])
+    Tables.table([litnbs ts_lit; ipynbs ts_ipynb]; header=["Notebook", "Elapsed (s)"]) |> markdown_table(String) |> print
 end
 
 # Run code
