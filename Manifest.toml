@@ -473,9 +473,9 @@ version = "1.15.1"
 
 [[deps.DifferentiationInterface]]
 deps = ["ADTypes", "LinearAlgebra"]
-git-tree-sha1 = "6a10acc94d4246b0e542eef3d850c1ad200e8958"
+git-tree-sha1 = "7ffe68edc2a4ad0ff2eeb5a32cc99ab45746fe3d"
 uuid = "a0c0ee7d-e4b9-4e03-894e-1c5f64a51d63"
-version = "0.6.26"
+version = "0.6.27"
 
     [deps.DifferentiationInterface.extensions]
     DifferentiationInterfaceChainRulesCoreExt = "ChainRulesCore"
@@ -880,9 +880,9 @@ version = "1.0.2"
 
 [[deps.HTTP]]
 deps = ["Base64", "CodecZlib", "ConcurrentUtilities", "Dates", "ExceptionUnwrapping", "Logging", "LoggingExtras", "MbedTLS", "NetworkOptions", "OpenSSL", "PrecompileTools", "Random", "SimpleBufferStream", "Sockets", "URIs", "UUIDs"]
-git-tree-sha1 = "ae350b8225575cc3ea385d4131c81594f86dfe4f"
+git-tree-sha1 = "6c22309e9a356ac1ebc5c8a217045f9bae6f8d9a"
 uuid = "cd3eb016-35fb-5094-929b-558a96fad6f3"
-version = "1.10.12"
+version = "1.10.13"
 
 [[deps.HarfBuzz_jll]]
 deps = ["Artifacts", "Cairo_jll", "Fontconfig_jll", "FreeType2_jll", "Glib_jll", "Graphite2_jll", "JLLWrappers", "Libdl", "Libffi_jll"]
@@ -1089,9 +1089,9 @@ version = "0.1.17"
 
 [[deps.LazyArrays]]
 deps = ["ArrayLayouts", "FillArrays", "LinearAlgebra", "MacroTools", "SparseArrays"]
-git-tree-sha1 = "7a244220c6f22ddb5948acaac203ffb5d2283b0c"
+git-tree-sha1 = "f289bee714e11708df257c57514585863aa02b33"
 uuid = "5078a376-72f3-5289-bfd5-ec5146d43c02"
-version = "2.3.0"
+version = "2.3.1"
 
     [deps.LazyArrays.extensions]
     LazyArraysBandedMatricesExt = "BandedMatrices"
@@ -1478,9 +1478,9 @@ uuid = "26075421-4e9a-44e1-8bd1-420ed7ad02b2"
 version = "1.0.0"
 
 [[deps.OffsetArrays]]
-git-tree-sha1 = "1a27764e945a152f7ca7efa04de513d473e9542e"
+git-tree-sha1 = "39d000d9c33706b8364817d8894fae1548f40295"
 uuid = "6fe1bfb0-de20-5000-8ca7-80f57d26f881"
-version = "1.14.1"
+version = "1.14.2"
 weakdeps = ["Adapt"]
 
     [deps.OffsetArrays.extensions]
@@ -2074,9 +2074,9 @@ version = "0.6.43"
 
 [[deps.SciMLBase]]
 deps = ["ADTypes", "Accessors", "ArrayInterface", "CommonSolve", "ConstructionBase", "Distributed", "DocStringExtensions", "EnumX", "Expronicon", "FunctionWrappersWrappers", "IteratorInterfaceExtensions", "LinearAlgebra", "Logging", "Markdown", "PrecompileTools", "Preferences", "Printf", "RecipesBase", "RecursiveArrayTools", "Reexport", "RuntimeGeneratedFunctions", "SciMLOperators", "SciMLStructures", "StaticArraysCore", "Statistics", "SymbolicIndexingInterface"]
-git-tree-sha1 = "899468ac3c2fa6b87151cb3fa29367329017d365"
+git-tree-sha1 = "87e054302a94a2d087f918ad50b0290977db67e6"
 uuid = "0bca4576-84f4-4d90-8ffe-ffa030f20462"
-version = "2.66.0"
+version = "2.67.0"
 
     [deps.SciMLBase.extensions]
     SciMLBaseChainRulesCoreExt = "ChainRulesCore"
