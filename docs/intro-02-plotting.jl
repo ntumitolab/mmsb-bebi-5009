@@ -84,11 +84,10 @@ plt.quiver(X2d, Y2d, U2d, V2d)
 ```
 [matplotlib: quiver plot](https://matplotlib.org/stable/gallery/images_contours_and_fields/quiver_demo.html#sphx-glr-gallery-images-contours-and-fields-quiver-demo-py)
 ===#
-
 using Plots
 
 # ∇ = \nabla <TAB>
-function ∇f(x, y; scale=hypot(x, y)^0.5 * 3)
+function ∇f(x, y; scale=(x^2 + y^2)^0.25 * 3)
     return [-y, x] ./ scale
 end
 
