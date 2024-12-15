@@ -13,7 +13,7 @@
 - Define a problem (e.g. `ODEProblem`) using the modeling function (`f`), initial conditions (`u0`), simulation time span (`tspan == (tstart, tend)`), and parameter(s) `p`.
 - Solve the problem by calling `solve(prob)`.
 
-## Solve ODEs using OrdinaryDiffEq.jl
+## Solve ODEs using DifferentialEquations.jl
 
 Documentation: <https://docs.sciml.ai/DiffEqDocs/stable/>
 
@@ -32,8 +32,7 @@ $$
 - $\lambda$: The rate constant of decay. The half-life $t_{\frac{1}{2}} = \frac{ln2}{\lambda}$
 
 ===#
-
-using OrdinaryDiffEq
+using DifferentialEquations
 using Plots
 Plots.default(linewidth=2)
 
@@ -43,15 +42,6 @@ expdecay(u, p, t) = p * u
 p = -1.0            ## Rate of exponential decay
 u0 = 1.0            ## Initial condition
 tspan = (0.0, 2.0)  ## Start time and end time
-
-# Define a problem
-prob = ODEProblem(expdecay, u0, tspan, p)
-
-# Solve the problem
-sol = solve(prob)
-
-# Visualize the solution
-plot(sol, legend=:right)
 
 # Solution at time t=1.0 (with interpolation)
 sol(1.0)
@@ -88,20 +78,19 @@ $$
 - $\gamma$ : the rate of recovery of infectious people
 
 ===#
-
-using OrdinaryDiffEq
+using DifferentialEquations
 using Plots
 Plots.default(linewidth=2)
 
 # SIR model (in-place form)
-function sir!(D, u, p ,t)
+function sir!(du, u, p ,t)
 	s, i, r = u
 	β, γ = p
 	v1 = β * s * i
 	v2 = γ * i
-    D[1] = -v1
-    D[2] = v1 - v2
-    D[3] = v2
+    du[1] = -v1
+    du[2] = v1 - v2
+    du[3] = v2
 	return nothing
 end
 
@@ -116,14 +105,13 @@ sol = solve(prob)
 plot(sol, label=["S" "I" "R"], legend=:right)
 
 #===
-
 ## Using ModelingToolkit.jl (recommended)
 
-[ModelingToolkit.jl](https://mtk.sciml.ai/dev/) is a high-level package for symbolic-numeric modeling and simulation in the Julia ecosystem.
+[ModelingToolkit.jl](https://docs.sciml.ai/ModelingToolkit/stable/) is a high-level package for symbolic-numeric modeling and simulation in the Julia ecosystem.
 ===#
 
 using ModelingToolkit
-using OrdinaryDiffEq
+using DifferentialEquations
 using Plots
 Plots.default(linewidth=2)
 
@@ -159,7 +147,7 @@ $$
 \end{align}
 $$
 ===#
-using OrdinaryDiffEq
+using DifferentialEquations
 using ModelingToolkit
 using Plots
 Plots.default(linewidth=2)
@@ -214,7 +202,7 @@ CSV.write("lorenz.csv", df)
 rm("lorenz.csv")
 
 # ### SIR model
-using OrdinaryDiffEq
+using DifferentialEquations
 using ModelingToolkit
 using Plots
 Plots.default(linewidth=2)
@@ -245,8 +233,8 @@ plot(sol)
 
 [Catalyst.jl](https://github.com/SciML/Catalyst.jl) is a domain-specific language (DSL) package to simulate chemical reaction networks.
 ===#
+using DifferentialEquations
 using Catalyst
-using OrdinaryDiffEq
 using Plots
 Plots.default(linewidth=2)
 

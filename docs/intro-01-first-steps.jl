@@ -397,7 +397,8 @@ mm(1)
 
 #===
 ### Anonymous functions
-Often used with high-order functions e.g. `map()`
+
+Anonymous functions are often used with other functions that take in another function. e.g. `map()`
 ===#
 
 g = x->x^2
