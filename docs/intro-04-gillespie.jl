@@ -8,7 +8,7 @@ using Plots
 using Interpolations
 using Statistics        ## mean()
 using Random            ## randexp()
-Random.seed!(2022)
+Random.seed!(2024)
 
 #===
 Stochastic chemical reaction: Gillespie Algorithm (direct method)
@@ -77,8 +77,8 @@ u0 = [200, 0]
 tend = 10.0
 
 # Solve the problem using both direct and first reaction method
-soldirect = ssa_direct(model, u0, tend, parameters, stoich)
-solfirst = ssa_first(model, u0, tend, parameters, stoich)
+@time soldirect = ssa_direct(model, u0, tend, parameters, stoich)
+@time solfirst = ssa_first(model, u0, tend, parameters, stoich)
 
 # Plot the solution from the direct method
 plot(soldirect.t, soldirect.u,
@@ -126,7 +126,7 @@ plot!(fig1, b_avg, 0.0, tend, linecolor=:black, linewidth=3, linestyle = :dash, 
 fig1 |> display
 
 #===
-## Using Catalyst
+## Using Catalyst (recommended)
 
 [Catalyst.jl](https://github.com/SciML/Catalyst.jl) is a domain-specific language (DSL) package to solve law of mass action problems.
 ===#
@@ -156,9 +156,11 @@ plot(sol)
 # Parallel ensemble simulation
 ensprob = EnsembleProblem(jumpProb)
 sim = solve(ensprob, SSAStepper(), EnsembleThreads(); trajectories=50)
-plot(sim, alpha=0.1, color=[:blue :red])
-#---
 
+#---
+plot(sim, alpha=0.1, color=[:blue :red], fmt=:png)
+
+#---
 summ = EnsembleSummary(sim, 0:0.1:10)
 plot(summ,fillalpha=0.5)
 
