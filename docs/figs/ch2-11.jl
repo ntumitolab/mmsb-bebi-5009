@@ -3,7 +3,7 @@
 
 Model reduction of ODE metabolic networks.
 ===#
-using OrdinaryDiffEq
+using DifferentialEquations
 using Catalyst
 using ModelingToolkit
 using Plots

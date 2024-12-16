@@ -3,7 +3,7 @@
 
 Michaelis-Menten kinetics
 ===#
-using OrdinaryDiffEq
+using DifferentialEquations
 using ModelingToolkit
 using Catalyst
 using Plots

@@ -5,8 +5,7 @@ Model of calcium-induced calcium release in hepatocytes
 ===#
 using Catalyst
 using ModelingToolkit
-using OrdinaryDiffEq
-using DiffEqCallbacks
+using DifferentialEquations
 using Plots
 Plots.default(linewidth=2)
 

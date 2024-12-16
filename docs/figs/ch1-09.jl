@@ -4,7 +4,7 @@
 Hodgkin-Huxley model
 
 ===#
-using OrdinaryDiffEq
+using DifferentialEquations
 using ModelingToolkit
 using Plots
 Plots.default(linewidth=2)

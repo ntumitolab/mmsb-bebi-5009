@@ -5,7 +5,7 @@ Collins toggle switch
 
 For Figures 1.7, 7.13, 7.14, 7.15
 ===#
-using OrdinaryDiffEq
+using DifferentialEquations
 using ModelingToolkit
 using Plots
 Plots.default(linewidth=2)
@@ -13,7 +13,6 @@ Plots.default(linewidth=2)
 # Convenience functions
 hil(x, k) = x / (x + k)
 hil(x, k, n) = hil(x^n, k^n)
-exprel(x) = x / expm1(x)
 
 # Define the problem
 function build_collins(;name)
