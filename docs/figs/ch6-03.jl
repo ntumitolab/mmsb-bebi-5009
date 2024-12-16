@@ -4,8 +4,7 @@ Two component pathway
 ===#
 using ModelingToolkit
 using Catalyst
-using OrdinaryDiffEq
-using DiffEqCallbacks
+using DifferentialEquations
 using Plots
 Plots.default(linewidth=2)
 
@@ -36,7 +35,7 @@ discrete_events = [[1.0] => [L~3.0], [3.0] => [L~0.0]]
 osys = convert(ODESystem, rn; discrete_events, remove_conserved = true) |> structural_simplify
 
 #---
-observed(osys)
+equations(osys)
 
 # ## Fig. 6.3 A
 tspan = (0., 10.)
@@ -57,14 +56,13 @@ prob_func = function(prob, i, repeat)
     remake(prob, p=[L => lrange[i]])
 end
 
-prob = ODEProblem(osys, [], Inf, [])
-callback = TerminateSteadyState()
+prob = SteadyStateProblem(osys, [], [])
 trajectories = length(lrange)
-alg = Rodas5()
+alg = DynamicSS(Rodas5())
 eprob = EnsembleProblem(prob; prob_func)
-sim = solve(eprob, alg; save_everystep=false, trajectories, callback)
+sim = solve(eprob, alg; trajectories, abstol=1e-10, reltol=1e-10)
 
-pstar = map(s->s[Ps][end], sim)
-rl = map(s->s[RL][end], sim)
+pstar = map(s->s[Ps], sim)
+rl = map(s->s[RL], sim)
 plot(lrange, [pstar rl], label=["P*" "RL"], title="Fig. 6.3 (B)",
 xlabel="Ligand", ylabel="Steady-state concentration", xlims=(0, 1), ylims=(0, 8))

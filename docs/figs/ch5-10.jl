@@ -3,8 +3,8 @@
 
 Methionine model
 ===#
-using OrdinaryDiffEq
-using SimpleUnPack
+using DifferentialEquations
+using SimpleUnPack: @unpack
 using Plots
 Plots.default(linewidth=2)
 

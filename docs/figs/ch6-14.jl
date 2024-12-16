@@ -5,17 +5,16 @@ Model of E. coli chemotaxis signalling pathway
 ===#
 using ModelingToolkit
 using Catalyst
-using OrdinaryDiffEq
-using DiffEqCallbacks
+using DifferentialEquations
 using Plots
 Plots.default(linewidth=2)
 
 #---
 rn = @reaction_network begin
-    mm(Am, k1 * BP, KM1), Am ⇒ A
-    mm(AmL, k2 * BP, KM2), AmL ⇒ AL
-    km1 * R , A ⇒ Am
-    km2 * R , AL ⇒ AmL
+    mm(Am, k1 * BP, KM1), Am => A
+    mm(AmL, k2 * BP, KM2), AmL => AL
+    km1 * R , A => Am
+    km2 * R , AL => AmL
     (k3 * L, km3), Am <--> AmL
     (k4 * L, km4), A <--> AL
     (k5 * Am, km5), B <--> BP

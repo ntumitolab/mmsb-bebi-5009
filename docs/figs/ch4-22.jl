@@ -3,7 +3,7 @@
 
 Tangent line.
 
-Using ForwardDiff to calculate the derivative on a curve.
+Using ForwardDiff to calculate the derivative (slope of the tangent) on a curve.
 ===#
 using ForwardDiff
 using Plots

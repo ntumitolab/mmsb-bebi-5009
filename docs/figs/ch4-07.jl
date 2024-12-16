@@ -1,6 +1,6 @@
 # # Fig 4.7, 4.8
 # Symmetric (bistable) biological networks.
-using OrdinaryDiffEq
+using DifferentialEquations
 using Plots
 Plots.default(linewidth=2)
 

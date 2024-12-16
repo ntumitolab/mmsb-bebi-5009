@@ -5,20 +5,15 @@ Continuation diagram
 
 See also [BifurcationKit.jl](https://github.com/bifurcationkit/BifurcationKit.jl)
 ===#
-using OrdinaryDiffEq
-using SteadyStateDiffEq
+using DifferentialEquations
 using Plots
 Plots.default(linewidth=2)
-
-#---
-hil(x, k) = x / (x + k)
-hil(x, k, n) = hil(x^n, k^n)
 
 #---
 function model418!(D, u, p, t)
     a, b = u
     k1, k2, k3, k4, k5, n = p
-    D[1] = k1 * hil(1, b, n) - (k3 + k5) * a
+    D[1] = k1 / (1 + b^n) - (k3 + k5) * a
     D[2] = k2 + k5 * a - k4 * b
 end
 

@@ -65,7 +65,6 @@ plot(ax1, ax2)
 fig = plot(ax1, ax2, layout=(2, 1))
 
 #===
-
 ## Vector field
 
 ### `Plots.jl`
@@ -77,21 +76,18 @@ quiver(vec(x2d), vec(y2d), quiver=(vec(vx2d), vec(vy2d))
 quiver(x2d, y2d, quiver=f)
 ```
 
-### `PyPlot.jl`:
+### `PythonPlot.jl`:
 
 ```julia
-using PyPlot as plt
+using PythonPlot as plt
 plt.quiver(X2d, Y2d, U2d, V2d)
 ```
-
-See also: [matplotlib: quiver plot](https://matplotlib.org/stable/gallery/images_contours_and_fields/quiver_demo.html#sphx-glr-gallery-images-contours-and-fields-quiver-demo-py)
-
+[matplotlib: quiver plot](https://matplotlib.org/stable/gallery/images_contours_and_fields/quiver_demo.html#sphx-glr-gallery-images-contours-and-fields-quiver-demo-py)
 ===#
-
 using Plots
 
 # ∇ = \nabla <TAB>
-function ∇f(x, y; scale=hypot(x, y)^0.5 * 3)
+function ∇f(x, y; scale=(x^2 + y^2)^0.25 * 3)
     return [-y, x] ./ scale
 end
 
@@ -106,11 +102,11 @@ quiver(xx, yy, quiver=∇f, aspect_ratio=:equal, line=(:black), arrow=(:closed))
 #===
 ## Save figure
 
-`savefig(filename)`
+`savefig([fig_obj,] filename)`
 ===#
 
 # Save the current figure
 savefig("vfield.png")
 
-# Save the figure saved in a variable
+# Save the figure `fig`
 savefig(fig, "subplots.png")

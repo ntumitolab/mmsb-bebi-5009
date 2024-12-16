@@ -6,7 +6,7 @@ Goodwin oscillator model: https://en.wikipedia.org/wiki/Goodwin_model_(biology)
 
 using Catalyst
 using ModelingToolkit
-using OrdinaryDiffEq
+using DifferentialEquations
 using Plots
 Plots.default(linewidth=2)
 
