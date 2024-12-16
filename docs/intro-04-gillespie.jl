@@ -8,6 +8,7 @@ using Plots
 using Interpolations
 using Statistics        ## mean()
 using Random            ## randexp()
+using DisplayAs: PNG
 Random.seed!(2024)
 
 #===
@@ -83,12 +84,12 @@ tend = 10.0
 # Plot the solution from the direct method
 plot(soldirect.t, soldirect.u,
     xlabel="time", ylabel="# of molecules",
-    title = "SSA (direct method)", label=["A" "B"])
+    title = "SSA (direct method)", label=["A" "B"]) |> PNG
 
 # Plot the solution by the first reaction method
 plot(solfirst.t, solfirst.u,
     xlabel="time", ylabel="# of molecules",
-    title = "SSA (1st reaction method)", label=["A" "B"])
+    title = "SSA (1st reaction method)", label=["A" "B"]) |> PNG
 
 # Running 50 simulations
 numRuns = 50
@@ -117,13 +118,13 @@ for sol in sols
     plot!(fig1, sol.t, sol.u, linecolor=[:blue :red], linealpha=0.05, label=false)
 end
 
-fig1 |> display
+fig1 |> PNG
 
 # Plot averages
-plot!(fig1, a_avg, 0.0, tend, linecolor=:black, linewidth=3, linestyle = :solid, label="Avarage [A]")
-plot!(fig1, b_avg, 0.0, tend, linecolor=:black, linewidth=3, linestyle = :dash, label="Avarage [B]")
+plot!(fig1, a_avg, 0.0, tend, linecolor=:black, linewidth=3, linestyle = :solid, label="Avarage [A]") |> PNG
+plot!(fig1, b_avg, 0.0, tend, linecolor=:black, linewidth=3, linestyle = :dash, label="Avarage [B]") |> PNG
 
-fig1 |> display
+fig1 |> PNG
 
 #===
 ## Using Catalyst (recommended)
@@ -151,18 +152,18 @@ dprob = DiscreteProblem(rn, u0, (0.0, tend), params)
 
 jumpProb = JumpProblem(rn, dprob, Direct())
 sol = solve(jumpProb, SSAStepper())
-plot(sol)
+plot(sol) |> PNG
 
 # Parallel ensemble simulation
 ensprob = EnsembleProblem(jumpProb)
 sim = solve(ensprob, SSAStepper(), EnsembleThreads(); trajectories=50)
 
 #---
-plot(sim, alpha=0.1, color=[:blue :red], fmt=:png)
+plot(sim, alpha=0.1, color=[:blue :red]) |> PNG
 
 #---
 summ = EnsembleSummary(sim, 0:0.1:10)
-plot(summ,fillalpha=0.5)
+plot(summ,fillalpha=0.5) |> PNG
 
 #===
 **See also** the [JumpProcesses.jl docs](https://docs.sciml.ai/JumpProcesses/stable/api/#JumpProcesses.ConstantRateJump) about discrete stochastic examples.
