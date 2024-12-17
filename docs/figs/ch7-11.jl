@@ -4,6 +4,7 @@
 Model of phage lambda decision switch
 ===#
 using DifferentialEquations
+using ModelingToolkit
 using Plots
 Plots.default(linewidth=2)
 
