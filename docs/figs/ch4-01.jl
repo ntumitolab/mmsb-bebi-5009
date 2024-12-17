@@ -4,7 +4,6 @@
 Steady states and phase plots in an asymmetric network.
 ===#
 using DifferentialEquations
-using SimpleUnPack              ## @unpack
 using ModelingToolkit
 using Plots
 Plots.default(linewidth=2)
@@ -15,15 +14,16 @@ Plots.default(linewidth=2)
 @parameters k1 k2 k3 k4 k5 n
 D = Differential(t)
 
-@mtkbuild osys = ODESystem([
+eqs = [
     D(A) ~ k1 / (1 + B^n) - (k3 + k5) * A,
-    D(B) ~ k2 + k5 * A - k4 * B,
-], t)
+    D(B) ~ k2 + k5 * A - k4 * B
+]
+@mtkbuild osys = ODESystem(eqs, t)
 
 # ## Fig 4.2 A
 tend = 1.5
-ps1 = Dict(k1=>20, k2=>5, k3=>5, k4=>5, k5=>2, n=>4)
-prob = ODEProblem(osys, [0.0, 0.0], tend, ps1)
+ps1 = Dict(k1 => 20, k2 => 5, k3 => 5, k4 => 5, k5 => 2, n => 4)
+prob = ODEProblem(osys, [A => 0.0, B => 0.0], tend, ps1)
 
 u0s = [
     [0.0, 0.0],
@@ -35,17 +35,15 @@ u0s = [
 
 #---
 sols = map(u0s) do u0
-    newprob = remake(prob, u0=u0)
-    solve(newprob)
+    solve(remake(prob, u0=u0))
 end
-
-prob.f([0.0, 0.0], prob.p, nothing)
 
 #---
 plot(sols[1], xlabel="Time", ylabel="Concentration", title="Fig. 4.2 A (Time series)")
 
 # ## Fig. 4.2 B (Phase plot)
-plot( sols[1], idxs=(A, B),
+plot(
+    sols[1], idxs=(A, B),
     xlabel="[A]", ylabel="[B]",
     aspect_ratio=:equal, legend=nothing,
     title="Fig. 4.2 B (Phase plot)",
@@ -70,7 +68,7 @@ for sol in sols
     plot!(fig, sol, idxs=(A, B), legend=nothing)
 end
 
-plot!(fig, xlabel="[A]", ylabel="[B]", xlims=(0., 2.), ylims=(0., 2.), aspect_ratio=:equal)
+plot!(fig, xlabel="[A]", ylabel="[B]", xlims=(0.0, 2.0), ylims=(0.0, 2.0), aspect_ratio=:equal)
 
 # Let's sketch vector fields in phase plots.
 
@@ -103,15 +101,16 @@ fig = plot(title="Fig. 4.5 A (Phase plot with nullclines)")
 
 ## Phase plots
 for sol in sols
-    plot!(fig, sol, idxs=(1, 2), linealpha=0.7, lab=nothing)
+    plot!(fig, sol, idxs=(A, B), linealpha=0.7, lab=nothing)
 end
 
 ## nullclines
-contour!(fig, 0:0.01:2, 0:0.01:2, ∂A, levels=[0], cbar=false, line=(:black))
+
+contour!(fig, 0:0.01:2, 0:0.01:2, (x, y) -> ∂F44(x, y)[1], levels=[0], cbar=false, line=(:black))
 plot!(fig, Float64[], Float64[], line=(:black), label="A nullcline")  ## Adding a fake line for the legend of A nullcline
-contour!(fig, 0:0.01:2, 0:0.01:2, ∂B, levels=[0], cbar=false, line=(:black, :dash))
+contour!(fig, 0:0.01:2, 0:0.01:2, (x, y) -> ∂F44(x, y)[2], levels=[0], cbar=false, line=(:black, :dash))
 plot!(fig, Float64[], Float64[], line=(:black, :dash), label="B nullcline") ## Adding a fake line for the legend of B nullcline
-plot!(fig, xlim=(0., 2.), ylim=(0., 2.), legend=:bottomright, size=(600, 600), xlabel="[A]", ylabel="[B]", aspect_ratio=:equal)
+plot!(fig, xlim=(0.0, 2.0), ylim=(0.0, 2.0), legend=:bottomright, size=(600, 600), xlabel="[A]", ylabel="[B]", aspect_ratio=:equal)
 
 # ## Figure 4.5 B
 
@@ -120,8 +119,8 @@ fig = plot(title="Fig. 4.5 B (Vector field with nullclines)")
 quiver!(fig, xx, yy, quiver=∂F44, line=(:lightgrey), arrow=(:closed), aspect_ratio=:equal)
 
 # Nullclines
-contour!(fig, 0:0.01:2, 0:0.01:2, ∂A, levels=[0], cbar=false, line=(:black))
+contour!(fig, 0:0.01:2, 0:0.01:2, (x, y) -> ∂F44(x, y)[1], levels=[0], cbar=false, line=(:black))
 plot!(fig, Float64[], Float64[], line=(:black), label="A nullcline")  ## Adding a fake line for the legend of A nullcline
-contour!(fig, 0:0.01:2, 0:0.01:2, ∂B, levels=[0], cbar=false, line=(:black, :dash))
+contour!(fig, 0:0.01:2, 0:0.01:2, (x, y) -> ∂F44(x, y)[2], levels=[0], cbar=false, line=(:black, :dash))
 plot!(fig, Float64[], Float64[], line=(:black, :dash), label="B nullcline") ## Adding a fake line for the legend of B nullcline
-plot!(fig, xlim=(0., 2.), ylim=(0., 2.), legend=:bottomright, size=(600, 600), xlabel="[A]", ylabel="[B]")
+plot!(fig, xlim=(0.0, 2.0), ylim=(0.0, 2.0), legend=:bottomright, size=(600, 600), xlabel="[A]", ylabel="[B]")

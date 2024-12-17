@@ -11,6 +11,7 @@ Plots.default(linewidth=2)
 
 #---
 rn = @reaction_network begin
+    @parameters L(t)
     mm(Am, k1 * BP, KM1), Am => A
     mm(AmL, k2 * BP, KM2), AmL => AL
     km1 * R , A => Am
@@ -44,7 +45,8 @@ setdefaults!(rn, [
     :L => 20
 ])
 
-osys = convert(ODESystem, rn; remove_conserved = true) |> structural_simplify
+@unpack L = rn
+osys = convert(ODESystem, rn; remove_conserved = true, discrete_events = [[10] => [L ~ 40], [30] => [L ~ 80]]) |> structural_simplify
 
 #---
 observed(osys)
@@ -53,16 +55,10 @@ observed(osys)
 equations(osys)
 
 #---
-@unpack L = osys
+tend = 50.0
+prob = ODEProblem(osys, [], tend)
 
 #---
-cb1 = PresetTimeCallback([10.0], i -> begin i.ps[L] = 40; set_proposed_dt!(i, 0.01) end)
-cb2 = PresetTimeCallback([30.0], i -> begin i.ps[L] = 80; set_proposed_dt!(i, 0.01) end)
-cbs = CallbackSet(cb1, cb2)
-
-prob = ODEProblem(osys, [], (0., 50.))
-
-#---
-sol = solve(prob, callback=cbs)
+sol = solve(prob)
 
 plot(sol, idxs=[osys.Am], title="Fig 6.14", xlabel="Time", ylabel="Active CheA ([Am])", ylims=(0.01, 0.04), legend=false)

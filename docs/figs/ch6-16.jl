@@ -11,6 +11,7 @@ Plots.default(linewidth=2)
 
 #---
 rn = @reaction_network begin
+    @parameters I(t)
     (k1, k2), 0 <--> C8
     k3 * (C3s + I), C8 --> C8s
     k4, C8s --> 0
@@ -57,19 +58,16 @@ setdefaults!(rn, [
     :C3sIAP => 0.0
 ])
 
-osys = convert(ODESystem, rn; remove_conserved = true) |> structural_simplify
+@unpack I = rn
+
+osys = convert(ODESystem, rn; remove_conserved = true, discrete_events = [[100] => [I ~ 200], [1200] => [I ~ 0]]) |> structural_simplify
 equations(osys)
 
 #---
-@unpack I = osys
-
-#---
-cb1 = PresetTimeCallback([100.0], i -> begin i.ps[I] = 200; set_proposed_dt!(i, 0.01) end)
-cb2 = PresetTimeCallback([1200.0], i -> begin i.ps[I] = 0; set_proposed_dt!(i, 0.01) end)
-cbs = CallbackSet(cb1, cb2)
+tspan = (0., 1800.)
 prob = ODEProblem(osys, [], (0., 1800.))
 
 #--
-sol = solve(prob, callback=cbs)
+sol = solve(prob)
 
-plot(sol, idxs=[osys.C8s, osys.C3s], title="Fig 6.16", xlabel="Time", ylabel="Concentration", legend=:right, rightmargin=5*Plots.mm)
+plot(sol, idxs=[osys.C8s, osys.C3s, I*100], title="Fig 6.16", xlabel="Time", ylabel="Concentration", legend=:right, rightmargin=5*Plots.mm)
