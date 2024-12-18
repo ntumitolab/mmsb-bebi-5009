@@ -22,7 +22,7 @@ eqs = [
 
 # ## Fig 4.2 A
 tend = 1.5
-ps1 = Dict(k1 => 20, k2 => 5, k3 => 5, k4 => 5, k5 => 2, n => 4)
+ps1 = Dict(k1 => 20, k2 => 5, k3=> 5, k4 => 5, k5 => 2, n => 4)
 prob = ODEProblem(osys, [A => 0.0, B => 0.0], tend, ps1)
 
 u0s = [
@@ -94,7 +94,6 @@ end
 
 plot!(fig, size=(600, 600), xlims=(rxy[1], rxy[end]), ylims=(rxy[1], rxy[end]), xlabel="[A]", ylabel="[B]")
 
-# TODO: start from here
 # ## Figure 4.5A
 
 fig = plot(title="Fig. 4.5 A (Phase plot with nullclines)")
@@ -105,22 +104,22 @@ for sol in sols
 end
 
 ## nullclines
-
-contour!(fig, 0:0.01:2, 0:0.01:2, (x, y) -> ∂F44(x, y)[1], levels=[0], cbar=false, line=(:black))
+∂A44 = (x, y) -> prob.f([x, y], prob.p, nothing)[1]
+∂B44 = (x, y) -> prob.f([x, y], prob.p, nothing)[2]
+contour!(fig, 0:0.01:2, 0:0.01:2, ∂A44, levels=[0], cbar=false, line=(:black))
 plot!(fig, Float64[], Float64[], line=(:black), label="A nullcline")  ## Adding a fake line for the legend of A nullcline
-contour!(fig, 0:0.01:2, 0:0.01:2, (x, y) -> ∂F44(x, y)[2], levels=[0], cbar=false, line=(:black, :dash))
+contour!(fig, 0:0.01:2, 0:0.01:2, ∂B44, levels=[0], cbar=false, line=(:black, :dash))
 plot!(fig, Float64[], Float64[], line=(:black, :dash), label="B nullcline") ## Adding a fake line for the legend of B nullcline
 plot!(fig, xlim=(0.0, 2.0), ylim=(0.0, 2.0), legend=:bottomright, size=(600, 600), xlabel="[A]", ylabel="[B]", aspect_ratio=:equal)
 
 # ## Figure 4.5 B
-
 # Vector field
 fig = plot(title="Fig. 4.5 B (Vector field with nullclines)")
 quiver!(fig, xx, yy, quiver=∂F44, line=(:lightgrey), arrow=(:closed), aspect_ratio=:equal)
 
 # Nullclines
-contour!(fig, 0:0.01:2, 0:0.01:2, (x, y) -> ∂F44(x, y)[1], levels=[0], cbar=false, line=(:black))
+contour!(fig, 0:0.01:2, 0:0.01:2, ∂A44, levels=[0], cbar=false, line=(:black))
 plot!(fig, Float64[], Float64[], line=(:black), label="A nullcline")  ## Adding a fake line for the legend of A nullcline
-contour!(fig, 0:0.01:2, 0:0.01:2, (x, y) -> ∂F44(x, y)[2], levels=[0], cbar=false, line=(:black, :dash))
+contour!(fig, 0:0.01:2, 0:0.01:2, ∂B44, levels=[0], cbar=false, line=(:black, :dash))
 plot!(fig, Float64[], Float64[], line=(:black, :dash), label="B nullcline") ## Adding a fake line for the legend of B nullcline
 plot!(fig, xlim=(0.0, 2.0), ylim=(0.0, 2.0), legend=:bottomright, size=(600, 600), xlabel="[A]", ylabel="[B]")
