@@ -11,6 +11,7 @@ Plots.default(linewidth=2)
 
 #---
 rn = @reaction_network begin
+    @parameters L(t)
     (kRL * L, kRLm), R <--> RL
     kGa, G + RL --> Ga + Gbg + RL
     kGd0, Ga --> Gd
@@ -33,21 +34,15 @@ setdefaults!(rn, [
     :L => 0.
 ])
 
-osys = convert(ODESystem, rn; remove_conserved = true) |> structural_simplify
-
-#---
-observed(osys)
-
-#---
-@unpack L = osys
+@unpack L = rn
+discrete_events = [[200] => [L~1e-9], [800] => [L~0.0]]
+osys = convert(ODESystem, rn; discrete_events, remove_conserved = true) |> structural_simplify
 
 # ## Fig 6.5 A
-cb1 = PresetTimeCallback([200.0], i -> begin i.ps[L] = 1e-9; set_proposed_dt!(i, 0.01) end)
-cb2 = PresetTimeCallback([800.0], i -> begin i.ps[L] = 0.0; set_proposed_dt!(i, 0.01) end)
-cbs = CallbackSet(cb1, cb2)
-prob = ODEProblem(osys, [], (0., 1200.))
+tend = 1200.0
+prob = ODEProblem(osys, [], tend)
 
-sol = solve(prob, Rodas5(), callback=cbs, abstol=1e-8, reltol=1e-8, saveat=0:10:1200)
+sol = solve(prob, Rodas5P(), abstol=1e-8, reltol=1e-8)
 
 @unpack RL, Ga = osys
 plot(sol, idxs=[RL, Ga], title="Fig 6.05 (A)", xlabel="Time", ylabel="Abundance")
@@ -55,10 +50,7 @@ plot(sol, idxs=[RL, Ga], title="Fig 6.05 (A)", xlabel="Time", ylabel="Abundance"
 # ## Fig 6.5 B
 lrange = range(0, 20 * 1e-9, 101)
 
-prob_func = function(prob, i, repeat)
-    remake(prob, p=[L => lrange[i]])
-end
-
+prob_func = (prob, i, repeat) -> remake(prob, p=[L => lrange[i]])
 prob = SteadyStateProblem(osys, [], [])
 trajectories = length(lrange)
 alg = DynamicSS(Rodas5())

@@ -11,11 +11,12 @@ Plots.default(linewidth=2)
 
 #---
 rn = @reaction_network begin
+    @parameters I(t)
     (k1 * I, km1), R <--> RI
     (k2 * C, km2), RI <--> RIC
     (k3 * C, km3), RIC <--> RICC
     vr * (γ0 + γ1 * RIC) * (Cer - C), 0 --> C
-    hill(C, p1, p2, 4), C ⇒ 0
+    hill(C, p1, p2, 4), C => 0
 end
 
 #---
@@ -52,12 +53,12 @@ sol = solve(prob)
 plot(sol, idxs=[C, RIC, RICC], title="Fig 6.18 (A)", xlabel="Time", ylabel="Abundance", legend=:topright)
 
 # ## Fig 6.18 (B)
-cb1 = PresetTimeCallback([20.0], i -> begin i.ps[I] = 0.7; set_proposed_dt!(i, 0.01) end)
-cb2 = PresetTimeCallback([60.0], i -> begin i.ps[I] = 1.2; set_proposed_dt!(i, 0.01) end)
-cb3 = PresetTimeCallback([90.0], i -> begin i.ps[I] = 4.0; set_proposed_dt!(i, 0.01) end)
-cbs = CallbackSet(cb1, cb2, cb3)
 
-prob = ODEProblem(osys, [], (0., 120.))
-sol = solve(prob, callback=cbs)
+discrete_events = [[20] => [I ~ 0.7], [60] => [I ~ 1.2], [90] => [I ~ 4.0]]
+osys618 = convert(ODESystem, rn; discrete_events, remove_conserved = true) |> structural_simplify
+
+tend = 120.
+prob = ODEProblem(osys618, [], tend)
+sol = solve(prob)
 
 plot(sol, idxs=[osys.C], title="Fig 6.18 (B)", xlabel="Time", ylabel="Ca concentration", legend=false, ylim=(0, 2.5))

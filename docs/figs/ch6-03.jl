@@ -52,10 +52,7 @@ plot!(fig, title="Fig. 6.3 (A)", xlabel="Time", ylabel="Concentration")
 @unpack RL, Ps = osys
 lrange = 0:0.01:1
 
-prob_func = function(prob, i, repeat)
-    remake(prob, p=[L => lrange[i]])
-end
-
+prob_func = (prob, i, repeat) -> remake(prob, p=[L => lrange[i]])
 prob = SteadyStateProblem(osys, [], [])
 trajectories = length(lrange)
 alg = DynamicSS(Rodas5())

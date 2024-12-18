@@ -3,7 +3,6 @@
 
 Goodwin oscillator model: https://en.wikipedia.org/wiki/Goodwin_model_(biology)
 ===#
-
 using Catalyst
 using ModelingToolkit
 using DifferentialEquations
@@ -42,4 +41,4 @@ sol = solve(prob)
 plot(sol, title="Fig 7.17 (A)", xlabel="Time", ylabel="Concentration")
 
 #---
-plot(sol, idxs=(1, 2, 3), title="Fig 7.17 (B)", legend=false, size=(600, 600))
+plot(sol, idxs=(rn.X, rn.Y, rn.Z), title="Fig 7.17 (B)", legend=false, size=(600, 600))
