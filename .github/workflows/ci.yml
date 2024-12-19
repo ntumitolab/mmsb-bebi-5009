@@ -12,9 +12,10 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NBCONVERT_JOBS: '4'
-  LITERATE_PROC: '4'
+  NBCONVERT_JOBS: '2'
+  LITERATE_PROC: '2'
   OPENBLAS_NUM_THREADS: '1'
+  JULIA_NUM_THREADS: '2'
   ALLOWERRORS: 'false'
   NBCACHE: '.cache'
   JULIA_CONDAPKG_BACKEND: 'Null'
