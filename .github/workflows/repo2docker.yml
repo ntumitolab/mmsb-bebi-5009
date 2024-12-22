@@ -5,8 +5,11 @@ on:
     branches: [main]
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}-binder
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
+
+env:
+  APP_ID: '189113' # https://github.com/apps/wen-wei-s-pr-bot
 
 jobs:
   binder:
@@ -54,8 +57,19 @@ jobs:
       run: |
         mkdir -p binder
         echo "FROM ghcr.io/${{ github.repository }}:binder" > binder/Dockerfile
-    - name: Push changed file
-      uses: stefanzweifel/git-auto-commit-action@v5
+    # Authenticate with a custom GitHub APP
+      # https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#authenticating-with-github-app-generated-tokens
+    - name: Generate token for PR
+      uses: actions/create-github-app-token@v1
+      id: generate-token
       with:
-        commit_message: Apply binder cache file
-        push_options: --force
+        app-id: ${{ env.APP_ID }}
+        private-key: ${{ secrets.APP_PRIVATE_KEY }}
+    - name: Create Pull Request
+      id: cpr
+      uses: peter-evans/create-pull-request@v7
+      with:
+        title: Add binder docker image path
+        token: ${{ steps.generate-token.outputs.token }}
+        labels: |
+          automerge
