@@ -47,7 +47,15 @@ jobs:
         DOCKER_USERNAME: ${{ github.repository_owner }}
         DOCKER_PASSWORD: ${{ github.token }}
         IMAGE_NAME: ${{ github.repository }}
-        BINDER_CACHE: true
         PUBLIC_REGISTRY_CHECK: true
         LATEST_TAG_OFF: true
         ADDITIONAL_TAG: binder
+    - name: Write binder cache file
+      run: |
+        mkdir -p binder
+        echo "FROM ghcr.io/${{ github.repository }}:binder" > binder/Dockerfile
+    - name: Push changed file
+      uses: stefanzweifel/git-auto-commit-action@v5
+      with:
+        commit_message: Apply binder cache file
+        push_options: --force
