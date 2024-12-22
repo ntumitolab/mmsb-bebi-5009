@@ -1,0 +1,53 @@
+name: Repo2docker
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-binder
+  cancel-in-progress: true
+
+jobs:
+  binder:
+    runs-on: self-hosted
+    permissions:
+      packages: write
+      contents: write
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+    - name: Setup Julia
+      uses: julia-actions/setup-julia@v2
+    - name: Convert literate notebooks to ipynb files
+      shell: julia --color=yes {0}
+      working-directory: docs
+      run: |
+        import Pkg
+        Pkg.add("Literate")
+        using Literate
+        for (root, dirs, files) in walkdir(pwd())
+          for file in files
+            if endswith(file, ".jl")
+              nb = joinpath(root, file)
+              Literate.notebook(nb, dirname(nb); mdstrings=true, execute=false)
+            end
+          end
+        end
+    - name: Login to ghcr.io
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.repository_owner	}}
+        password: ${{ github.token }}
+    - name: Update binder docker image with repo2docker
+      uses: jupyterhub/repo2docker-action@master
+      with:
+        DOCKER_REGISTRY: ghcr.io
+        DOCKER_USERNAME: ${{ github.repository_owner }}
+        DOCKER_PASSWORD: ${{ github.token }}
+        IMAGE_NAME: ${{ github.repository }}
+        BINDER_CACHE: true
+        PUBLIC_REGISTRY_CHECK: true
+        LATEST_TAG_OFF: true
+        ADDITIONAL_TAG: binder
