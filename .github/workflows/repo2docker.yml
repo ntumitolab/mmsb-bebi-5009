@@ -10,7 +10,7 @@ concurrency:
 
 jobs:
   binder:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     permissions:
       packages: write
       contents: write
