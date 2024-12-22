@@ -44,7 +44,9 @@ jobs:
         username: ${{ github.repository_owner	}}
         password: ${{ github.token }}
     - name: Remove binder cache file
-      run: rm binder/Dockerfile || true
+      run: |
+        rm binder/Dockerfile || true
+        rm -r binder || true
     - name: Update binder docker image with repo2docker
       uses: jupyterhub/repo2docker-action@master
       with:
