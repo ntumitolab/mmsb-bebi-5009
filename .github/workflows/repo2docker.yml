@@ -45,7 +45,7 @@ jobs:
     - name: Install Python dependencies
       run: |
         pip install uv
-        uv pip install --system -r jupyter-repo2docker
+        uv pip install --system jupyter-repo2docker
     - name: Login to ghcr.io
       uses: docker/login-action@v3
       with:
