@@ -58,7 +58,7 @@ jobs:
         mkdir -p binder
         echo "FROM ghcr.io/${{ github.repository }}:binder" > binder/Dockerfile
     # Authenticate with a custom GitHub APP
-      # https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#authenticating-with-github-app-generated-tokens
+    # https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#authenticating-with-github-app-generated-tokens
     - name: Generate token for PR
       uses: actions/create-github-app-token@v1
       id: generate-token
