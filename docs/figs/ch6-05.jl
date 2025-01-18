@@ -6,6 +6,8 @@ Model of G-protein signalling pathway
 using ModelingToolkit
 using Catalyst
 using OrdinaryDiffEq
+using DiffEqCallbacks
+using SteadyStateDiffEq
 using Plots
 Plots.default(linewidth=2)
 
@@ -36,7 +38,7 @@ setdefaults!(rn, [
 
 @unpack L = rn
 discrete_events = [[200] => [L~1e-9], [800] => [L~0.0]]
-osys = convert(ODESystem, rn; discrete_events, remove_conserved = true) |> structural_simplify
+osys = convert(ODESystem, rn; discrete_events, remove_conserved = true) |> complete
 
 # ## Fig 6.5 A
 tend = 1200.0
