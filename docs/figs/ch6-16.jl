@@ -5,7 +5,7 @@ Model of apoptosis signalling pathway
 ===#
 using Catalyst
 using ModelingToolkit
-using DifferentialEquations
+using OrdinaryDiffEq
 using Plots
 Plots.default(linewidth=2)
 

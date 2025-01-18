@@ -5,7 +5,8 @@ Continuation diagram
 
 See also [BifurcationKit.jl](https://github.com/bifurcationkit/BifurcationKit.jl)
 ===#
-using DifferentialEquations
+using OrdinaryDiffEq
+using SteadyStateDiffEq
 using ModelingToolkit
 using Plots
 Plots.default(linewidth=2)

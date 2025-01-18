@@ -5,7 +5,7 @@ Collins toggle switch
 
 For Figures 1.7, 7.13, 7.14, 7.15
 ===#
-using DifferentialEquations
+using OrdinaryDiffEq
 using ModelingToolkit
 using Plots
 Plots.default(linewidth=2)

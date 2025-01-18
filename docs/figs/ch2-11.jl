@@ -3,7 +3,7 @@
 
 Model reduction of ODE metabolic networks.
 ===#
-using DifferentialEquations
+using OrdinaryDiffEq
 using Catalyst
 using ModelingToolkit
 using Plots
@@ -18,8 +18,8 @@ end
 
 #---
 @unpack k0, k1, km1, k2, A, B = rn211
-ps1 = [k0=>0., k1=>9., km1=>12., k2=>2.]
-u0 = [A=>0., B=>10.]
+ps1 = [k0 => 0.0, k1 => 9.0, km1 => 12.0, k2 => 2.0]
+u0 = [A => 0.0, B => 10.0]
 tend = 3.0
 sol211 = solve(ODEProblem(rn211, u0, tend, ps1))
 
@@ -34,7 +34,7 @@ plot(
 
 # ## Figure 2.12 : Rapid equilibrium assumption
 
-function make_212(;name)
+function make_212(; name)
     @parameters k0 k1 km1 k2
     @independent_variables t
     @variables A(t) B(t) C(t)
@@ -64,9 +64,9 @@ independent_variables(model212)
 
 #---
 @unpack k0, k1, km1, k2, C, A, B = model212
-ps1 = [k0=>0., k1=>9., km1=>12., k2=>2.]
-u0 = [C=>10.]
-tend = 3.
+ps1 = [k0 => 0.0, k1 => 9.0, km1 => 12.0, k2 => 2.0]
+u0 = [C => 10.0]
+tend = 3.0
 prob = ODEProblem(model212, u0, tend, ps1)
 sol212 = solve(prob)
 
@@ -87,8 +87,8 @@ fig
 When another set of parameters is not suitable for rapid equilibrium assumption.
 ===#
 
-ps2 = [k0=>9., k1=>20., km1=>12., k2=>2.]
-u0 = [A=>8., B=>4.]
+ps2 = [k0 => 9.0, k1 => 20.0, km1 => 12.0, k2 => 2.0]
+u0 = [A => 8.0, B => 4.0]
 tend = 3.0
 
 sol213full = solve(ODEProblem(rn211, u0, tend, ps2))
@@ -110,13 +110,13 @@ fig
 Quasi-steady state assumption on species A
 ===#
 
-function make_214(;name)
+function make_214(; name)
     @parameters k0 k1 km1 k2
     @independent_variables t
     @variables A(t) B(t)
     D = Differential(t)
     eqs = [
-        A ~ (k0 + km1 * B)/k1
+        A ~ (k0 + km1 * B) / k1
         D(B) ~ k1 * A - (km1 + k2) * B
     ]
     return ODESystem(eqs, t; name)

@@ -3,7 +3,7 @@
 
 Steady states and phase plots in an asymmetric network.
 ===#
-using DifferentialEquations
+using OrdinaryDiffEq
 using ModelingToolkit
 using Plots
 Plots.default(linewidth=2)

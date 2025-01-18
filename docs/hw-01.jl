@@ -12,7 +12,7 @@ with initial condition $x(t=0)=0.0$
 
 ## Part 1: Julia's ODE solver
 
-Please **solve** the ODE using `DifferentialEquations.jl` for $t \in [0.0, 5]$ and **plot** the time series. **Compare** it to the analytical solution *in one plot*.
+Please **solve** the ODE using `OrdinaryDiffEq.jl` for $t \in [0.0, 5]$ and **plot** the time series. **Compare** it to the analytical solution *in one plot*.
 
 ## Part 2: The forward Euler method
 

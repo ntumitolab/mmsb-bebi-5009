@@ -5,7 +5,7 @@ Metabolic network simulation
 
 Using `Catalyst.jl` to simulate a metabolic network.
 ===#
-using DifferentialEquations
+using OrdinaryDiffEq
 using Catalyst
 using ModelingToolkit
 using Plots
