@@ -5,7 +5,7 @@ Model of G-protein signalling pathway
 ===#
 using ModelingToolkit
 using Catalyst
-using DifferentialEquations
+using OrdinaryDiffEq
 using Plots
 Plots.default(linewidth=2)
 

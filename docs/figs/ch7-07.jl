@@ -5,7 +5,7 @@ model of lac operon in E. coli
 ===#
 using Catalyst
 using ModelingToolkit
-using DifferentialEquations
+using OrdinaryDiffEq
 using Plots
 Plots.default(linewidth=2)
 

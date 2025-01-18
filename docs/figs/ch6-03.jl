@@ -4,7 +4,7 @@ Two component pathway
 ===#
 using ModelingToolkit
 using Catalyst
-using DifferentialEquations
+using OrdinaryDiffEq
 using Plots
 Plots.default(linewidth=2)
 

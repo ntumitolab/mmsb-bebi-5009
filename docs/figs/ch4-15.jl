@@ -1,7 +1,7 @@
 # # Fig 4.15, 4.16, 4.17
 # Oscillatory networks.
 # ## Figure 4.15 (A)
-using DifferentialEquations
+using OrdinaryDiffEq
 using ModelingToolkit
 using Plots
 Plots.default(linewidth=2)
