@@ -23,7 +23,7 @@ env:
 
 jobs:
   CI:
-    runs-on: self-hosted
+    runs-on: [self-hosted, aorus]
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
