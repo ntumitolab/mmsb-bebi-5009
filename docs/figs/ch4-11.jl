@@ -1,7 +1,7 @@
 #===
 # Fig 4.11
 
-Surface plots reference: [surface plots @ PlotsGallery.jl](https://goropikari.github.io/PlotsGallery.jl/src/surface.html)
+Surface plots
 ===#
 using Plots
 Plots.default(linewidth=2)
