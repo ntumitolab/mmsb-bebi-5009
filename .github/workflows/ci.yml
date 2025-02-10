@@ -12,10 +12,10 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NBCONVERT_JOBS: '6'
-  LITERATE_PROC: '6'
-  OPENBLAS_NUM_THREADS: '1'
+  NBCONVERT_JOBS: '2'
+  LITERATE_PROC: '2'
   JULIA_NUM_THREADS: '2'
+  OPENBLAS_NUM_THREADS: '1'
   ALLOWERRORS: 'false'
   NBCACHE: '.cache'
   JULIA_CONDAPKG_BACKEND: 'Null'
@@ -23,7 +23,7 @@ env:
 
 jobs:
   CI:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -40,11 +40,10 @@ jobs:
       id: read_toml
       run: echo value=$(python -c 'import tomllib; from pathlib import Path; print(tomllib.loads(Path("Manifest.toml").read_text())["julia_version"])') >> "$GITHUB_OUTPUT"
     - name: Get environment hash
-      id: jl
+      id: hash
       run: |
-        echo "pkg=${{ hashFiles('Project.toml', 'Manifest.toml', 'src/**') }}" >> "$GITHUB_OUTPUT"
+        echo "value=${{ hashFiles('Project.toml', 'Manifest.toml', 'src/**') }}" >> "$GITHUB_OUTPUT"
         echo "ver=${{ runner.os }}-julia-${{ steps.read_toml.outputs.value }}" >> "$GITHUB_OUTPUT"
-        echo "doc=${{ hashFiles('docs/**/*.ipynb', 'docs/**/*.jl') }}" >> "$GITHUB_OUTPUT"
     - name: Cache executed notebooks
       uses: actions/cache@v4
       id: cache-nb
@@ -52,9 +51,9 @@ jobs:
         path: |
           ${{ env.NBCACHE }}/**/*.ipynb
           ${{ env.NBCACHE }}/**/*.sha
-        key: nb-${{ steps.jl.outputs.pkg }}-${{ steps.jl.outputs.doc }}
+        key: notebook-${{ steps.hash.outputs.value }}-${{ hashFiles('docs/**/*.ipynb', 'docs/**/*.jl') }}
         restore-keys: |
-          nb-${{ steps.jl.outputs.pkg }}-
+          notebook-${{ steps.hash.outputs.value }}-
     - name: Setup Julia
       uses: julia-actions/setup-julia@v2
       with:
@@ -65,14 +64,12 @@ jobs:
       id: cache-julia
       with:
         path: ~/.julia
-        key: jlpkg-${{ steps.jl.outputs.ver }}-${{ steps.jl.outputs.pkg }}
+        key: ${{ steps.hash.outputs.ver }}-${{ steps.hash.outputs.value }}
         restore-keys: |
-          jlpkg-${{ steps.jl.outputs.ver }}-
+          ${{ steps.hash.outputs.ver }}-
     - name: Install Julia packages
       if: ${{ runner.environment == 'self-hosted' || steps.cache-julia.outputs.cache-hit != 'true' }}
       shell: julia --color=yes {0}
-      env:
-        JUPYTER: 'jupyter'
       run: |
         using Pkg
         Pkg.add(["IJulia", "Literate", "Tables", "MarkdownTables", "JSON"])
@@ -93,7 +90,7 @@ jobs:
         key: ${{ steps.cache-julia.outputs.cache-primary-key }}
     - name: Run notebooks
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' }}
-      run: julia --project=@. --color=yes -p ${{ env.LITERATE_PROC }} ci.jl
+      run: julia --project=@. --color=yes -p ${{ env.LITERATE_PROC }} .github/ci.jl
     - name: Copy back built notebooks
       run: cp --verbose -rf ${{ env.NBCACHE }}/docs/* docs/
     - name: Build website
