@@ -9,10 +9,9 @@ $$
 
 with initial condition $x(t=0)=0.0$
 
-
 ## Part 1: Julia's ODE solver
 
-Please **solve** the ODE using `OrdinaryDiffEq.jl` for $t \in [0.0, 5]$ and **plot** the time series. **Compare** it to the analytical solution *in one plot*.
+Please **solve** the ODE using `OrdinaryDiffEq.jl` (optionally `ModelingToolkit.jl`) for $t \in [0, 5]$ and **plot** the time series. **Compare** it to the analytical solution *in one plot*.
 
 ## Part 2: The forward Euler method
 
@@ -35,7 +34,7 @@ end
 # Forward Euler method
 euler(model, u, p, t, dt) = u .+ dt .* model(u, p, t)
 
-# The self-made ODE solver
+# The home-grown ODE solver
 function mysolve(model, u0, tspan, p; dt=0.1, method=euler)
     ## Time points
     ts = tspan[begin]:dt:tspan[end]
@@ -47,7 +46,7 @@ function mysolve(model, u0, tspan, p; dt=0.1, method=euler)
     for i in 1:length(ts)-1
         us[i+1, :] .= method(model, us[i, :], p, ts[i], dt)
     end
-    ## Results
+    ## Retrun results
     return (t = ts, u = us)
 end
 
@@ -59,21 +58,20 @@ u0 = 0.0
 # Solve the problem
 sol = mysolve(model, u0, tspan, p, dt=1.0, method=euler)
 
-# Numerical solution
+# Analytical solution
 analytical(t) = 1 - exp(-t)
 
 # Visualization
 using Plots
 Plots.default(linewidth=2)
 
-fig = plot(sol.t, sol.u, label="FE method")
-plot!(fig, analytical, sol.t[begin], sol.t[end], label = "Analytical solution", linestyle=:dash)
+plot(sol.t, sol.u, label="FE method")
+plot!(analytical, sol.t[begin], sol.t[end], label = "Analytical solution", linestyle=:dash)
 
 #===
-
 ## Part 3: The RK4 method
 
-1. Please **try** a range of dts to **solve** the ODE using the (home-made) fourth order Runge-Kutta ([RK4](https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods)) method for $t \in [0.0, 5.0]$, **plot** the time series, and **compare** them to the analytical solution *in one plot*. In which way are dts related to accuracy?
+1. Please **try** a range of dts to **solve** the ODE using the (home-grown) fourth order Runge-Kutta ([RK4](https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods)) method for $t \in [0.0, 5.0]$, **plot** the time series, and **compare** them to the analytical solution *in one plot*. In which way are dts related to accuracy?
 2. Compared to the forward Euler method, which one is more accurate for the same `dt`? Please make a visual comparison by plotting the analytical solution, Euler's solution, and RK4's solution together.
 
 **About the RK4 method**
@@ -104,5 +102,4 @@ end
 
 sol = mysolve(model, u0, tspan, p, dt=1.0, method=rk4)
 ```
-
 ===#
