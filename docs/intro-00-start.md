@@ -2,12 +2,12 @@
 
 See [Julia in Visual Studio Code](https://code.visualstudio.com/docs/languages/julia) for details.
 
-## Installation
+## Tools
 
-- [Install Julia](https://julialang.org/downloads/) in the official website or via the [Windows store](https://www.microsoft.com/zh-tw/p/julia/9njnww8pvkmn?rtc=1&activetab=pivot:overviewtab).
-- [Install VS Code](https://code.visualstudio.com/).
-- [Install Julia extension for VS Code](https://marketplace.visualstudio.com/items?itemName=julialang.language-julia). See alos [Julia extension's website](https://www.julia-vscode.org/).
-- (Optional) [Install Jupyter extension for VS Code](https://marketplace.visualstudio.com/items?itemName=ms-toolsai.jupyter) for opening and running Jupyter notebooks in VS Code.
+- Install [Julia](https://julialang.org/downloads/) in the official website or via the [Windows store](https://www.microsoft.com/zh-tw/p/julia/9njnww8pvkmn?rtc=1&activetab=pivot:overviewtab).
+- Install [VS Code](https://code.visualstudio.com/).
+- Install the [Julia extension for VS Code](https://www.julia-vscode.org/). See also [Julia extension's website]().
+- (Optional) Install the [Jupyter extension for VS Code](https://marketplace.visualstudio.com/items?itemName=ms-toolsai.jupyter) for opening and running Jupyter notebooks in VS Code.
 
 ## Running Julia in VS Code
 
@@ -28,18 +28,14 @@ In the Julia script
 ```julia
 using Pkg
 
-# Function form
+# Using the current directory as the project folder
+Pkg.activate(".")
+
+# Or: Using the directory where the script resides as the project folder
+Pkg.activate(@__DIR__)
+
+# Add packages
 Pkg.add("Plots")
-
-# Or use Pkg's special strings
-pkg"add Plots"
-```
-
-
-In the Julia REPL:
-
-```julia-repl
-] add Plots
 ```
 
 ### See installed packages
@@ -47,16 +43,6 @@ In the Julia REPL:
 ```julia
 using Pkg
 Pkg.status()
-
-# Or
-pkg"st" # pkg"status"
-
-```
-
-In the Julia REPL:
-
-```julia-repl
-] st
 ```
 
 ### Remove packages
@@ -64,13 +50,6 @@ In the Julia REPL:
 ```julia
 using Pkg
 Pkg.remove("Plots")
-
-# Or
-pkg"rm Plots"
-```
-
-```julia-repl
-] rm Plots
 ```
 
 ### Update installed packages
@@ -78,9 +57,6 @@ pkg"rm Plots"
 ```julia
 using Pkg
 Pkg.update()
-
-# Or
-pkg"up" # pkg"update"
 ```
 
 ### Create / Use a environment
@@ -94,10 +70,10 @@ Pkg.activate("foldername")
 
 # Or activate the current working directory
 # current_project() is a little bit misleading
-# since it actually looks for available Project.toml file
+# since it actually looks for an available Project.toml file
 Pkg.activate(".")
 
-# Install the packages according to the environment
+# Reproduce the environment
 Pkg.instantiate()
 
 # If the above failed, try this
