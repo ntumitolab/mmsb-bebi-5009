@@ -1,5 +1,3 @@
-#===
-
 # Mathematical Modeling in Systems Biology
 
 ## Course information
@@ -36,13 +34,3 @@ Other topics:
 
 - Agent-based modeling (ABM)
 - (Metabolic) flux balance analysis
-
-===#
-
-# ## Runtime information
-import Pkg
-Pkg.status()
-
-#---
-import InteractiveUtils
-InteractiveUtils.versioninfo()
