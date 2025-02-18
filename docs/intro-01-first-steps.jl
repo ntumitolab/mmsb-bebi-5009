@@ -79,29 +79,6 @@ typeof(Float64(x))
 typeof(float(x))
 
 #===
-## Compound expressions (Code blocks)
-
-- A [begin block](https://docs.julialang.org/en/v1/base/base/#begin) `begin` ... `end` squashes multiple expressions into one.
-- A [let block](https://docs.julialang.org/en/v1/manual/variables-and-scoping/#Let-Blocks) `let` ... `end` is similar to a begin block but variables inside will be discarded outside the block.
-===#
-
-# a1 and a2 are available after begin block ends
-begin
-	a1 = 2
-	a2 = 35
-	a1 = a1 * a2
-end
-
-# x, y, z are NOT available after let block ends
-let
-	x = 1
-	y = 2
-	z = 3
-
-	x + y * z
-end
-
-#===
 ## Math expressions
 
 Julia supports basic arithmatic operations and essential math functions by default.
@@ -243,6 +220,29 @@ string("The class is ", str1, '-', str2, ".")
 str1*"-"*str2
 
 #===
+## Compound expressions (Code blocks)
+
+- A [begin block](https://docs.julialang.org/en/v1/base/base/#begin) `begin` ... `end` squashes multiple expressions into one.
+- A [let block](https://docs.julialang.org/en/v1/manual/variables-and-scoping/#Let-Blocks) `let` ... `end` is similar to a begin block but variables inside will be discarded outside the block.
+===#
+
+# a1 and a2 are available after begin block ends
+begin
+	a1 = 2
+	a2 = 35
+	a1 = a1 * a2
+end
+
+# x, y, z are NOT available after let block ends
+let
+	x = 1
+	y = 2
+	z = 3
+
+	x + y * z
+end
+
+#===
 ## Control flow
 
 - [control flow](https://docs.julialang.org/en/v1/manual/control-flow/)
@@ -299,7 +299,7 @@ end
 
 Repeated evaluations in a code block.
 
-While loop:
+While loop (we will use it to solve stochastic simulations)
 
 ```julia
 while cond
@@ -307,7 +307,7 @@ while cond
 end
 ```
 
-For loop:
+For loop (we will use it to solve ODEs)
 
 ```julia
 for i in seq
@@ -344,7 +344,7 @@ let n = 100
     s
 end
 
-# For loop
+# How `continue` and `break` work
 for x in 1:9
     if x == 5
         continue ## jump to `x in 1:9`
@@ -354,8 +354,8 @@ for x in 1:9
     println(x, "^2 = ", x^2)
 end
 
-# Use enumerate(seq) to get a pair of idx and element
-for (i, x) in [2, 3, 5, 7, 9, 11, 13]
+# You can use `enumerate(seq)` to get a pair of index number and the element.
+for (i, x) in enumerate([2, 3, 5, 7, 9, 11, 13])
     println("xs[", i, "] = ", x)
 end
 
