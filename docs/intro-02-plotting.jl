@@ -72,8 +72,8 @@ fig = plot(ax1, ax2, layout=(2, 1))
 ```julia
 # Quiver plot
 quiver(vec(x2d), vec(y2d), quiver=(vec(vx2d), vec(vy2d))
-# Or if you have a function f(x,y) -> (vx, vy)
-quiver(x2d, y2d, quiver=f)
+# Or if you have a gradient function ∇f(x,y) -> (vx, vy)
+quiver(x2d, y2d, quiver=∇f)
 ```
 
 ### `PythonPlot.jl`:

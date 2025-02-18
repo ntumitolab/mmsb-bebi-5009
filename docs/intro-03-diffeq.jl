@@ -17,7 +17,7 @@
 
 Documentation: <https://docs.sciml.ai/DiffEqDocs/stable/>
 
-### Exponential decay model
+### Single varaible: Exponential decay model
 
 The concentration of a decaying nuclear isotope could be described as an exponential decay:
 
@@ -59,9 +59,9 @@ sol.u
 plot(sol)
 
 #===
-### SIR model
+### Three variables: The SIR model
 
-This 3-variable model describes the spreading of an contagious disease can be described by the [SIR model](https://en.wikipedia.org/wiki/Compartmental_models_in_epidemiology):
+The SIR model describes the spreading of an contagious disease can be described by the [SIR model](https://en.wikipedia.org/wiki/Compartmental_models_in_epidemiology):
 
 $$
 \begin{align}
@@ -87,7 +87,7 @@ using OrdinaryDiffEq
 using Plots
 Plots.default(linewidth=2)
 
-# SIR model (in-place form)
+# SIR model (in-place form can save array allocations and thus faster)
 function sir!(du, u, p, t)
     s, i, r = u
     β, γ = p
@@ -139,6 +139,35 @@ prob = ODEProblem(expdecaySys, u0, tspan, p)
 sol = solve(prob)
 plot(sol)
 
+# ### SIR model
+using OrdinaryDiffEq
+using ModelingToolkit
+using Plots
+Plots.default(linewidth=2)
+
+@independent_variables t
+@parameters β γ
+@variables s(t) i(t) r(t)
+D = Differential(t)
+
+eqs = [
+    D(s) ~ -β * s * i,
+    D(i) ~ β * s * i - γ * i,
+    D(r) ~ γ * i
+]
+
+@mtkbuild sirSys = ODESystem(eqs, t)
+
+#---
+p = [β => 1.0, γ => 0.3]
+u0 = [s => 0.99, i => 0.01, r => 0.00]
+tspan = (0.0, 20.0)
+
+prob = ODEProblem(sirSys, u0, tspan, p)
+sol = solve(prob)
+
+plot(sol)
+
 #===
 ### Lorenz system
 
@@ -157,6 +186,7 @@ using ModelingToolkit
 using Plots
 Plots.default(linewidth=2)
 
+# Builing the model is wrapped in a function
 function build_lorentz(; name)
     @parameters begin
         σ = 10.0
@@ -205,35 +235,6 @@ using CSV
 df = DataFrame(sol)
 CSV.write("lorenz.csv", df)
 rm("lorenz.csv")
-
-# ### SIR model (MTK)
-using OrdinaryDiffEq
-using ModelingToolkit
-using Plots
-Plots.default(linewidth=2)
-
-@independent_variables t
-@parameters β γ
-@variables s(t) i(t) r(t)
-D = Differential(t)
-
-eqs = [
-    D(s) ~ -β * s * i,
-    D(i) ~ β * s * i - γ * i,
-    D(r) ~ γ * i
-]
-
-@mtkbuild sirSys = ODESystem(eqs, t)
-
-#---
-p = [β => 1.0, γ => 0.3]
-u0 = [s => 0.99, i => 0.01, r => 0.00]
-tspan = (0.0, 20.0)
-
-prob = ODEProblem(sirSys, u0, tspan, p)
-sol = solve(prob)
-
-plot(sol)
 
 #===
 ## Catalyst.jl

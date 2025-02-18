@@ -4,7 +4,7 @@ md"""
 
 ## Comments
 
-Comments are non-coding part in the source code. Although the compiler does not read comments, comments are important notes for humans, making the code more readable (hopefully).
+Comments are non-coding parts in the source code. Although the compiler does not read comments, comments are important notes for humans, making the code more readable (hopefully).
 
 ```julia
 # One line comments
@@ -33,22 +33,19 @@ x = 1
 # A (64-bit) floating-point number
 y = 1.0
 
-# Also a (64-bit) floating-point
-y = 1.
-
 # A 32-bit floating-point number. less accurate but calculates faster. Often used in GPU computing.
 y = 1.0f0
 
 # Complex number
 z = 3 + 5im
 
-# Unicode names: "\alpha<tab>"
+# Unicode names are supported. For example, `\alpha<tab>`
 α = 3.74
 
-# Strings (Text) are surrounded by double quotes. NOT SINGLE QUOTES!
+# Strings (Text) are surrounded by **double** quotes.
 s = "Julia"
 
-# Characters are surrounded by single quotes
+# Characters are surrounded by single quotes.
 c = ' '
 
 # Fractions (rational numbers)
@@ -57,7 +54,7 @@ station = 9 + 3//4
 # Constants will emit a warning if you try to change it after its creation
 const theUltimateAnswer = 42
 
-#---
+# Print content to the terminal
 println("Hello World")
 
 #---
@@ -66,26 +63,26 @@ println("Hello ", s)
 #---
 println(1, 2, 3)
 
-# @show will print x = val
+# `@show` will print x = val
 @show x	1+1 2-2 3*3;
 
-#---
+# Types of the data
 @show typeof(x) typeof(y) typeof(c)  typeof(s) typeof(z) typeof(1//2);
 
-# `convert(T,x)`` converts x to type T
+# `convert(T,x)` converts x to type T
 typeof(convert(Float64, x))
 
 # There is also `Type(x)`
 typeof(Float64(x))
 
-# Or this convenience function
+# Converts numbers to floating numbers
 typeof(float(x))
 
 #===
-## Compound expressions
+## Compound expressions (Code blocks)
 
 - A [begin block](https://docs.julialang.org/en/v1/base/base/#begin) `begin` ... `end` squashes multiple expressions into one.
-- A [let block](https://docs.julialang.org/en/v1/manual/variables-and-scoping/#Let-Blocks) `let` ... `end` is similar to a begin block but variables inside will be discarded outside.
+- A [let block](https://docs.julialang.org/en/v1/manual/variables-and-scoping/#Let-Blocks) `let` ... `end` is similar to a begin block but variables inside will be discarded outside the block.
 ===#
 
 # a1 and a2 are available after begin block ends
@@ -140,9 +137,9 @@ b % a
 a^b
 
 #===
-## Comparison
+### Comparison
 
-Returns a Boolean value (`true` / `false`)
+Returns a boolean value (`true` or `false`)
 ===#
 
 a, b = 2, 3
@@ -171,9 +168,10 @@ a == b + 1
 # The same as
 isapprox(1e10 + 1.0, 1e10)
 
-# ## Math functions
+# ### Math functions
+# [Math functions in Julia](https://docs.julialang.org/en/v1/base/math/#Mathematical-Functions)
 
-# `\pi<TAB>`
+# How to type π : `\pi<TAB>`
 sin(0.5*π)
 
 # More precise
@@ -197,11 +195,10 @@ log10(10)
 # Natural exponant
 exp(-5)
 
-# expm1(x) is more accurate that exp(x) - 1 when x is very close to zero
+# expm1(x) is more accurate that exp(x) - 1 when x is very close to zero.
 exp(1e-12) - 1, expm1(1e-12)
 
 #===
-
 ## Strings
 
 - [Think Julia ch8](https://benlauwens.github.io/ThinkJulia.jl/latest/book.html#chap08)
@@ -217,9 +214,7 @@ A `string` is a sequence of characters.
 - `[idx]` to access an individual character.
 - `$` to insert (or interpolate) a value into a string.
 
-
-Although `string(x, y)` looks less streamlined, it is generally faster than interpolation `$` or concatenation `*` and is most recommended.
-
+Although `string(x, y)` looks less streamlined, it is generally faster than interpolation `$` or concatenation `*`.
 ===#
 
 "I am a string."
@@ -241,19 +236,17 @@ str1 = "BEBI"
 str2 = "5009"
 string("The class is ", str1, '-', str2, ".")
 
-# Use string interpolation
+# String interpolation `$`
 "The class is $(str1)-$(str2)."
 
-# concat string using `*`
+# String concatenation `*`
 str1*"-"*str2
 
 #===
-
 ## Control flow
 
 - [control flow](https://docs.julialang.org/en/v1/manual/control-flow/)
 - [functions](https://docs.julialang.org/en/v1/manual/functions/)
-
 
 Julia programs are able to run nonlinearly by controlling its execution flow.
 
@@ -264,29 +257,29 @@ Julia programs are able to run nonlinearly by controlling its execution flow.
 - `if` blocks are "leaky", i.e. they do not introduce a local scope. (The same as Python)
 - Only boolean (true / false) could be evaluated in `if` blocks. Using other types (e.g. Int) will generate an error.
 
+#### Ternary operator
+
+`cond ? T:F`
+
 #### ifelse function
 
-All the arguments are evaluated first in `ifelse(cond, tvalue, fvalue)`.
-
+A no-branching alternative. All the arguments are evaluated first in `ifelse(cond, tvalue, fvalue)`.
 
 #### short cicuit evaluation
 
-`&&` (logical and) and `||` (logical or) operators support [short circuit evaluation](
-Short-circuit evaluation - Wikipedia
-https://en.wikipedia.org › wiki › Short-circuit_evaluation).
+`&&` (logical and) and `||` (logical or) operators support [short circuit evaluation](https://en.wikipedia.org/wiki/Short-circuit_evaluation).
 
 - In the expression `a && b`, the subexpression `b` is only evaluated if `a` evaluates to true.
 - In the expression `a || b`, the subexpression `b` is only evaluated if `a` evaluates to false.
-
 ===#
 
-# && evaluates and returns the second argument if the first is true
+# Short circuit and `&&` evaluates and returns the second argument if the first is true
 (2 > 1) && println("Hi")
 
-# && otherwise returns false
+# otherwise it returns false
 (2 < 1) && println("Hi")
 
-# `if` block has return value(s)
+# A `if` block can return value(s)
 let score = 10
     response = if 80 < score <= 100
         "Good"
@@ -304,14 +297,28 @@ end
 #===
 ### Loops
 
-Loops are repeated evaluations of a code block.
+Repeated evaluations in a code block.
 
-- `while` loops are often related to a predicate.
-- `for` loops are often related to a sequence.
+While loop:
 
+```julia
+while cond
+    expr
+end
+```
+
+For loop:
+
+```julia
+for i in seq
+    expr
+end
+```
+
+Loop controls:
 
 - `break`: exit the loop immediately.
-- `continue`: move on to the next item / evaluation immediately.
+- `continue`: move on to the predicate immediately.
 ===#
 
 # Hailstone sequence (3n+1 problem) in a while loop
@@ -340,15 +347,15 @@ end
 # For loop
 for x in 1:9
     if x == 5
-        continue ## jump to line #2
+        continue ## jump to `x in 1:9`
     elseif x >=8
-        break    ## jump to line #9
+        break    ## jump to the end of loop
     end
     println(x, "^2 = ", x^2)
 end
 
 # Use enumerate(seq) to get a pair of idx and element
-for (i, x) in enumerate(10:-1:1)
+for (i, x) in [2, 3, 5, 7, 9, 11, 13]
     println("xs[", i, "] = ", x)
 end
 
@@ -363,27 +370,27 @@ end
 > In Julia, a function is an object that maps a tuple of argument values to a return value.
 > [Julia docs](https://docs.julialang.org/en/v1/manual/functions/)
 
-
-Functions facilitate:
+Functions could do:
 - Code reuse and encapsulation.
-- Specializations ([Methods](https://docs.julialang.org/en/v1/manual/methods/))
+- Specializations of [Methods](https://docs.julialang.org/en/v1/manual/methods/) for different data types.
 
+Notes:
 - Functions are first-class objects and can be passed into a higher-order function.
-- The arguments are "passed-by-sharing". Modifications to mutable argument values (such as `Arrays`) will be reflected to the caller. (Similar to Python)
-- Functions that will update the arguments are named with a bang `!` by convention. (e.g. sort(arr) vs sort!(arr))
-- Often only the scalar version of a function is required; for vector element-wise operations, there are broadcast (dot) syntax.
-- You can write multiple function with the same name provided they have different parameter lists. Julia will choose the most apporpriate one for you.
-
-### Standard form
+- The arguments are "passed-by-sharing" (Similar to Python). Modifications to mutable argument values (such as `Arrays`) will be reflected to the caller.
+- By convention, functions that will update the arguments are named with a bang `!`. (e.g. `sort(arr)` vs `sort!(arr)`)
+- For element-wise operations, use the broadcast (dot) syntax. e.g. `sqrt.(arr)`
+- You can write multiple functions with the same name provided they have distinct parameters. Julia will choose the most apporpriate one accroding to the input.
 ===#
+
+# ### Standard form
 
 "Mechaelis-Menton function"  ## Function documentations
 function mm(x, k)            ## function name and parameter list
-  result = x / (x +k)        ## Doing calculations
-  return result              ## return statement is optional
-end
+    result = x / (x +k)      ## Doing stuff
+    return result            ## Return statement
+end                          ## End of function
 
-#---
+# Call the function
 mm(1, 0.5)
 
 # ### One-liner form
@@ -398,7 +405,7 @@ mm(1)
 #===
 ### Anonymous functions
 
-Anonymous functions are often used with other functions that take in another function. e.g. `map()`
+Anonymous functions are often used with other functions that take in another function. e.g. `map(func, seq)`
 ===#
 
 g = x->x^2
@@ -407,7 +414,7 @@ g(3)
 #---
 map(x->x^2, 1:3)
 
-# Use [`do` block](https://docs.julialang.org/en/v1/manual/functions/#Do-Block-Syntax-for-Function-Arguments) for long anonymous functions.
+# Use the [`do` block](https://docs.julialang.org/en/v1/manual/functions/#Do-Block-Syntax-for-Function-Arguments) for long anonymous functions.
 
 val = rand(-6:6, 10)
 
@@ -423,6 +430,23 @@ map(val) do x
 end
 
 #===
+The same as
+
+```julia
+map(x -> begin
+    res = if x < 0 && iseven(x)
+        zero(x)
+    elseif x == 0
+        one(x)
+    else
+        x
+    end
+    res
+end, val)
+```
+===#
+
+#===
 
 ### Optional arguments
 
@@ -430,7 +454,7 @@ end
 
 ```julia
 function func(a, b, c=1)
-
+    ## do_stuff
 end
 ```
 
@@ -442,17 +466,13 @@ And they are called with `func(a, b)` or `func(a, b, 3)`
 
 ```julia
 function plot(x, y; style="solid", width=1, color="black")
-    ...
+    ## do_stuff
 end
 ```
 
 And they are called with `plot(x, y, width=2)` or `plot(x, y; width=2)`
 
 ===#
-
-args_kwargs(args...; kwargs...) = (args, kwargs)  ## Note the semicolon
-
-args_kwargs(1, 2, 3; a=4, b=5.0, c="Hello")
 
 #===
 
@@ -465,8 +485,8 @@ args_kwargs(1, 2, 3; a=4, b=5.0, c="Hello")
 ===#
 
 #===
+## Collections
 
-## Collections, broadcasting, and Methods
 Using built-in collections is the simplest way to group and organize data.
 
 The values in a `immutable` collection cannot be updated after its creation, while in a `mutable` collection can.
@@ -777,7 +797,7 @@ exp10.(LinRange(-3.0, 3.0, 50))
 collect(1:9) .* transpose(collect(1:9))
 
 #===
-## Custom data structures
+## Custom data structures and Methods
 
 https://docs.julialang.org/en/v1/manual/types/#Composite-Types
 ===#
@@ -811,7 +831,7 @@ You can overload the same function with different argument types/numbers. Julia 
 
 func(a::Int) = a + 2
 func(a::AbstractFloat) = a/2
-func(a::Rational) = a/11
+func(a::Rational) = a//11
 func(a::Complex) = sqrt(a)
 func(a, b::String) = "$a, $b"
 
@@ -828,4 +848,4 @@ func(33//4)
 func(-2 + 0im)
 
 #---
-func(true, "it just works and compiles down to optimal code")
+func(true, "it just works")

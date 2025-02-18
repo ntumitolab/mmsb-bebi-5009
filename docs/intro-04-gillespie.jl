@@ -8,53 +8,38 @@ using Plots
 using Interpolations
 using Statistics        ## mean()
 using Random            ## randexp()
-using DisplayAs: PNG
+using DisplayAs: PNG    ## For faster rendering
 Random.seed!(2024)
 
 #===
-Stochastic chemical reaction: Gillespie Algorithm (direct method)
+## Do-it-yourself
+
+Stochastic chemical reaction: Gillespie Algorithm (direct and first reaction method)
 Adapted from: Chemical and Biomedical Enginnering Calculations Using Python Ch.4-3
 ===#
-function ssa_direct(model, u0::AbstractArray, tend, p, stoich; tstart=zero(tend))
+function ssa_alg(model, u0::AbstractVector, tend, p, stoich; tstart=zero(tend), method=:direct)
     t = tstart   ## Current time
     ts = [t]     ## Time points
     u = copy(u0) ## Current state
-    us = copy(u) ## States over time
+    us = copy(u') ## States over time
     while t < tend
         a = model(u, p, t)               ## propensities
-        dt = randexp() / sum(a)          ## Time step for the direct method
-        du = sample(stoich, Weights(a))  ## Choose the stoichiometry for the next reaction
+        if method == :direct
+            dt = randexp() / sum(a)          ## Time step for the direct method
+            du = sample(stoich, Weights(a))  ## Choose the stoichiometry for the next reaction
+        elseif method == :first
+            dts = randexp(length(a)) ./ a   ## time scales of all reactions
+            i = argmin(dts)                 ## Choose the most recent reaction to occur
+            dt = dts[i]
+            du = stoich[i]
+        else
+            error("Method should be either :direct or :first")
+        end
         u .+= du   ## Update time
         t += dt    ## Update time
-        us = [us u]  ## Append state
-        push!(ts, t) ## Append time point
+        us = [us; u']  ## Append state
+        push!(ts, t)   ## Append time point
     end
-    us = collect(us') ## Transpose to make columns as state variables, rows as observations
-    return (t = ts, u = us)
-end
-
-#===
-Stochastic chemical reaction: Gillespie Algorithm (first reaction method)
-Adapted from: Chemical and Biomedical Enginnering Calculations Using Python Ch.4-3
-===#
-
-function ssa_first(model, u0, tend, p, stoich; tstart=zero(tend))
-    t = tstart   ## Current time
-    ts = [t]     ## Time points
-    u = copy(u0) ## Current state
-    us = copy(u) ## States over time
-    while t < tend
-        a = model(u, p, t)              ## propensities
-        dts = randexp(length(a)) ./ a   ## time scales of all reactions
-        i = argmin(dts) ## Choose which reaction to occur
-        dt = dts[i]
-        du = stoich[i]
-        u .+= du  ## Update state
-        t += dt   ## Update time
-        us = [us u]  ## Append state variable to record
-        push!(ts, t) ## Append time point to record
-    end
-    us = collect(us') ## Make column as variables, rows as observations
     return (t = ts, u = us)
 end
 
@@ -78,8 +63,8 @@ u0 = [200, 0]
 tend = 10.0
 
 # Solve the problem using both direct and first reaction method
-@time soldirect = ssa_direct(model, u0, tend, parameters, stoich)
-@time solfirst = ssa_first(model, u0, tend, parameters, stoich)
+@time soldirect = ssa_alg(model, u0, tend, parameters, stoich; method=:direct)
+@time solfirst = ssa_alg(model, u0, tend, parameters, stoich; method=:first)
 
 # Plot the solution from the direct method
 plot(soldirect.t, soldirect.u,
@@ -95,7 +80,7 @@ plot(solfirst.t, solfirst.u,
 numRuns = 50
 
 sols = map(1:numRuns) do _
-    ssa_direct(model, u0, tend, parameters, stoich)
+    ssa_alg(model, u0, tend, parameters, stoich; method=:direct)
 end;
 
 # A interpolation function for each solution
