@@ -96,7 +96,7 @@ end;
 a_avg(t) = mean(i -> i(t), itpsA)
 b_avg(t) = mean(i -> i(t), itpsB)
 
-# Plot the soluton
+# Plot the solution
 fig1 = plot(xlabel="Time", ylabel="# of molecules", title="SSA (direct method) ensemble")
 
 for sol in sols
@@ -130,7 +130,6 @@ end
 params = [:k1 => 1.0, :k2 => 0.5]
 u0 = [:A => 200, :B => 0]
 tend = 10.0
-
 dprob = DiscreteProblem(rn, u0, (0.0, tend), params)
 
 # In this case, we would like to solve a `JumpProblem` using [Gillespie's Direct stochastic simulation algorithm (SSA)](https://doi.org/10.1016/0021-9991(76)90041-3).
