@@ -4,7 +4,7 @@
 
 **Standard procedures**
 
-- Define a model function representing the right-hand-side (RHS) of the sysstem.
+- Define a model function representing the right-hand-side (RHS) of the system.
   - Out-of-place form: `f(u, p, t)` where `u` is the state variable(s), `p` is the parameter(s), and `t` is the independent variable (usually time). The output is the right hand side (RHS) of the differential equation system.
   - In-place form: `f!(du, u, p, t)`, where the output is saved to `du`. The rest is the same as the out of place form. The in-place form has potential performance benefits since it allocates less than the out-of-place (`f(u, p, t)`) counterpart.
   - Using ModelingToolkit.jl : define equations and build an ODE system.
@@ -17,7 +17,7 @@
 
 Documentation: <https://docs.sciml.ai/DiffEqDocs/stable/>
 
-### Single varaible: Exponential decay model
+### Single variable: Exponential decay model
 
 The concentration of a decaying nuclear isotope could be described as an exponential decay:
 
@@ -37,13 +37,13 @@ using Plots
 Plots.default(linewidth=2)
 
 # The model function is the 3-argument out-of-place form, `f(u, p, t)`.
-expdecay(u, p, t) = p * u
+decay(u, p, t) = p * u
 
 p = -1.0            ## Rate of exponential decay
 u0 = 1.0            ## Initial condition
 tspan = (0.0, 2.0)  ## Start time and end time
 
-prob = ODEProblem(expdecay, u0, tspan, p)
+prob = ODEProblem(decay, u0, tspan, p)
 sol = solve(prob)
 
 # Solution at time t=1.0 (with interpolation)
@@ -128,14 +128,14 @@ D = Differential(t)         ## Differential operator
 
 # Define an ODE with equations
 eqs = [D(C) ~ -λ * C]
-@mtkbuild expdecaySys = ODESystem(eqs, t)
+@mtkbuild decaySys = ODESystem(eqs, t)
 
 #---
 u0 = [C => 1.0]
 p = [λ => 1.0]
 tspan = (0.0, 2.0)
 
-prob = ODEProblem(expdecaySys, u0, tspan, p)
+prob = ODEProblem(decaySys, u0, tspan, p)
 sol = solve(prob)
 plot(sol)
 
@@ -186,7 +186,7 @@ using ModelingToolkit
 using Plots
 Plots.default(linewidth=2)
 
-# Builing the model is wrapped in a function
+# Building the model is wrapped in a function
 function build_lorentz(; name)
     @parameters begin
         σ = 10.0

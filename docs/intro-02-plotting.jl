@@ -2,9 +2,9 @@
 
 # Plotting with Julia
 
-- [Plots.jl](https://github.com/JuliaPlots/Plots.jl): powerful and convenient visualization mwith ultiple backends. See also [Plots.jl docs](https://docs.juliaplots.org/latest/)
-- [PyPlot.jl](https://github.com/JuliaPy/PyPlot.jl): `matplotlib` in Julia. See also [matplotlib docs](https://matplotlib.org/stable/index.html)
-- [Makie.jl](https://github.com/MakieOrg/Makie.jl): a data visualization ecosystem for the Julia programming language, with high performance and extensibility. See also [Makie.jl docs](https://docs.makie.org/stable/)
+- https://github.com/JuliaPlots/Plots.jl : powerful and convenient visualization with multiple backends. See also [Plots.jl docs](https://docs.juliaplots.org/latest/)
+- https://github.com/JuliaPy/PythonPlot.jl : `matplotlib` in Julia. See also [matplotlib docs](https://matplotlib.org/stable/index.html)
+- https://github.com/MakieOrg/Makie.jl : a data visualization ecosystem for the Julia programming language, with high performance and extensibility. See also [Makie.jl docs](https://docs.makie.org/stable/)
 
 ===#
 using Plots
@@ -72,6 +72,7 @@ fig = plot(ax1, ax2, layout=(2, 1))
 ```julia
 # Quiver plot
 quiver(vec(x2d), vec(y2d), quiver=(vec(vx2d), vec(vy2d))
+
 # Or if you have a gradient function ∇f(x,y) -> (vx, vy)
 quiver(x2d, y2d, quiver=∇f)
 ```
@@ -82,11 +83,12 @@ quiver(x2d, y2d, quiver=∇f)
 using PythonPlot as plt
 plt.quiver(X2d, Y2d, U2d, V2d)
 ```
-[matplotlib: quiver plot](https://matplotlib.org/stable/gallery/images_contours_and_fields/quiver_demo.html#sphx-glr-gallery-images-contours-and-fields-quiver-demo-py)
+
+See also: [matplotlib: quiver plot](https://matplotlib.org/stable/gallery/images_contours_and_fields/quiver_demo.html#sphx-glr-gallery-images-contours-and-fields-quiver-demo-py)
 ===#
 using Plots
 
-# ∇ = \nabla <TAB>
+# ∇ = `\nabla <TAB>`
 function ∇f(x, y; scale=(x^2 + y^2)^0.25 * 3)
     return [-y, x] ./ scale
 end
@@ -106,7 +108,7 @@ quiver(xx, yy, quiver=∇f, aspect_ratio=:equal, line=(:black), arrow=(:closed))
 ===#
 
 # Save the current figure
-savefig("vfield.png")
+savefig("vector-field.png")
 
 # Save the figure `fig`
 savefig(fig, "subplots.png")

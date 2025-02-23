@@ -46,7 +46,7 @@ function mysolve(model, u0, tspan, p; dt=0.1, method=euler)
     for i in 1:length(ts)-1
         us[i+1, :] .= method(model, us[i, :], p, ts[i], dt)
     end
-    ## Retrun results
+    ## Return results
     return (t = ts, u = us)
 end
 

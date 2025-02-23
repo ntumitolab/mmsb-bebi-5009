@@ -81,7 +81,7 @@ typeof(float(x))
 #===
 ## Math expressions
 
-Julia supports basic arithmatic operations and essential math functions by default.
+Julia supports basic arithmetic operations and essential math functions by default.
 
 ### Basic arithmetic
 ===#
@@ -163,13 +163,13 @@ cospi(1//2)
 # `\sqrt<TAB>`
 sqrt(π) ≈ √π
 
-# Natual log
+# Natural log
 log(10)
 
 # Common log
 log10(10)
 
-# Natural exponant
+# Natural exponent
 exp(-5)
 
 # expm1(x) is more accurate that exp(x) - 1 when x is very close to zero.
@@ -186,7 +186,7 @@ A `string` is a sequence of characters.
 - `" ... "` for one line strings.
 - Three double quotes surround multiline string.
 - `str1*str2*...` to concatenate strings
-- `string(str1, str2, ...)` to convert the data (if neede) and make a string.
+- `string(str1, str2, ...)` to convert the data (if needed) and make a string.
 - `^` to repeat a string: `str^3` to repeat `str` three times.
 - `[idx]` to access an individual character.
 - `$` to insert (or interpolate) a value into a string.
@@ -248,8 +248,6 @@ end
 - [control flow](https://docs.julialang.org/en/v1/manual/control-flow/)
 - [functions](https://docs.julialang.org/en/v1/manual/functions/)
 
-Julia programs are able to run nonlinearly by controlling its execution flow.
-
 ### Conditional statements
 
 - The `elseif` and `else` blocks are optional. `if` and `end` are mandatory.
@@ -265,12 +263,12 @@ Julia programs are able to run nonlinearly by controlling its execution flow.
 
 A no-branching alternative. All the arguments are evaluated first in `ifelse(cond, tvalue, fvalue)`.
 
-#### short cicuit evaluation
+#### short circuit evaluation
 
 `&&` (logical and) and `||` (logical or) operators support [short circuit evaluation](https://en.wikipedia.org/wiki/Short-circuit_evaluation).
 
-- In the expression `a && b`, the subexpression `b` is only evaluated if `a` evaluates to true.
-- In the expression `a || b`, the subexpression `b` is only evaluated if `a` evaluates to false.
+- In the expression `a && b`, the expression `b` would be evaluated only if `a` evaluates to `true`.
+- In the expression `a || b`, the expression `b` would be evaluated only if `a` evaluates to `false`.
 ===#
 
 # Short circuit and `&&` evaluates and returns the second argument if the first is true
@@ -379,12 +377,12 @@ Notes:
 - The arguments are "passed-by-sharing" (Similar to Python). Modifications to mutable argument values (such as `Arrays`) will be reflected to the caller.
 - By convention, functions that will update the arguments are named with a bang `!`. (e.g. `sort(arr)` vs `sort!(arr)`)
 - For element-wise operations, use the broadcast (dot) syntax. e.g. `sqrt.(arr)`
-- You can write multiple functions with the same name provided they have distinct parameters. Julia will choose the most apporpriate one accroding to the input.
+- You can write multiple functions with the same name provided they have distinct parameters. Julia will choose the most appropriate one according to the input.
 ===#
 
 # ### Standard form
 
-"Mechaelis-Menton function"  ## Function documentations
+"Michaelis-Menton function"  ## Function documentations
 function mm(x, k)            ## function name and parameter list
     result = x / (x +k)      ## Doing stuff
     return result            ## Return statement
@@ -479,7 +477,7 @@ And they are called with `plot(x, y, width=2)` or `plot(x, y; width=2)`
 ### See also
 
 - [Compositing functions and pipes](https://docs.julialang.org/en/v1/manual/functions/#Function-composition-and-piping)
-- [Variable argument (vararg) functions](https://docs.julialang.org/en/v1/manual/functions/#Varargs-Functions)
+- [Variable argument functions](https://docs.julialang.org/en/v1/manual/functions/#Varargs-Functions)
 - [Scope of variables](https://docs.julialang.org/en/v1/manual/variables-and-scoping/)
 
 ===#
@@ -507,14 +505,14 @@ General rules for sequential collections:
 
 `start[:step]:end`
 
-- Immuatable
-- Sequencial
-- Eheap
+- Immutable
+- Sequential
+- Cheap
 - Evenly-spaced numerical sequences
 
 ===#
 
-# A simple range
+# A simple range starts from one, and stops at ten, with a step size of two,.
 1:2:10
 
 # Length of a sequence
@@ -526,8 +524,8 @@ dump(1:2:10)
 # Explicit range function
 range(1, 10, length=10)
 
-# linspace() equivalent
-LinRange(1, 10, 10)
+# Pick an element
+(1:10)[3]
 
 # Pick elements by a range of indices
 (1:10)[3:end]
@@ -545,10 +543,11 @@ LinRange(1, 10, 10)
 
 tuple(1, 'a', 3.14)
 
-# Usually written as
+# Tuples are usually written as
 (1, 'a', 3.14)
 
-# Accessing elements
+# Pick elements
+# You cannot change the elements once its created. (immutable)
 t1 = (1, 2, 3)
 t1[1]
 
@@ -584,10 +583,10 @@ sincospi(1//2)
 
 `[seq...]` / `collect(seq)`
 
-Arryas are the bread and butter for scientific computing, similar to numpy's ndarrays.
+Arrays are the bread and butter for scientific computing, similar to numpy's `ndarrays`.
 
 - Column-major (Fortran style) rather than row-major (C and numpy style)
-- Assignments and updating may cuase unwanted editing due to memory sharing.
+- Assignments and updating may cause unwanted editing due to memory sharing.
 
 Some useful functions for arrays:
 
@@ -648,8 +647,8 @@ tuple([1,2,3])
 Tuple([1,2,3])
 
 # 2D array (matrix)
-# space is a shorthand for hcat()
-# semicolone is a shorthand for vcat()
+# A space is a shorthand for hcat()
+# A semicolon is a shorthand for vcat()
 A = [1 2 3;
      4 5 6]
 
@@ -760,7 +759,7 @@ for (k ,v) in eng2sp
     println(k, " => ", v)
 end
 
-# Creating a dict from an arrya of tuples
+# Creating a dict from an array of tuples
 Dict([('a', 1), ('c', 3), ('b', 2)])
 
 # Creating a Dict via a generator (similar to comprehensions)
@@ -790,8 +789,8 @@ ks = (:a, :b, :c)
 vs = (1, 2, 3)
 Dict(ks .=> vs)
 
-# How to do logspace() in Julia
-exp10.(LinRange(-3.0, 3.0, 50))
+# How to do `logspace()` in Julia
+exp10.(range(-3.0, 3.0, 50))
 
 # Make a 9*9 multiplication table
 collect(1:9) .* transpose(collect(1:9))
@@ -815,7 +814,7 @@ Point() = Point(0.0, 0.0)
 p1 = Point(1.0, 2.0)
 p2 = Point(-3.0, 2.0)
 
-# Define a method for our cutsom type
+# Define a method for our custom type
 add(a::Point, b::Point) = Point(a.x + b.x, a.y + b.y)
 
 #---

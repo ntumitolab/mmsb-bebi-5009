@@ -13,7 +13,7 @@ See [Julia in Visual Studio Code](https://code.visualstudio.com/docs/languages/j
 
 Julia extension will be automatically activated upon opening a Julia file (`*.jl`).
 
-You can open the command pallete (`Ctrl + Shift + P` in windows) and search "Julia" for available commands and keyboard shortcuts. The most used on is `Shift + Enter`: to execute the current selected line.
+You can open the command palette (`Ctrl + Shift + P` in windows) and search "Julia" for available commands and keyboard shortcuts. The most used on is `Shift + Enter`: to execute the current selected line.
 
 ## Package management in Julia
 
