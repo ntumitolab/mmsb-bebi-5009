@@ -46,7 +46,7 @@ setdefaults!(rn, [
 ])
 
 @unpack L = rn
-osys = convert(ODESystem, rn; remove_conserved = true, discrete_events = [[10] => [L ~ 40], [30] => [L ~ 80]]) |> structural_simplify
+osys = convert(ODESystem, rn; remove_conserved = true, discrete_events = [[10] => [L ~ 40], [30] => [L ~ 80]]) |> complete
 
 #---
 observed(osys)
@@ -56,9 +56,8 @@ equations(osys)
 
 #---
 tend = 50.0
-prob = ODEProblem(osys, [], tend)
-
-#---
+prob = ODEProblem(osys, [], tend);
 sol = solve(prob)
 
+#---
 plot(sol, idxs=[osys.Am], title="Fig 6.14", xlabel="Time", ylabel="Active CheA ([Am])", ylims=(0.01, 0.04), legend=false)

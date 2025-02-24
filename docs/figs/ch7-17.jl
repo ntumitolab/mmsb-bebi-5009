@@ -32,9 +32,7 @@ u0 = zeros(3)
 tend = 35.0
 
 #---
-prob = ODEProblem(rn, u0, tend, ps)
-
-#---
+prob = ODEProblem(rn, u0, tend, ps);
 sol = solve(prob)
 
 #---
