@@ -3,11 +3,11 @@
 
 ## Gillespie Algorithm
 ===#
-using StatsBase         ## Weights() and sample()
 using Plots
-using Interpolations
-using Statistics        ## mean()
-using Random            ## randexp()
+using DataInterpolations: LinearInterpolation
+using StatsBase: Weights, sample
+using Statistics: mean
+using Random
 using DisplayAs: PNG    ## For faster rendering
 Random.seed!(2024)
 
@@ -79,25 +79,24 @@ plot(solfirst.t, solfirst.u,
 # Running 50 simulations
 numRuns = 50
 
-sols = map(1:numRuns) do _
-    ssa_alg(model, u0, tend, parameters, stoich; method=:direct)
+@time sols = map(1:numRuns) do _
+    ssa_alg(model, u0, tend, parameters, stoich; method=:first)
 end;
 
-# A interpolation function for each solution
-itpsA = map(sols) do sol
-    linear_interpolation(sol.t, sol.u[:, 1], extrapolation_bc=Line())
-end;
+# Average values and interpolation
+ts = range(0, tend, 101)
+a_avg(t) = mean(sols) do sol
+    A = LinearInterpolation(sol.u[:, 1], sol.t)
+    A(t)
+end
 
-itpsB = map(sols) do sol
-    linear_interpolation(sol.t, sol.u[:, 2], extrapolation_bc=Line())
-end;
-
-# Calculate average A and B levels in the ensemble.
-a_avg(t) = mean(i -> i(t), itpsA)
-b_avg(t) = mean(i -> i(t), itpsB)
+b_avg(t) = mean(sols) do sol
+    A = LinearInterpolation(sol.u[:, 2], sol.t)
+    A(t)
+end
 
 # Plot the solution
-fig1 = plot(xlabel="Time", ylabel="# of molecules", title="SSA (direct method) ensemble")
+fig1 = plot(xlabel="Time", ylabel="# of molecules", title="SSA (first method) ensemble")
 
 for sol in sols
     plot!(fig1, sol.t, sol.u, linecolor=[:blue :red], linealpha=0.05, label=false)
@@ -108,19 +107,18 @@ fig1 |> PNG
 # Plot averages
 plot!(fig1, a_avg, 0.0, tend, linecolor=:black, linewidth=3, linestyle=:solid, label="Average [A]") |> PNG
 plot!(fig1, b_avg, 0.0, tend, linecolor=:black, linewidth=3, linestyle=:dash, label="Average [B]") |> PNG
-
 fig1 |> PNG
 
 #===
 ## Using Catalyst (recommended)
 
-[Catalyst.jl](https://github.com/SciML/Catalyst.jl) is a domain-specific language (DSL) package to solve law of mass action problems.
+https://github.com/SciML/Catalyst.jl is a domain-specific language (DSL) package to simulate chemical reaction networks.
 ===#
 using Catalyst
 using JumpProcesses
 using Plots
 
-rn = @reaction_network begin
+two_state_model = @reaction_network begin
     k1, A --> B
     k2, B --> A
 end
@@ -129,17 +127,17 @@ end
 
 params = [:k1 => 1.0, :k2 => 0.5]
 u0 = [:A => 200, :B => 0]
-tend = 10.0
-dprob = DiscreteProblem(rn, u0, (0.0, tend), params)
+tspan = (0.0, 10.0)
+jinput = JumpInputs(two_state_model, u0, tspan, params)
+
 
 # In this case, we would like to solve a `JumpProblem` using [Gillespie's Direct stochastic simulation algorithm (SSA)](https://doi.org/10.1016/0021-9991(76)90041-3).
-
-jumpProb = JumpProblem(rn, dprob, Direct())
-sol = solve(jumpProb, SSAStepper())
+jprob = JumpProblem(jinput)
+sol = solve(jprob)
 plot(sol) |> PNG
 
 # Parallel ensemble simulation
-ensprob = EnsembleProblem(jumpProb)
+ensprob = EnsembleProblem(jprob)
 sim = solve(ensprob, SSAStepper(), EnsembleThreads(); trajectories=50)
 
 #---

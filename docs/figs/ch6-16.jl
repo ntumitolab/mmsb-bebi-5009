@@ -65,9 +65,6 @@ equations(osys)
 
 #---
 tspan = (0., 1800.)
-prob = ODEProblem(osys, [], (0., 1800.))
-
-#--
+prob = ODEProblem(osys, [], (0., 1800.), []);
 sol = solve(prob)
-
 plot(sol, idxs=[osys.C8s, osys.C3s, I*100], title="Fig 6.16", xlabel="Time", ylabel="Concentration", legend=:right, rightmargin=5*Plots.mm)

@@ -64,16 +64,14 @@ function build_hh(;name)
 end
 
 #---
-tend = 100.0
+tspan = (0.0, 100.0)
 @mtkbuild sys = build_hh()
-prob = ODEProblem(sys, [], tend)
-
-#---
+prob = ODEProblem(sys, [], tspan, []);
 sol = solve(prob)
 
 #---
 @unpack v, m, h, n, iStim = sys
-p1 = plot(sol, idxs = v, ylabel="Voltage (mV)", xlabel="",  labels="Membrane potential", title="Fig 1.9", legend=:topleft)
+p1 = plot(sol, idxs = v, ylabel="Voltage (mV)", xlabel="",  label="Membrane potential", title="Fig 1.9", legend=:topleft)
 p2 = plot(sol, idxs = [m, h, n], xlabel="")
-p3 = plot(sol, idxs = iStim, xlabel="Time (ms)", ylabel="Current (uA/cm^2)", labels="Stimulation current", legend=:left)
+p3 = plot(sol, idxs = iStim, xlabel="Time (ms)", ylabel="Current (uA/cm^2)", label="Stimulation current", legend=:left)
 plot(p1, p2, p3, layout=(3, 1), size=(600, 900), leftmargin=5*Plots.mm)
