@@ -23,7 +23,7 @@ dmypy.json
 .pyre/
 
 # Local VSCode settings
-.vscode/
+# .vscode/
 
 # Julia DEPOT
 .julia/
