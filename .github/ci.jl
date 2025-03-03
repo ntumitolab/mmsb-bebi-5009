@@ -2,7 +2,7 @@ using Distributed
 using Tables
 using MarkdownTables
 using SHA
-using IJulia
+# using IJulia
 
 @everywhere begin
     ENV["GKSwstype"] = "100"
