@@ -23,6 +23,8 @@ env:
 jobs:
   CI:
     runs-on: self-hosted
+    permissions:
+      contents: write
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -95,26 +97,13 @@ jobs:
       run: cp --verbose -rf ${{ env.NBCACHE }}/docs/* docs/
     - name: Build website
       run: jupyter-book build docs/
-    - name: Upload pages artifact
+    - name: Copy environment to website
+      run: cp Manifest.toml Project.toml requirements.txt ./docs/_build/html
+    - name: Deploy pages
+      uses: peaceiris/actions-gh-pages@v4
       if: ${{ github.ref == 'refs/heads/main' }}
-      uses: actions/upload-pages-artifact@v3
       with:
-        path: docs/_build/html/
-
-  # Deploy pages
-  deploy:
-    needs: CI
-    if: ${{ github.ref == 'refs/heads/main' }}
-    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
-    permissions:
-      pages: write # to deploy to Pages
-      id-token: write # to verify the deployment originates from an appropriate source
-      actions: read   # to download an artifact uploaded by `actions/upload-pages-artifact@v3`
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs/_build/html
+        force_orphan: true
+        commit_message: ${{ github.event.head_commit.message }}
