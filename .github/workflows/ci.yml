@@ -34,10 +34,10 @@ jobs:
       with:
         python-version: '3.x'
         check-latest: true
-    - name: Setup uv
-      run: curl -LsSf https://astral.sh/uv/install.sh | sh
+    # - name: Setup uv
+    #   run: curl -LsSf https://astral.sh/uv/install.sh | sh
     - name: Install Python dependencies
-      run: uv pip install --system -r requirements.txt
+      run: pip install -r requirements.txt
     - name: Read Julia version
       id: read_toml
       run: echo value=$(python -c 'import tomllib; from pathlib import Path; print(tomllib.loads(Path("Manifest.toml").read_text())["julia_version"])') >> "$GITHUB_OUTPUT"
