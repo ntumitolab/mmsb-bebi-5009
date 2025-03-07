@@ -15,26 +15,49 @@ Please **solve** the ODE using `OrdinaryDiffEq.jl` (optionally `ModelingToolkit.
 
 ## Part 2: The forward Euler method
 
-Please **try** a range of time steps (e.g. from 0.1 to 1.5) to **solve** the ODE using the (home-made) forward Euler method for $t \in [0.0, 5.0]$, **plot** the time series, and **compare** them to the analytical solution *in one plot*. In which way are dts related to accuracy?
+Please try a range of time steps (e.g. from 0.1 to 1.5) to solve the ODE using the forward Euler method **below** for $t \in [0.0, 5.0]$, plot the time series, and compare them to the analytical solution *in one figure*. What happened when dt gets larger? Describe your results and show them in the figure.
 
 **About the forward Euler method**
 
-We plot the trajectory as a straight line locally. In each step, the next state variables ($\vec{u}_{n+1}$) is accumulated by the time step (dt) multiplied the derivative ( slope) at the current state ($\vec{u}_{n}$):
+We plot the trajectory as a straight line locally. In each step, the next state variables ($\vec{u}_{n+1}$) are accumulated by the time step (dt) multiplied the derivatives (slope) at the current state ($\vec{u}_{n}$):
 
 $$
 \vec{u}_{n+1} = \vec{u}_{n} + dt \cdot f(\vec{u}_{n}, t_{n})
 $$
 ===#
 
-# The ODE model. Exponential decay in this example
+# The ODE model. Exponential decay in this example.
 function model(u, p, t)
     return 1 .- u[1]
 end
 
-# Forward Euler method
+#===
+Forward Euler method
+
+Inputs:
+
+- `model`: the ODE model which returns the derivative(s) of the state variable(s)
+- `u`: state variable(s)
+- `p`: parameter(s)
+- `t`: time in the model
+- `dt`: time step
+
+Outputs: state variable(s) of the next time step.
+===#
 euler(model, u, p, t, dt) = u .+ dt .* model(u, p, t)
 
-# The home-grown ODE solver
+#===
+A simple ODE solver
+
+Inputs:
+
+- `model`: the ODE model which returns the derivative(s) of the state variable(s)
+- `u0` : initial conditions of the state variable(s)
+- `tspan` : time span in the model, written as `(tstart, tend)`
+- `p`: parameters
+- `dt`: time step
+- `method`: stepping method. Defaults to the Forward Euler method `euler`
+===#
 function mysolve(model, u0, tspan, p; dt=0.1, method=euler)
     ## Time points
     ts = tspan[begin]:dt:tspan[end]
@@ -56,7 +79,8 @@ p = nothing
 u0 = 0.0
 
 # Solve the problem
-sol = mysolve(model, u0, tspan, p, dt=1.0, method=euler)
+sol01 = mysolve(model, u0, tspan, p, dt=0.1, method=euler)
+sol1 = mysolve(model, u0, tspan, p, dt=1.0, method=euler)
 
 # Analytical solution
 analytical(t) = 1 - exp(-t)
@@ -65,14 +89,14 @@ analytical(t) = 1 - exp(-t)
 using Plots
 Plots.default(linewidth=2)
 
-plot(sol.t, sol.u, label="FE method")
-plot!(analytical, sol.t[begin], sol.t[end], label = "Analytical solution", linestyle=:dash)
+plot(sol01.t, sol01.u, label="Euler (dt=0.1)")
+plot!(sol1.t, sol1.u, label = "Euler (dt=1)")
+plot!(analytical, sol.t[begin], sol.t[end], label = "Analytical solution", linestyle=:dash, legend=:right)
 
 #===
 ## Part 3: The RK4 method
 
-1. Please **try** a range of dts to **solve** the ODE using the (home-grown) fourth order Runge-Kutta ([RK4](https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods)) method for $t \in [0.0, 5.0]$, **plot** the time series, and **compare** them to the analytical solution *in one plot*. In which way are dts related to accuracy?
-2. Compared to the forward Euler method, which one is more accurate for the same `dt`? Please make a visual comparison by plotting the analytical solution, Euler's solution, and RK4's solution together.
+Please **try** some time steps to **solve** the ODE using the (home-grown) fourth order Runge-Kutta ([RK4](https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods)) method for $t \in [0.0, 5.0]$, **plot** the time series, and **compare** them to the analytical solution and the solution by the Forward Eular method (of the same dt). Which method is more accurate? Please show your results in the figure.
 
 **About the RK4 method**
 
@@ -95,7 +119,7 @@ Hint: you can replace the Euler method with the RK4 one to reuse the `mysolve()`
 euler(model, u, p, t, dt) = u .+ dt .* model(u, p, t)
 # Your RK4 stepper
 function rk4(model, u, p, t, dt)
-    # calculate k1, k2, k3, and k4
+    ### calculate k1, k2, k3, and k4 here ###
     next = u .+ (k1 .+ 2k2 .+ 2k3 .+ k4) ./ 6
     return next
 end
