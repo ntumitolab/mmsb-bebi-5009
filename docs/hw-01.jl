@@ -91,7 +91,7 @@ Plots.default(linewidth=2)
 
 plot(sol01.t, sol01.u, label="Euler (dt=0.1)")
 plot!(sol1.t, sol1.u, label = "Euler (dt=1)")
-plot!(analytical, sol.t[begin], sol.t[end], label = "Analytical solution", linestyle=:dash, legend=:right)
+plot!(analytical, tspan[begin], tspan[end], label = "Analytical solution", linestyle=:dash, legend=:right)
 
 #===
 ## Part 3: The RK4 method
