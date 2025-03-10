@@ -103,10 +103,8 @@ jobs:
     - name: Copy environment to website
       run: cp Manifest.toml Project.toml requirements.txt ./docs/_build/html
     - name: Deploy pages
-      uses: peaceiris/actions-gh-pages@v4
+      uses: JamesIves/github-pages-deploy-action@v4
       if: ${{ github.ref == 'refs/heads/main' }}
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./docs/_build/html
-        force_orphan: true
-        commit_message: ${{ github.event.head_commit.message }}
+        folder: ./docs/_build/html
+        commit-message: ${{ github.event.head_commit.message }}
