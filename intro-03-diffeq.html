@@ -1,0 +1,1318 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Solving differential equations in Julia &#8212; BEBI-5009</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"loader": {"load": ["[tex]/mhchem"]}, "tex": {"packages": {"[+]": ["mhchem"]}}, "options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'intro-03-diffeq';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Stochastic simulations" href="intro-04-gillespie.html" />
+    <link rel="prev" title="Plotting with Julia" href="intro-02-plotting.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">BEBI-5009</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="index.html">
+                    Mathematical Modeling in Systems Biology
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Introduction to Julia</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="intro-00-start.html">Start using Julia</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro-01-first-steps.html">First steps</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro-02-plotting.html">Plotting with Julia</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Solving differential equations in Julia</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro-04-gillespie.html">Stochastic simulations</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">MMSB textbook</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="figs/README.html">Figures</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="figs/ch1-07.html">Fig 1.07</a></li>
+<li class="toctree-l2"><a class="reference internal" href="figs/ch1-09.html">Fig 1.09</a></li>
+<li class="toctree-l2"><a class="reference internal" href="figs/ch2-04.html">Fig 2.04</a></li>
+<li class="toctree-l2"><a class="reference internal" href="figs/ch2-09.html">Fig 2.09</a></li>
+<li class="toctree-l2"><a class="reference internal" href="figs/ch2-11.html">Fig 2.11, 2.12, 2.13, 2.14</a></li>
+<li class="toctree-l2"><a class="reference internal" href="figs/ch2-p246.html">Prob 2.4.6</a></li>
+<li class="toctree-l2"><a class="reference internal" href="figs/ch3-03.html">Fig 3.03</a></li>
+<li class="toctree-l2"><a class="reference internal" href="figs/ch3-13.html">Fig 3.13</a></li>
+<li class="toctree-l2"><a class="reference internal" href="figs/ch4-01.html">Chapter 4</a></li>
+<li class="toctree-l2"><a class="reference internal" href="figs/ch4-07.html">Fig 4.7, 4.8</a></li>
+<li class="toctree-l2"><a class="reference internal" href="figs/ch4-11.html">Fig 4.11</a></li>
+<li class="toctree-l2"><a class="reference internal" href="figs/ch4-15.html">Fig 4.15, 4.16, 4.17</a></li>
+<li class="toctree-l2"><a class="reference internal" href="figs/ch4-18.html">Fig 4.18</a></li>
+<li class="toctree-l2"><a class="reference internal" href="figs/ch4-22.html">Fig 4.22</a></li>
+<li class="toctree-l2"><a class="reference internal" href="figs/ch5-10.html">Fig 5.10, 5.11</a></li>
+<li class="toctree-l2"><a class="reference internal" href="figs/ch6-03.html">Fig 6.3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="figs/ch6-05.html">Fig 6.5</a></li>
+<li class="toctree-l2"><a class="reference internal" href="figs/ch6-07.html">Fig 6.07</a></li>
+<li class="toctree-l2"><a class="reference internal" href="figs/ch6-14.html">Fig 6.14</a></li>
+<li class="toctree-l2"><a class="reference internal" href="figs/ch6-16.html">Fig 6.16</a></li>
+<li class="toctree-l2"><a class="reference internal" href="figs/ch6-18.html">Fig 6.18</a></li>
+<li class="toctree-l2"><a class="reference internal" href="figs/ch7-07.html">Fig 7.7</a></li>
+<li class="toctree-l2"><a class="reference internal" href="figs/ch7-11.html">Fig 7.11</a></li>
+<li class="toctree-l2"><a class="reference internal" href="figs/ch7-17.html">Fig 7.17</a></li>
+</ul>
+</details></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Homework</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="hw-00.html">Rules for programming homeworks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hw-01.html">Homework 1: Solving an ODE</a></li>
+</ul>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="runtime.html">Runtime information</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-launch-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Launch interactive content">
+    <i class="fas fa-rocket"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://mybinder.org/v2/gh/ntumitolab/mmsb-bebi-5009/gh-pages?urlpath=lab/tree/_sources/intro-03-diffeq.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Binder"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Binder logo" src="_static/images/logo_binder.svg">
+  </span>
+<span class="btn__text-container">Binder</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://colab.research.google.com/github/ntumitolab/mmsb-bebi-5009/blob/gh-pages/_sources/intro-03-diffeq.ipynb" target="_blank"
+   class="btn btn-sm dropdown-item"
+   title="Launch on Colab"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  
+    <img alt="Colab logo" src="_static/images/logo_colab.png">
+  </span>
+<span class="btn__text-container">Colab</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+<a href="https://github.com/ntumitolab/mmsb-bebi-5009" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/intro-03-diffeq.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Solving differential equations in Julia</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#solve-odes-using-ordinarydiffeq-jl">Solve ODEs using OrdinaryDiffEq.jl</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#single-variable-exponential-decay-model">Single variable: Exponential decay model</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#three-variables-the-sir-model">Three variables: The SIR model</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-modelingtoolkit-jl-recommended">Using ModelingToolkit.jl (recommended)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#exponential-decay-model">Exponential decay model</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sir-model">SIR model</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lorenz-system">Lorenz system</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#saving-simulation-results">Saving simulation results</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#catalyst-jl">Catalyst.jl</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Exponential decay model</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">SIR model</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="solving-differential-equations-in-julia">
+<h1>Solving differential equations in Julia<a class="headerlink" href="#solving-differential-equations-in-julia" title="Link to this heading">#</a></h1>
+<p><strong>Standard procedures</strong></p>
+<ul class="simple">
+<li><p>Define a model function representing the right-hand-side (RHS) of the system.</p>
+<ul>
+<li><p>Out-of-place form: <code class="docutils literal notranslate"><span class="pre">f(u,</span> <span class="pre">p,</span> <span class="pre">t)</span></code> where <code class="docutils literal notranslate"><span class="pre">u</span></code> is the state variable(s), <code class="docutils literal notranslate"><span class="pre">p</span></code> is the parameter(s), and <code class="docutils literal notranslate"><span class="pre">t</span></code> is the independent variable (usually time). The output is the right hand side (RHS) of the differential equation system.</p></li>
+<li><p>In-place form: <code class="docutils literal notranslate"><span class="pre">f!(du,</span> <span class="pre">u,</span> <span class="pre">p,</span> <span class="pre">t)</span></code>, where the output is saved to <code class="docutils literal notranslate"><span class="pre">du</span></code>. The rest is the same as the out of place form. The in-place form has potential performance benefits since it allocates less than the out-of-place (<code class="docutils literal notranslate"><span class="pre">f(u,</span> <span class="pre">p,</span> <span class="pre">t)</span></code>) counterpart.</p></li>
+<li><p>Using ModelingToolkit.jl : define equations and build an ODE system.</p></li>
+</ul>
+</li>
+<li><p>Initial conditions (<code class="docutils literal notranslate"><span class="pre">u0</span></code>) for the state variable(s).</p></li>
+<li><p>(Optional) define parameter(s) <code class="docutils literal notranslate"><span class="pre">p</span></code>.</p></li>
+<li><p>Define a problem (e.g. <code class="docutils literal notranslate"><span class="pre">ODEProblem</span></code>) using the modeling function (<code class="docutils literal notranslate"><span class="pre">f</span></code>), initial conditions (<code class="docutils literal notranslate"><span class="pre">u0</span></code>), simulation time span (<code class="docutils literal notranslate"><span class="pre">tspan</span> <span class="pre">==</span> <span class="pre">(tstart,</span> <span class="pre">tend)</span></code>), and parameter(s) <code class="docutils literal notranslate"><span class="pre">p</span></code>.</p></li>
+<li><p>Solve the problem by calling <code class="docutils literal notranslate"><span class="pre">solve(prob)</span></code>.</p></li>
+</ul>
+<section id="solve-odes-using-ordinarydiffeq-jl">
+<h2>Solve ODEs using OrdinaryDiffEq.jl<a class="headerlink" href="#solve-odes-using-ordinarydiffeq-jl" title="Link to this heading">#</a></h2>
+<p>Documentation: <a class="reference external" href="https://docs.sciml.ai/DiffEqDocs/stable/">https://docs.sciml.ai/DiffEqDocs/stable/</a></p>
+<section id="single-variable-exponential-decay-model">
+<h3>Single variable: Exponential decay model<a class="headerlink" href="#single-variable-exponential-decay-model" title="Link to this heading">#</a></h3>
+<p>The concentration of a decaying nuclear isotope could be described as an exponential decay:</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{d}{dt}C(t) = - \lambda C(t)
+\]</div>
+<p><strong>State variable</strong></p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(C(t)\)</span>: The concentration of a decaying nuclear isotope.</p></li>
+</ul>
+<p><strong>Parameter</strong></p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\lambda\)</span>: The rate constant of decay. The half-life <span class="math notranslate nohighlight">\(t_{\frac{1}{2}} = \frac{ln2}{\lambda}\)</span></p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">OrdinaryDiffEq</span>
+<span class="k">using</span><span class="w"> </span><span class="n">Plots</span>
+<span class="n">Plots</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The model function is the 3-argument out-of-place form, <code class="docutils literal notranslate"><span class="pre">f(u,</span> <span class="pre">p,</span> <span class="pre">t)</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">decay</span><span class="p">(</span><span class="n">u</span><span class="p">,</span><span class="w"> </span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">u</span>
+
+<span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mf">1.0</span><span class="w">            </span><span class="c">## Rate of exponential decay</span>
+<span class="n">u0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="w">            </span><span class="c">## Initial condition</span>
+<span class="n">tspan</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">)</span><span class="w">  </span><span class="c">## Start time and end time</span>
+
+<span class="n">prob</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ODEProblem</span><span class="p">(</span><span class="n">decay</span><span class="p">,</span><span class="w"> </span><span class="n">u0</span><span class="p">,</span><span class="w"> </span><span class="n">tspan</span><span class="p">,</span><span class="w"> </span><span class="n">p</span><span class="p">)</span>
+<span class="n">sol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>retcode: Success
+Interpolation: 3rd order Hermite
+t: 8-element Vector{Float64}:
+ 0.0
+ 0.10001999200479662
+ 0.34208427066999536
+ 0.6553980136343391
+ 1.0312652525315806
+ 1.4709405856363595
+ 1.9659576669700232
+ 2.0
+u: 8-element Vector{Float64}:
+ 1.0
+ 0.9048193287657775
+ 0.7102883621328676
+ 0.5192354400036404
+ 0.35655576576996556
+ 0.2297097907863828
+ 0.14002247272452764
+ 0.1353360028400881
+</pre></div>
+</div>
+</div>
+</div>
+<p>Solution at time t=1.0 (with interpolation)</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">sol</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.3678796381978344
+</pre></div>
+</div>
+</div>
+</div>
+<p>Time points</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">sol</span><span class="o">.</span><span class="n">t</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>8-element Vector{Float64}:
+ 0.0
+ 0.10001999200479662
+ 0.34208427066999536
+ 0.6553980136343391
+ 1.0312652525315806
+ 1.4709405856363595
+ 1.9659576669700232
+ 2.0
+</pre></div>
+</div>
+</div>
+</div>
+<p>Solutions at corresponding time points</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">sol</span><span class="o">.</span><span class="n">u</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>8-element Vector{Float64}:
+ 1.0
+ 0.9048193287657775
+ 0.7102883621328676
+ 0.5192354400036404
+ 0.35655576576996556
+ 0.2297097907863828
+ 0.14002247272452764
+ 0.1353360028400881
+</pre></div>
+</div>
+</div>
+</div>
+<p>Visualize the solution</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span><span class="p">(</span><span class="n">sol</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/44cc398a05ab37fc9e7550294b532de1260fb823ca01f5fd06997563ee9deac5.png" src="_images/44cc398a05ab37fc9e7550294b532de1260fb823ca01f5fd06997563ee9deac5.png" />
+</div>
+</div>
+</section>
+<section id="three-variables-the-sir-model">
+<h3>Three variables: The SIR model<a class="headerlink" href="#three-variables-the-sir-model" title="Link to this heading">#</a></h3>
+<p>The SIR model describes the spreading of an contagious disease can be described by the <a class="reference external" href="https://en.wikipedia.org/wiki/Compartmental_models_in_epidemiology">SIR model</a>:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{align}
+\frac{d}{dt}S(t) &amp;= - \beta S(t)I(t)  \\
+\frac{d}{dt}I(t) &amp;= \beta S(t)I(t)  - \gamma I(t)  \\
+\frac{d}{dt}R(t) &amp;= \gamma I(t)
+\end{align}
+\end{split}\]</div>
+<p><strong>State variables</strong></p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(S(t)\)</span> : the fraction of susceptible people</p></li>
+<li><p><span class="math notranslate nohighlight">\(I(t)\)</span> : the fraction of infectious people</p></li>
+<li><p><span class="math notranslate nohighlight">\(R(t)\)</span> : the fraction of recovered (or removed) people</p></li>
+</ul>
+<p><strong>Parameters</strong></p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\beta\)</span> : the rate of infection when susceptible and infectious people meet</p></li>
+<li><p><span class="math notranslate nohighlight">\(\gamma\)</span> : the rate of recovery of infectious people</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">OrdinaryDiffEq</span>
+<span class="k">using</span><span class="w"> </span><span class="n">Plots</span>
+<span class="n">Plots</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>SIR model (in-place form can save array allocations and thus faster)</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="n">sir!</span><span class="p">(</span><span class="n">du</span><span class="p">,</span><span class="w"> </span><span class="n">u</span><span class="p">,</span><span class="w"> </span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">)</span>
+<span class="w">    </span><span class="n">s</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">u</span>
+<span class="w">    </span><span class="n">β</span><span class="p">,</span><span class="w"> </span><span class="n">γ</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">p</span>
+<span class="w">    </span><span class="n">v1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">β</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">i</span>
+<span class="w">    </span><span class="n">v2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">γ</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">i</span>
+<span class="w">    </span><span class="n">du</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">v1</span>
+<span class="w">    </span><span class="n">du</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">v2</span>
+<span class="w">    </span><span class="n">du</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">v2</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nb">nothing</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>sir! (generic function with 1 method)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">β</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="n">γ</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">u0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">0.99</span><span class="p">,</span><span class="w"> </span><span class="mf">0.01</span><span class="p">,</span><span class="w"> </span><span class="mf">0.00</span><span class="p">]</span>
+<span class="n">tspan</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">20.0</span><span class="p">)</span>
+<span class="n">prob</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ODEProblem</span><span class="p">(</span><span class="n">sir!</span><span class="p">,</span><span class="w"> </span><span class="n">u0</span><span class="p">,</span><span class="w"> </span><span class="n">tspan</span><span class="p">,</span><span class="w"> </span><span class="n">p</span><span class="p">)</span>
+<span class="n">sol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>retcode: Success
+Interpolation: 3rd order Hermite
+t: 17-element Vector{Float64}:
+  0.0
+  0.08921318693905476
+  0.3702862715172094
+  0.7984257132319627
+  1.3237271485666187
+  1.991841832691831
+  2.7923706947355837
+  3.754781614278828
+  4.901904318934307
+  6.260476636498209
+  7.7648912410433075
+  9.39040980993922
+ 11.483861023017885
+ 13.372369854616487
+ 15.961357172044833
+ 18.681426667664056
+ 20.0
+u: 17-element Vector{Vector{Float64}}:
+ [0.99, 0.01, 0.0]
+ [0.9890894703413342, 0.010634484617786016, 0.00027604504087978485]
+ [0.9858331594901347, 0.012901496825852227, 0.0012653436840130785]
+ [0.9795270529591532, 0.017282420996456258, 0.003190526044390597]
+ [0.9689082167415561, 0.02463126703444545, 0.006460516223998508]
+ [0.9490552312363142, 0.03827338797605378, 0.012671380787632141]
+ [0.9118629475333939, 0.06347250098224964, 0.024664551484356558]
+ [0.8398871089274511, 0.11078176031568547, 0.049331130756863524]
+ [0.7075842068024722, 0.19166147882272844, 0.1007543143747994]
+ [0.508146028721987, 0.29177419341470584, 0.20007977786330722]
+ [0.31213222024413995, 0.3415879120018046, 0.34627986775405545]
+ [0.18215683096365565, 0.3099983134156389, 0.5078448556207055]
+ [0.10427205468919205, 0.22061114011133276, 0.6751168051994751]
+ [0.07386737407725845, 0.14760143051851143, 0.7785311954042301]
+ [0.05545028910907714, 0.07997076922865315, 0.8645789416622697]
+ [0.047334990695892025, 0.04060565321383335, 0.9120593560902746]
+ [0.04522885458929332, 0.029057416110814603, 0.925713729299892]
+</pre></div>
+</div>
+</div>
+</div>
+<p>Visualize the solution</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span><span class="p">(</span><span class="n">sol</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="p">[</span><span class="s">&quot;S&quot;</span><span class="w"> </span><span class="s">&quot;I&quot;</span><span class="w"> </span><span class="s">&quot;R&quot;</span><span class="p">],</span><span class="w"> </span><span class="n">legend</span><span class="o">=</span><span class="ss">:right</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/f086ae656fc169db7a012223b28e28e315f02c2a50684c56ba9e34949bd3c837.png" src="_images/f086ae656fc169db7a012223b28e28e315f02c2a50684c56ba9e34949bd3c837.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="using-modelingtoolkit-jl-recommended">
+<h2>Using ModelingToolkit.jl (recommended)<a class="headerlink" href="#using-modelingtoolkit-jl-recommended" title="Link to this heading">#</a></h2>
+<p><a class="reference external" href="https://docs.sciml.ai/ModelingToolkit/stable/">ModelingToolkit.jl</a> is a high-level package for symbolic-numeric modeling and simulation in the Julia ecosystem.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">ModelingToolkit</span>
+<span class="k">using</span><span class="w"> </span><span class="n">OrdinaryDiffEq</span>
+<span class="k">using</span><span class="w"> </span><span class="n">Plots</span>
+<span class="n">Plots</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="exponential-decay-model">
+<h3>Exponential decay model<a class="headerlink" href="#exponential-decay-model" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="nd">@independent_variables</span><span class="w"> </span><span class="n">t</span><span class="w">    </span><span class="c">## Time</span>
+<span class="nd">@parameters</span><span class="w"> </span><span class="n">λ</span><span class="w">               </span><span class="c">## Decaying rate constant</span>
+<span class="nd">@variables</span><span class="w"> </span><span class="n">C</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w">             </span><span class="c">## Time and concentration</span>
+<span class="n">D</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Differential</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w">         </span><span class="c">## Differential operator</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Differential(t)
+</pre></div>
+</div>
+</div>
+</div>
+<p>Define an ODE with equations</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">eqs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">D</span><span class="p">(</span><span class="n">C</span><span class="p">)</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="o">-</span><span class="n">λ</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">C</span><span class="p">]</span>
+<span class="nd">@mtkbuild</span><span class="w"> </span><span class="n">decaySys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ODESystem</span><span class="p">(</span><span class="n">eqs</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_latex math notranslate nohighlight">
+\[ \begin{align}
+\frac{\mathrm{d} C\left( t \right)}{\mathrm{d}t} &amp;=  - C\left( t \right) \lambda
+\end{align}
+ \]</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">u0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">C</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">1.0</span><span class="p">]</span>
+<span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">λ</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">1.0</span><span class="p">]</span>
+<span class="n">tspan</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">)</span>
+
+<span class="n">prob</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ODEProblem</span><span class="p">(</span><span class="n">decaySys</span><span class="p">,</span><span class="w"> </span><span class="n">u0</span><span class="p">,</span><span class="w"> </span><span class="n">tspan</span><span class="p">,</span><span class="w"> </span><span class="n">p</span><span class="p">)</span>
+<span class="n">sol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">sol</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/ca4b849184f7658fd6b67e8e2e87c142a9e0b9f76d4f6b48de09c88ee0ee6f74.png" src="_images/ca4b849184f7658fd6b67e8e2e87c142a9e0b9f76d4f6b48de09c88ee0ee6f74.png" />
+</div>
+</div>
+</section>
+<section id="sir-model">
+<h3>SIR model<a class="headerlink" href="#sir-model" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">OrdinaryDiffEq</span>
+<span class="k">using</span><span class="w"> </span><span class="n">ModelingToolkit</span>
+<span class="k">using</span><span class="w"> </span><span class="n">Plots</span>
+<span class="n">Plots</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="nd">@independent_variables</span><span class="w"> </span><span class="n">t</span>
+<span class="nd">@parameters</span><span class="w"> </span><span class="n">β</span><span class="w"> </span><span class="n">γ</span>
+<span class="nd">@variables</span><span class="w"> </span><span class="n">s</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"> </span><span class="n">i</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"> </span><span class="n">r</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+<span class="n">D</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Differential</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+
+<span class="n">eqs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="n">D</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="o">-</span><span class="n">β</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">i</span><span class="p">,</span>
+<span class="w">    </span><span class="n">D</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">β</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">γ</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">i</span><span class="p">,</span>
+<span class="w">    </span><span class="n">D</span><span class="p">(</span><span class="n">r</span><span class="p">)</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">γ</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">i</span>
+<span class="p">]</span>
+
+<span class="nd">@mtkbuild</span><span class="w"> </span><span class="n">sirSys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ODESystem</span><span class="p">(</span><span class="n">eqs</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_latex math notranslate nohighlight">
+\[\begin{split} \begin{align}
+\frac{\mathrm{d} s\left( t \right)}{\mathrm{d}t} &amp;=  - i\left( t \right) s\left( t \right) \beta \\
+\frac{\mathrm{d} i\left( t \right)}{\mathrm{d}t} &amp;=  - i\left( t \right) \gamma + i\left( t \right) s\left( t \right) \beta \\
+\frac{\mathrm{d} r\left( t \right)}{\mathrm{d}t} &amp;= i\left( t \right) \gamma
+\end{align}
+ \end{split}\]</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">β</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="n">γ</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">0.3</span><span class="p">]</span>
+<span class="n">u0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">s</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">0.99</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">0.01</span><span class="p">,</span><span class="w"> </span><span class="n">r</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">0.00</span><span class="p">]</span>
+<span class="n">tspan</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">20.0</span><span class="p">)</span>
+
+<span class="n">prob</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ODEProblem</span><span class="p">(</span><span class="n">sirSys</span><span class="p">,</span><span class="w"> </span><span class="n">u0</span><span class="p">,</span><span class="w"> </span><span class="n">tspan</span><span class="p">,</span><span class="w"> </span><span class="n">p</span><span class="p">)</span>
+<span class="n">sol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span>
+
+<span class="n">plot</span><span class="p">(</span><span class="n">sol</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/ad0caf374533912e67ce5ffa361c806af8d60b23eadbb3fab9bdba577e7e19e6.png" src="_images/ad0caf374533912e67ce5ffa361c806af8d60b23eadbb3fab9bdba577e7e19e6.png" />
+</div>
+</div>
+</section>
+<section id="lorenz-system">
+<h3>Lorenz system<a class="headerlink" href="#lorenz-system" title="Link to this heading">#</a></h3>
+<p>The Lorenz system is a system of ordinary differential equations having chaotic solutions for certain parameter values and initial conditions. (<a class="reference external" href="https://en.wikipedia.org/wiki/Lorenz_system">Wikipedia</a>)</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{align}
+  \frac{dx}{dt} &amp;= \sigma(y-x) \\
+  \frac{dy}{dt} &amp;= x(\rho - z) -y \\
+  \frac{dz}{dt} &amp;= xy - \beta z
+\end{align}
+\end{split}\]</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">OrdinaryDiffEq</span>
+<span class="k">using</span><span class="w"> </span><span class="n">ModelingToolkit</span>
+<span class="k">using</span><span class="w"> </span><span class="n">Plots</span>
+<span class="n">Plots</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Building the model is wrapped in a function</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="n">build_lorentz</span><span class="p">(;</span><span class="w"> </span><span class="n">name</span><span class="p">)</span>
+<span class="w">    </span><span class="nd">@parameters</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">        </span><span class="n">σ</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">10.0</span>
+<span class="w">        </span><span class="n">ρ</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">28.0</span>
+<span class="w">        </span><span class="n">β</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">8</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">3</span>
+<span class="w">    </span><span class="k">end</span>
+
+<span class="w">    </span><span class="nd">@independent_variables</span><span class="w"> </span><span class="n">t</span>
+<span class="w">    </span><span class="nd">@variables</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">        </span><span class="n">x</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="w">    </span><span class="c">## Independent variable (time)</span>
+<span class="w">        </span><span class="n">y</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0</span><span class="w">    </span><span class="c">## Independent variable (time)</span>
+<span class="w">        </span><span class="n">z</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0</span><span class="w">    </span><span class="c">## Independent variable (time)</span>
+<span class="w">    </span><span class="k">end</span>
+
+<span class="w">    </span><span class="n">D</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Differential</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+
+<span class="w">    </span><span class="n">eqs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="n">D</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">σ</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">y</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">x</span><span class="p">),</span>
+<span class="w">        </span><span class="n">D</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">ρ</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">z</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">y</span><span class="p">,</span>
+<span class="w">        </span><span class="n">D</span><span class="p">(</span><span class="n">z</span><span class="p">)</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">β</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">z</span>
+<span class="w">    </span><span class="p">]</span>
+
+<span class="w">    </span><span class="n">sys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ODESystem</span><span class="p">(</span><span class="n">eqs</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">;</span><span class="w"> </span><span class="n">name</span><span class="p">)</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">sys</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>build_lorentz (generic function with 1 method)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">tspan</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">100.0</span><span class="p">)</span>
+<span class="nd">@mtkbuild</span><span class="w"> </span><span class="n">sys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">build_lorentz</span><span class="p">()</span>
+<span class="n">prob</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ODEProblem</span><span class="p">(</span><span class="n">sys</span><span class="p">,</span><span class="w"> </span><span class="p">[],</span><span class="w"> </span><span class="n">tspan</span><span class="p">,</span><span class="w"> </span><span class="p">[])</span>
+<span class="n">sol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>retcode: Success
+Interpolation: 3rd order Hermite
+t: 1292-element Vector{Float64}:
+   0.0
+   3.5678604836301404e-5
+   0.0003924646531993154
+   0.003262408731175873
+   0.009058076622686189
+   0.01695647090176743
+   0.027689960116420883
+   0.041856352219618344
+   0.060240411865493296
+   0.08368541210909924
+   ⋮
+  99.43545175575305
+  99.50217600300971
+  99.56297541572351
+  99.62622492183432
+  99.69561088424294
+  99.77387244562912
+  99.86354266863755
+  99.93826978918452
+ 100.0
+u: 1292-element Vector{Vector{Float64}}:
+ [1.0, 0.0, 0.0]
+ [0.9996434557625105, 0.0009988049817849058, 1.781434788799189e-8]
+ [0.9961045497425811, 0.010965399721242457, 2.1469553658389193e-6]
+ [0.9693591548287857, 0.0897706331002921, 0.00014380191884671585]
+ [0.9242043547708632, 0.24228915014052968, 0.0010461625485930237]
+ [0.8800455783133068, 0.43873649717821195, 0.003424260078582332]
+ [0.8483309823046307, 0.6915629680633586, 0.008487625469885364]
+ [0.8495036699348377, 1.0145426764822272, 0.01821209108471829]
+ [0.9139069585506618, 1.442559985646147, 0.03669382222358562]
+ [1.0888638225734468, 2.0523265829961646, 0.07402573595703686]
+ ⋮
+ [1.2013409155396158, -2.429012698730855, 25.83593282347909]
+ [-0.4985909866565941, -2.2431908075030083, 21.591758421186338]
+ [-1.3554328352527145, -2.5773570617802326, 18.48962628032902]
+ [-2.1618698772305467, -3.5957801801676297, 15.934724265473792]
+ [-3.433783468673715, -5.786446127166032, 14.065327938066913]
+ [-5.971873646288483, -10.261846004477597, 14.060290896024572]
+ [-10.941900618598972, -17.312154206417734, 20.65905960858999]
+ [-14.71738043327772, -16.96871551014668, 33.06627229408802]
+ [-13.714517151605754, -8.323306384833089, 38.798231477265624]
+</pre></div>
+</div>
+</div>
+</div>
+<p>x-y-z time-series</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span><span class="p">(</span><span class="n">sol</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/f677f488fe9fa07ae170f75bbd1fb4ab0c2e05435bb536caaa318e5ecb0aa24d.png" src="_images/f677f488fe9fa07ae170f75bbd1fb4ab0c2e05435bb536caaa318e5ecb0aa24d.png" />
+</div>
+</div>
+<p>y-t plot</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span><span class="p">(</span><span class="n">sol</span><span class="p">,</span><span class="w"> </span><span class="n">idxs</span><span class="o">=</span><span class="p">[</span><span class="n">sys</span><span class="o">.</span><span class="n">y</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/2b1ac737ed6411f6b2805f6921dfe42c6e7a71129e456249557c80c71aa50fdb.png" src="_images/2b1ac737ed6411f6b2805f6921dfe42c6e7a71129e456249557c80c71aa50fdb.png" />
+</div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">idxs=(sys.x,</span> <span class="pre">sys.y,</span> <span class="pre">sys.z)</span></code> makes a phase plot.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span><span class="p">(</span><span class="n">sol</span><span class="p">,</span><span class="w"> </span><span class="n">idxs</span><span class="o">=</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">sys</span><span class="o">.</span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">sys</span><span class="o">.</span><span class="n">z</span><span class="p">),</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="nb">false</span><span class="p">,</span><span class="w"> </span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span><span class="w"> </span><span class="mi">600</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/ec46cc25131fedc05b9be427e666887bdd1221d2ed1fa2553bb4f623b15c3023.png" src="_images/ec46cc25131fedc05b9be427e666887bdd1221d2ed1fa2553bb4f623b15c3023.png" />
+</div>
+</div>
+</section>
+</section>
+<section id="saving-simulation-results">
+<h2>Saving simulation results<a class="headerlink" href="#saving-simulation-results" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">DataFrames</span>
+<span class="k">using</span><span class="w"> </span><span class="n">CSV</span>
+
+<span class="n">df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DataFrame</span><span class="p">(</span><span class="n">sol</span><span class="p">)</span>
+<span class="n">CSV</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;lorenz.csv&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">df</span><span class="p">)</span>
+<span class="n">rm</span><span class="p">(</span><span class="s">&quot;lorenz.csv&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="catalyst-jl">
+<h2>Catalyst.jl<a class="headerlink" href="#catalyst-jl" title="Link to this heading">#</a></h2>
+<p><a class="reference external" href="https://github.com/SciML/Catalyst.jl">Catalyst.jl</a> is a domain-specific language (DSL) package to simulate chemical reaction networks.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">OrdinaryDiffEq</span>
+<span class="k">using</span><span class="w"> </span><span class="n">Catalyst</span>
+<span class="k">using</span><span class="w"> </span><span class="n">Plots</span>
+<span class="n">Plots</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="id1">
+<h3>Exponential decay model<a class="headerlink" href="#id1" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">decay_rn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nd">@reaction_network</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">    </span><span class="n">λ</span><span class="p">,</span><span class="w"> </span><span class="n">C</span><span class="w"> </span><span class="o">--&gt;</span><span class="w"> </span><span class="mi">0</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_latex math notranslate nohighlight">
+\[ \begin{align*}
+\mathrm{C} &amp;\xrightarrow{\lambda} \varnothing  
+ \end{align*}
+ \]</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="ss">:λ</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">1.0</span><span class="p">]</span>
+<span class="n">u0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="ss">:C</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">1.0</span><span class="p">]</span>
+<span class="n">tspan</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">)</span>
+
+<span class="n">prob</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ODEProblem</span><span class="p">(</span><span class="n">decay_rn</span><span class="p">,</span><span class="w"> </span><span class="n">u0</span><span class="p">,</span><span class="w"> </span><span class="n">tspan</span><span class="p">,</span><span class="w"> </span><span class="n">p</span><span class="p">)</span>
+<span class="n">sol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>retcode: Success
+Interpolation: 3rd order Hermite
+t: 8-element Vector{Float64}:
+ 0.0
+ 0.10001999200479662
+ 0.34208427066999536
+ 0.6553980136343391
+ 1.0312652525315806
+ 1.4709405856363595
+ 1.9659576669700232
+ 2.0
+u: 8-element Vector{Vector{Float64}}:
+ [1.0]
+ [0.9048193287657775]
+ [0.7102883621328676]
+ [0.5192354400036404]
+ [0.35655576576996556]
+ [0.2297097907863828]
+ [0.14002247272452764]
+ [0.1353360028400881]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span><span class="p">(</span><span class="n">sol</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;Exponential Decay&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/ecde3e543fe1a6f98adc79b6254d886b1fa0c4f353da69e6f4836053b469d261.png" src="_images/ecde3e543fe1a6f98adc79b6254d886b1fa0c4f353da69e6f4836053b469d261.png" />
+</div>
+</div>
+</section>
+<section id="id2">
+<h3>SIR model<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">sir_rn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nd">@reaction_network</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">    </span><span class="n">β</span><span class="p">,</span><span class="w"> </span><span class="n">S</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">I</span><span class="w"> </span><span class="o">--&gt;</span><span class="w"> </span><span class="mi">2</span><span class="n">I</span>
+<span class="w">    </span><span class="n">γ</span><span class="p">,</span><span class="w"> </span><span class="n">I</span><span class="w"> </span><span class="o">--&gt;</span><span class="w"> </span><span class="n">R</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_latex math notranslate nohighlight">
+\[\begin{split} \begin{align*}
+\mathrm{S} + \mathrm{I} &amp;\xrightarrow{\beta} 2 \mathrm{I} \\
+\mathrm{I} &amp;\xrightarrow{\gamma} \mathrm{R}  
+ \end{align*}
+ \end{split}\]</div>
+</div>
+</div>
+<p>Extract the symbols for later use</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="nd">@unpack</span><span class="w"> </span><span class="n">β</span><span class="p">,</span><span class="w"> </span><span class="n">γ</span><span class="p">,</span><span class="w"> </span><span class="n">S</span><span class="p">,</span><span class="w"> </span><span class="n">I</span><span class="p">,</span><span class="w"> </span><span class="n">R</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sir_rn</span>
+
+<span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">β</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="n">γ</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">0.3</span><span class="p">]</span>
+<span class="n">u0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">S</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">0.99</span><span class="p">,</span><span class="w"> </span><span class="n">I</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">0.01</span><span class="p">,</span><span class="w"> </span><span class="n">R</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">0.00</span><span class="p">]</span>
+<span class="n">tspan</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">20.0</span><span class="p">)</span>
+
+<span class="n">prob</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ODEProblem</span><span class="p">(</span><span class="n">sir_rn</span><span class="p">,</span><span class="w"> </span><span class="n">u0</span><span class="p">,</span><span class="w"> </span><span class="n">tspan</span><span class="p">,</span><span class="w"> </span><span class="n">p</span><span class="p">)</span>
+<span class="n">sol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>retcode: Success
+Interpolation: 3rd order Hermite
+t: 17-element Vector{Float64}:
+  0.0
+  0.08921318693905476
+  0.3702862715172094
+  0.7984257132319627
+  1.3237271485666187
+  1.991841832691831
+  2.7923706947355837
+  3.754781614278828
+  4.901904318934307
+  6.260476636498209
+  7.7648912410433075
+  9.39040980993922
+ 11.483861023017885
+ 13.372369854616487
+ 15.961357172044833
+ 18.681426667664056
+ 20.0
+u: 17-element Vector{Vector{Float64}}:
+ [0.99, 0.01, 0.0]
+ [0.9890894703413342, 0.010634484617786016, 0.00027604504087978485]
+ [0.9858331594901347, 0.012901496825852227, 0.0012653436840130785]
+ [0.9795270529591532, 0.017282420996456258, 0.003190526044390597]
+ [0.9689082167415561, 0.02463126703444545, 0.006460516223998508]
+ [0.9490552312363142, 0.03827338797605378, 0.012671380787632141]
+ [0.9118629475333939, 0.06347250098224964, 0.024664551484356558]
+ [0.8398871089274511, 0.11078176031568547, 0.049331130756863524]
+ [0.7075842068024722, 0.19166147882272844, 0.1007543143747994]
+ [0.508146028721987, 0.29177419341470584, 0.20007977786330722]
+ [0.31213222024413995, 0.3415879120018046, 0.34627986775405545]
+ [0.18215683096365565, 0.3099983134156389, 0.5078448556207055]
+ [0.10427205468919205, 0.22061114011133276, 0.6751168051994751]
+ [0.07386737407725845, 0.14760143051851143, 0.7785311954042301]
+ [0.05545028910907714, 0.07997076922865315, 0.8645789416622697]
+ [0.047334990695892025, 0.04060565321383335, 0.9120593560902746]
+ [0.04522885458929332, 0.029057416110814603, 0.925713729299892]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span><span class="p">(</span><span class="n">sol</span><span class="p">,</span><span class="w"> </span><span class="n">legend</span><span class="o">=</span><span class="ss">:right</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;SIR Model&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/21028590b3075a72ae9addf3a9df95641ea23608e05125c3a1f8861b7b4750fd.png" src="_images/21028590b3075a72ae9addf3a9df95641ea23608e05125c3a1f8861b7b4750fd.png" />
+</div>
+</div>
+<hr class="docutils" />
+<p><em>This notebook was generated using <a class="reference external" href="https://github.com/fredrikekre/Literate.jl">Literate.jl</a>.</em></p>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "julia-1.10"
+        },
+        kernelOptions: {
+            name: "julia-1.10",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'julia-1.10'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="intro-02-plotting.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Plotting with Julia</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="intro-04-gillespie.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Stochastic simulations</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#solve-odes-using-ordinarydiffeq-jl">Solve ODEs using OrdinaryDiffEq.jl</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#single-variable-exponential-decay-model">Single variable: Exponential decay model</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#three-variables-the-sir-model">Three variables: The SIR model</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-modelingtoolkit-jl-recommended">Using ModelingToolkit.jl (recommended)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#exponential-decay-model">Exponential decay model</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sir-model">SIR model</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lorenz-system">Lorenz system</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#saving-simulation-results">Saving simulation results</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#catalyst-jl">Catalyst.jl</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Exponential decay model</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">SIR model</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Wen-Wei Tseng
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2022.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
