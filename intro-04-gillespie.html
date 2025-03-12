@@ -587,8 +587,8 @@ Reaction of A &lt;-&gt; B with rate constants k1 &amp; k2</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  0.547768 seconds (482.23 k allocations: 47.684 MiB, 37.26% gc time, 99.02% compilation time)
-  0.166754 seconds (9.95 k allocations: 14.957 MiB, 96.44% gc time)
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  1.044179 seconds (783.45 k allocations: 54.729 MiB, 14.99% gc time, 99.22% compilation time)
+  0.009261 seconds (16.33 k allocations: 14.929 MiB)
 </pre></div>
 </div>
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(t = [0.0, 0.006874672879606227, 0.0070050915014185, 0.01329115182676454, 0.015335530116774018, 0.01942319769041779, 0.021346508038833215, 0.02345030020299408, 0.025497753122539372, 0.02734483697039726  …  9.937773197389458, 9.938360255993572, 9.964450740930666, 9.96564917153764, 9.975440668199402, 9.978594329657025, 9.982318425245289, 9.987213207313044, 9.995833233887383, 10.024199143896238], u = [200 0; 199 1; … ; 75 125; 74 126])
@@ -606,7 +606,7 @@ Reaction of A &lt;-&gt; B with rate constants k1 &amp; k2</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/3b1fa6a16368f92991f6e610608827619a0c57ebb66dcb2a6d8c19099967c795.png" src="_images/3b1fa6a16368f92991f6e610608827619a0c57ebb66dcb2a6d8c19099967c795.png" />
+<img alt="_images/929003d6e40f7a1677513004831b00ccae06fb4363d97a0c29caa35b8d38f204.png" src="_images/929003d6e40f7a1677513004831b00ccae06fb4363d97a0c29caa35b8d38f204.png" />
 </div>
 </div>
 <p>Plot the solution by the first reaction method</p>
@@ -634,7 +634,7 @@ Reaction of A &lt;-&gt; B with rate constants k1 &amp; k2</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  0.304881 seconds (735.27 k allocations: 778.513 MiB, 14.19% gc time, 26.11% compilation time)
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  0.812526 seconds (1.02 M allocations: 770.311 MiB, 50.01% gc time, 10.26% compilation time)
 </pre></div>
 </div>
 </div>
@@ -675,7 +675,7 @@ Reaction of A &lt;-&gt; B with rate constants k1 &amp; k2</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/4746a47a843481358d4ef15f94d9c48f02319b57c0929127ab199ee83d82af83.png" src="_images/4746a47a843481358d4ef15f94d9c48f02319b57c0929127ab199ee83d82af83.png" />
+<img alt="_images/f36956c5b4f40c2de4163336d19980e070133de201c8c80644cc255ce7e189d2.png" src="_images/f36956c5b4f40c2de4163336d19980e070133de201c8c80644cc255ce7e189d2.png" />
 </div>
 </div>
 <p>Plot averages</p>
@@ -688,7 +688,7 @@ Reaction of A &lt;-&gt; B with rate constants k1 &amp; k2</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/96c8ab20a1ce220f6d1dd8a74e5482d65daac8d98ba7e3aa2cd22aee2bca9f84.png" src="_images/96c8ab20a1ce220f6d1dd8a74e5482d65daac8d98ba7e3aa2cd22aee2bca9f84.png" />
+<img alt="_images/fa92faa8304c5550be4c4e879b15b819f9504a97489e7ec13f3d80dbc5e7eec4.png" src="_images/fa92faa8304c5550be4c4e879b15b819f9504a97489e7ec13f3d80dbc5e7eec4.png" />
 </div>
 </div>
 </section>
@@ -709,6 +709,14 @@ Reaction of A &lt;-&gt; B with rate constants k1 &amp; k2</p>
 </div>
 </div>
 <div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Precompiling Catalyst...
+  21638.4 ms  ✓ Catalyst
+  1 dependency successfully precompiled in 22 seconds. 295 already precompiled.
+Precompiling DataInterpolationsSymbolicsExt...
+   6056.6 ms  ✓ DataInterpolations → DataInterpolationsSymbolicsExt
+  1 dependency successfully precompiled in 7 seconds. 164 already precompiled.
+</pre></div>
+</div>
 <div class="output text_latex math notranslate nohighlight">
 \[ \begin{align*}
 \mathrm{A} &amp;\xrightleftharpoons[\mathtt{k2}]{\mathtt{k1}} \mathrm{B}  
@@ -728,7 +736,7 @@ Reaction of A &lt;-&gt; B with rate constants k1 &amp; k2</p>
 </div>
 <div class="cell_output docutils container">
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>JumpInputs storing
-  JumpSystem: ##ReactionSystem#235
+  JumpSystem: ##ReactionSystem#240
   Problem type: DiscreteProblem
 </pre></div>
 </div>
@@ -769,7 +777,7 @@ SciMLBase.ODESolution{Float64, 2, Vector{Vector{Float64}}, Nothing, Nothing, Vec
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/ba0c8933f8df1fe6607fa0ef748e2cf639b89880babfdbf2504cedfeacbb92a3.png" src="_images/ba0c8933f8df1fe6607fa0ef748e2cf639b89880babfdbf2504cedfeacbb92a3.png" />
+<img alt="_images/b8e65e055aebc2b801afa8ea0875c83065fc61bbe4cc4f7eae25b1794fb1afdd.png" src="_images/b8e65e055aebc2b801afa8ea0875c83065fc61bbe4cc4f7eae25b1794fb1afdd.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -780,7 +788,7 @@ SciMLBase.ODESolution{Float64, 2, Vector{Vector{Float64}}, Nothing, Nothing, Vec
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/b82a10ac8e1e8b1717ebc7389bd081160a3ad56dd87e98b10dba24daac2461be.png" src="_images/b82a10ac8e1e8b1717ebc7389bd081160a3ad56dd87e98b10dba24daac2461be.png" />
+<img alt="_images/97cecd68e8ed04d3d82946a4fa0130a305b6b8eaece85670a10cfb26585a0b82.png" src="_images/97cecd68e8ed04d3d82946a4fa0130a305b6b8eaece85670a10cfb26585a0b82.png" />
 </div>
 </div>
 <p><strong>See also</strong> the <a class="reference external" href="https://docs.sciml.ai/JumpProcesses/stable/api/#JumpProcesses.ConstantRateJump">JumpProcesses.jl docs</a> about discrete stochastic examples.</p>
@@ -804,16 +812,16 @@ SciMLBase.ODESolution{Float64, 2, Vector{Vector{Float64}}, Nothing, Nothing, Vec
         },
         codeMirrorConfig: {
             theme: "abcdef",
-            mode: "julia-1.10"
+            mode: "julia-1.11"
         },
         kernelOptions: {
-            name: "julia-1.10",
+            name: "julia-1.11",
             path: "./."
         },
         predefinedOutput: true
     }
     </script>
-    <script>kernelName = 'julia-1.10'</script>
+    <script>kernelName = 'julia-1.11'</script>
 
                 </article>
               
