@@ -12,8 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NBCONVERT_JOBS: '6'
-  LITERATE_PROC: '6'
+  LITERATE_PROC: '2'
   JULIA_NUM_THREADS: '2'
   ALLOWERRORS: 'false'
   NBCACHE: '.cache'
@@ -23,7 +22,7 @@ env:
 
 jobs:
   CI:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:

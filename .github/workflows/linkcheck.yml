@@ -24,23 +24,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup Julia
-        uses: julia-actions/setup-julia@v2
-      - name: Convert literate notebooks to markdown files
-        shell: julia --color=yes {0}
-        working-directory: ./docs/
-        run: |
-          import Pkg
-          Pkg.add("Literate")
-          using Literate
-          for (root, dirs, files) in walkdir(pwd())
-            for file in files
-              if endswith(file, ".jl")
-                nb = joinpath(root, file)
-                Literate.markdown(nb, dirname(nb); mdstrings=true, flavor = Literate.CommonMarkFlavor())
-              end
-            end
-          end
       - name: Setup Python
         uses: actions/setup-python@v5
         id: setup-python
@@ -66,7 +49,7 @@ jobs:
         with:
           fail: false
           failIfEmpty: false
-          args: '--accept 200,204,429 --verbose --no-progress --cache --max-cache-age 1d docs/'
+          args: '--accept 200,204,429 --verbose --no-progress --cache --max-cache-age 1d "docs/**/*.md" "docs/**/*.jl"'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Create Issue From File
