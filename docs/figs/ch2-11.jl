@@ -21,7 +21,8 @@ end
 ps1 = [k0 => 0.0, k1 => 9.0, km1 => 12.0, k2 => 2.0]
 u0 = [A => 0.0, B => 10.0]
 tend = 3.0
-sol211 = solve(ODEProblem(rn211, u0, tend, ps1))
+prob = ODEProblem(rn211, u0, tend, ps1)
+@time sol211 = solve(prob)
 
 # Fig 2.11
 plot(
@@ -30,7 +31,6 @@ plot(
     ylabel="Concentration (AU)",
     title="Fig. 2.11 (Full model)"
 )
-
 
 # ## Figure 2.12 : Rapid equilibrium assumption
 
@@ -57,18 +57,12 @@ unknowns(model212)
 observed(model212)
 
 #---
-parameters(model212)
-
-#---
-independent_variables(model212)
-
-#---
 @unpack k0, k1, km1, k2, C, A, B = model212
 ps1 = [k0 => 0.0, k1 => 9.0, km1 => 12.0, k2 => 2.0]
 u0 = [C => 10.0]
 tend = 3.0
 prob = ODEProblem(model212, u0, tend, ps1)
-sol212 = solve(prob)
+@time sol212 = solve(prob)
 
 #---
 fig = plot(sol211, line=(:dash, 1), label=["A (full solution)" "B (full solution)"])
