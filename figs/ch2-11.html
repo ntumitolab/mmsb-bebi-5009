@@ -486,11 +486,15 @@ document.write(`
 <span class="n">ps1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">k0</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="n">k1</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">9.0</span><span class="p">,</span><span class="w"> </span><span class="n">km1</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">12.0</span><span class="p">,</span><span class="w"> </span><span class="n">k2</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">2.0</span><span class="p">]</span>
 <span class="n">u0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">A</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="n">B</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">10.0</span><span class="p">]</span>
 <span class="n">tend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">3.0</span>
-<span class="n">sol211</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">ODEProblem</span><span class="p">(</span><span class="n">rn211</span><span class="p">,</span><span class="w"> </span><span class="n">u0</span><span class="p">,</span><span class="w"> </span><span class="n">tend</span><span class="p">,</span><span class="w"> </span><span class="n">ps1</span><span class="p">))</span>
+<span class="n">prob</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ODEProblem</span><span class="p">(</span><span class="n">rn211</span><span class="p">,</span><span class="w"> </span><span class="n">u0</span><span class="p">,</span><span class="w"> </span><span class="n">tend</span><span class="p">,</span><span class="w"> </span><span class="n">ps1</span><span class="p">)</span>
+<span class="nd">@time</span><span class="w"> </span><span class="n">sol211</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  3.333901 seconds (22.77 M allocations: 1.200 GiB, 5.50% gc time, 99.96% compilation time)
+</pre></div>
+</div>
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>retcode: Success
 Interpolation: 3rd order Hermite
 t: 34-element Vector{Float64}:
@@ -624,45 +628,19 @@ A\left( t \right) &amp;=  - B\left( t \right) + C\left( t \right)
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">parameters</span><span class="p">(</span><span class="n">model212</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>4-element Vector{Any}:
- k0
- k2
- km1
- k1
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">independent_variables</span><span class="p">(</span><span class="n">model212</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1-element Vector{SymbolicUtils.BasicSymbolic{Real}}:
- t
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
 <div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="nd">@unpack</span><span class="w"> </span><span class="n">k0</span><span class="p">,</span><span class="w"> </span><span class="n">k1</span><span class="p">,</span><span class="w"> </span><span class="n">km1</span><span class="p">,</span><span class="w"> </span><span class="n">k2</span><span class="p">,</span><span class="w"> </span><span class="n">C</span><span class="p">,</span><span class="w"> </span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">B</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">model212</span>
 <span class="n">ps1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">k0</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="n">k1</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">9.0</span><span class="p">,</span><span class="w"> </span><span class="n">km1</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">12.0</span><span class="p">,</span><span class="w"> </span><span class="n">k2</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">2.0</span><span class="p">]</span>
 <span class="n">u0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">C</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mf">10.0</span><span class="p">]</span>
 <span class="n">tend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">3.0</span>
 <span class="n">prob</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ODEProblem</span><span class="p">(</span><span class="n">model212</span><span class="p">,</span><span class="w"> </span><span class="n">u0</span><span class="p">,</span><span class="w"> </span><span class="n">tend</span><span class="p">,</span><span class="w"> </span><span class="n">ps1</span><span class="p">)</span>
-<span class="n">sol212</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span>
+<span class="nd">@time</span><span class="w"> </span><span class="n">sol212</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  2.597871 seconds (16.52 M allocations: 908.558 MiB, 12.44% gc time, 99.98% compilation time)
+</pre></div>
+</div>
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>retcode: Success
 Interpolation: 3rd order Hermite
 t: 9-element Vector{Float64}:
