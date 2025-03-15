@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  LITERATE_PROC: '8'
+  LITERATE_PROC: '6'
   JULIA_NUM_THREADS: '2'
   ALLOWERRORS: 'false'
   NBCACHE: '.cache'
@@ -23,8 +23,6 @@ env:
 jobs:
   CI:
     runs-on: self-hosted
-    permissions:
-      contents: write
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -99,11 +97,63 @@ jobs:
       run: cp --verbose -rf ${{ env.NBCACHE }}/docs/* docs/
     - name: Build website
       run: jupyter-book build docs/
-    - name: Copy environment to website
-      run: cp Manifest.toml Project.toml requirements.txt ./docs/_build/html
+    - name: Upload pages artifact
+      if: ${{ github.ref == 'refs/heads/main' }}
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: docs/_build/html/
+
+  # Notebook branch
+  notebook:
+    name: Deploy notebook branch
+    needs: CI
+    if: ${{ github.ref == 'refs/heads/main' }}
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    - name: Setup Julia
+      uses: julia-actions/setup-julia@v2
+    - name: Convert literate files to Jupyter notebooks
+      shell: julia --color=yes {0}
+      working-directory: docs
+      run: |
+        import Pkg
+        Pkg.add("Literate")
+        using Literate
+        for (root, dirs, files) in walkdir(pwd())
+          for file in files
+            if endswith(file, ".jl")
+              nb = joinpath(root, file)
+              Literate.notebook(nb, dirname(nb); mdstrings=true, execute=false)
+            end
+          end
+        end
     - name: Deploy pages
       uses: JamesIves/github-pages-deploy-action@v4
       if: ${{ github.ref == 'refs/heads/main' }}
       with:
-        folder: ./docs/_build/html
+        folder: .
+        branch: ipynb
         commit-message: ${{ github.event.head_commit.message }}
+
+  # Deployment job
+  deploy:
+    name: Deploy to GitHub pages
+    needs: CI
+    if: ${{ github.ref == 'refs/heads/main' }}
+    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
+    permissions:
+      pages: write    # to deploy to Pages
+      id-token: write # to verify the deployment originates from an appropriate source
+      actions: read   # to download an artifact uploaded by `actions/upload-pages-artifact@v3`
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
