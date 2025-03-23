@@ -22,7 +22,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -31,8 +31,8 @@ jobs:
         with:
           version: '1.11'
       - name: Update Julia dependencies
-        # env:
-        #   JULIA_PKG_PRECOMPILE_AUTO: '0'
+        env:
+          JULIA_PKG_PRECOMPILE_AUTO: '0'
         run: julia --project=@. --color=yes -e 'using Pkg; Pkg.update()'
       # Authenticate with a custom GitHub APP
       # https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#authenticating-with-github-app-generated-tokens
