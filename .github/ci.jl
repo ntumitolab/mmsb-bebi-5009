@@ -1,11 +1,8 @@
 using Distributed
-using Tables
-using MarkdownTables
-using SHA
 
 @everywhere begin
     ENV["GKSwstype"] = "100"
-    using Literate, Pkg, JSON
+    using Literate, JSON, SHA
 end
 
 # Strip SVG output from a Jupyter notebook
@@ -71,51 +68,42 @@ function to_literate(nbpath; shell_or_help = r"^\s*[;?]")
     return jlpath
 end
 
-"Convert Jupyter notebooks into Literate notebooks in a dir tree"
-function convert_ipynb_to_literate(basedir)
-    for (root, _, files) in walkdir(basedir)
-        for file in files
-            name, ext = splitext(file)
-            if ext == ".ipynb"
-                nb = joinpath(root, file)
-                to_literate(nb)
-            end
-        end
-    end
-end
-
-"Recursively list Jupyter and Literate notebooks. Also process caching."
-function list_notebooks(basedir, cachedir)
+"Recursively list Literate notebooks"
+function list_notebooks(basedir)
     litnbs = String[]
     for (root, _, files) in walkdir(basedir)
         for file in files
+            nb = joinpath(root, file)
             name, ext = splitext(file)
             if ext == ".jl"
-                nb = joinpath(root, file)
-                shaval = read(nb, String) |> sha1 |> bytes2hex
-                @info "$(nb) SHA1 = $(shaval)"
-                shafilename = joinpath(cachedir, root, name * ".sha")
-                if isfile(shafilename) && read(shafilename, String) == shaval
-                    @info "$(nb) cache hits and will not be executed."
-                else
-                    @info "$(nb) cache misses. Writing hash to $(shafilename)."
-                    mkpath(dirname(shafilename))
-                    write(shafilename, shaval)
-                    push!(litnbs, nb)
-                end
+                push!(litnbs, nb)
+            elseif ext == ".ipynb"
+                lit = to_literate(nb)
+                rm(nb)
+                push!(litnbs, lit)
             end
         end
     end
     return litnbs
 end
 
-# Run a Literate.jl notebook
+# Run a Literate notebook
 @everywhere function run_literate(file, cachedir; rmsvg=true)
+    shaval = read(file, String) |> sha256 |> bytes2hex
+    @info "$(file) SHA256 = $(shaval)"
+    shafilename = joinpath(cachedir, splitext(file)[1] * ".sha")
+    ipynb = joinpath(cachedir, splitext(file)[1] * ".ipynb")
+    if isfile(shafilename) && read(shafilename, String) == shaval && isfile(ipynb)
+        @info "$(file) cache hits. The notebooks is $(ipynb). It will not be executed."
+        return ipynb
+    end
+    @info "$(file) cache misses. Writing hash to $(shafilename)."
+    mkpath(dirname(shafilename))
+    write(shafilename, shaval)
     outpath = joinpath(abspath(pwd()), cachedir, dirname(file))
     mkpath(outpath)
-    ipynb = Literate.notebook(file, outpath; mdstrings=true, execute=true)
-    rmsvg && strip_svg(ipynb)
-    return ipynb
+    @time "$(file) took" ipynb = Literate.notebook(file, outpath; mdstrings=true, execute=true)
+    return rmsvg ? strip_svg(ipynb) : ipynb
 end
 
 function main(;
@@ -125,36 +113,28 @@ function main(;
 
     mkpath(cachedir)
     clean_cache(cachedir)
-    convert_ipynb_to_literate(basedir)
-    litnbs = list_notebooks(basedir, cachedir)
+    litnbs = list_notebooks(basedir)
 
-    if !isempty(litnbs)
-        # Execute literate notebooks in worker process(es)
-        ts_lit = pmap(litnbs; on_error=ex -> NaN) do nb
-            @elapsed run_literate(nb, cachedir; rmsvg)
-        end
-        rmprocs(workers()) # Remove worker processes to release some memory
-
-        # Debug notebooks one by one if there are errors
-        for (nb, t) in zip(litnbs, ts_lit)
-            if isnan(t)
-                println("Debugging notebook: ", nb)
-                try
-                    withenv("JULIA_DEBUG" => "Literate") do
-                        run_literate(nb, cachedir; rmsvg)
-                    end
-                catch e
-                    println(e)
+    # Execute literate notebooks in worker process(es)
+    ts_lit = pmap(litnbs; on_error=ex -> NaN) do nb
+        @elapsed run_literate(nb, cachedir; rmsvg)
+    end
+    # Remove worker processes to release some memory
+    rmprocs(workers())
+    # Debug notebooks one by one if there are errors
+    for (nb, t) in zip(litnbs, ts_lit)
+        if isnan(t)
+            println("Debugging notebook: ", nb)
+            try
+                withenv("JULIA_DEBUG" => "Literate") do
+                    Literate.notebook(nb; mdstrings=true, execute=true)
                 end
+            catch e
+                println(e)
             end
         end
-        any(isnan, ts_lit) && error("Please check notebook error(s).")
-    else
-        ts_lit = []
     end
-
-    # Print execution result
-    Tables.table([litnbs ts_lit]; header=["Notebook", "Elapsed (s)"]) |> markdown_table(String) |> print
+    any(isnan, ts_lit) && error("Please check notebook error(s).")
 end
 
 # Run code
