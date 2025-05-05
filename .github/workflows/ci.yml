@@ -13,6 +13,7 @@ concurrency:
 
 env:
   LITERATE_PROC: '8'
+  NBCONVERT_JOBS: '8'
   JULIA_NUM_THREADS: '2'
   ALLOWERRORS: 'false'
   NBCACHE: '.cache'
@@ -39,13 +40,15 @@ jobs:
     - name: Install Python dependencies
       run: uv pip install -r requirements.txt
     - name: Read Julia version
-      id: read_toml
-      run: echo value=$(python -c 'import tomllib; from pathlib import Path; print(tomllib.loads(Path("Manifest.toml").read_text())["julia_version"])') >> "$GITHUB_OUTPUT"
+      uses: julia-actions/julia-version@main
+      id: julia-version
+      with:
+        versions: 'manifest'
     - name: Get environment hash
       id: hash
       run: |
         echo "value=${{ hashFiles('Project.toml', 'Manifest.toml', 'src/**') }}" >> "$GITHUB_OUTPUT"
-        echo "ver=${{ runner.os }}-julia-${{ steps.read_toml.outputs.value }}" >> "$GITHUB_OUTPUT"
+        echo "ver=${{ runner.os }}-julia-${{ steps.julia-version.outputs.resolved }}" >> "$GITHUB_OUTPUT"
     - name: Cache executed notebooks
       uses: actions/cache@v4
       id: cache-nb
@@ -59,7 +62,7 @@ jobs:
     - name: Setup Julia
       uses: julia-actions/setup-julia@v2
       with:
-        version: ${{ steps.read_toml.outputs.value }}
+        version: ${{ steps.julia-version.outputs.resolved }}
     - name: Restore Julia packages
       uses: actions/cache/restore@v4
       if: ${{ runner.environment == 'github-hosted' }}
@@ -74,7 +77,7 @@ jobs:
       shell: julia --color=yes {0}
       run: |
         using Pkg
-        Pkg.add(["Literate", "JSON"])
+        Pkg.add(["Literate", "Tables", "MarkdownTables", "JSON", "IJulia"])
         Pkg.activate(".")
         Pkg.instantiate()
         Pkg.precompile()
