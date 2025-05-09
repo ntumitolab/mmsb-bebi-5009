@@ -80,7 +80,7 @@ plot(solfirst.t, solfirst.u,
 numRuns = 50
 
 @time sols = map(1:numRuns) do _
-    ssa_alg(model, u0, tend, parameters, stoich; method=:first)
+    ssa_alg(model, u0, tend, parameters, stoich; method=:direct)
 end;
 
 # Average values and interpolation
