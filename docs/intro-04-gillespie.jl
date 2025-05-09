@@ -130,15 +130,14 @@ u0 = [:A => 200, :B => 0]
 tspan = (0.0, 10.0)
 jinput = JumpInputs(two_state_model, u0, tspan, params)
 
-
 # In this case, we would like to solve a `JumpProblem` using [Gillespie's Direct stochastic simulation algorithm (SSA)](https://doi.org/10.1016/0021-9991(76)90041-3).
 jprob = JumpProblem(jinput)
-sol = solve(jprob)
+@time sol = solve(jprob)
 plot(sol) |> PNG
 
 # Parallel ensemble simulation
 ensprob = EnsembleProblem(jprob)
-sim = solve(ensprob, SSAStepper(), EnsembleThreads(); trajectories=50)
+@time sim = solve(ensprob, SSAStepper(), EnsembleThreads(); trajectories=50)
 
 #---
 plot(sim, alpha=0.1, color=[:blue :red]) |> PNG
@@ -148,9 +147,5 @@ summ = EnsembleSummary(sim, 0:0.1:10)
 plot(summ, fillalpha=0.5) |> PNG
 
 #===
-**See also** the [JumpProcesses.jl docs](https://docs.sciml.ai/JumpProcesses/stable/api/#JumpProcesses.ConstantRateJump) about discrete stochastic examples.
-- High-level solutions using `Catalyst.jl` and low-level solutions defining the jumps directly.
-- Coupling stochastic discrete jumping and ODEs.
-- `RegularJumps` using a more efficient tau-leaping method.
-- [More solvers](https://docs.sciml.ai/JumpProcesses/stable/jump_types/) for discrete stochastic simulations.
+**See also** the [JumpProcesses.jl docs](https://docs.sciml.ai/JumpProcesses/stable/) about discrete stochastic algorithm examples.
 ===#
