@@ -169,3 +169,36 @@ plot(sol) |> PNG
 
 # ## Grid simulation
 # https://docs.sciml.ai/Catalyst/stable/spatial_modelling/lattice_reaction_systems/
+# https://docs.sciml.ai/JumpProcesses/stable/tutorials/spatial/
+using Catalyst
+using JumpProcesses
+using Plots
+
+rn = @reaction_network begin
+    (k1, k2), A + B <--> C
+end
+
+dA = @transport_reaction D A
+dB = @transport_reaction D B
+lattice = CartesianGrid((5,5))
+lrs = LatticeReactionSystem(rn, [dA, dB], lattice)
+
+# Initial conditions
+a0 = zeros(Int, 5, 5)
+a0[1, 1] = 25
+b0 = zeros(Int, 5, 5)
+b0[5, 5] = 25
+u0 = [:A => a0, :B => b0, :C => 0]
+ps = [:k1 => 6.0, :k2=> 0.05, :D => 1.0]
+tspan = (0.0, 10.0)
+prob = DiscreteProblem(lrs, u0, tspan, ps)
+jump_prob = JumpProblem(lrs, prob, NSM())
+
+@time sol = solve(jump_prob, SSAStepper())
+
+#---
+lat_getu(sol, :A, lrs)
+#---
+lat_getu(sol, :B, lrs)
+#---
+lat_getu(sol, :C, lrs)
