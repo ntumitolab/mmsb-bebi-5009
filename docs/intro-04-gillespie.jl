@@ -86,12 +86,12 @@ end;
 # Average values and interpolation
 ts = range(0, tend, 101)
 a_avg(t) = mean(sols) do sol
-    A = LinearInterpolation(sol.u[:, 1], sol.t)
+    A = LinearInterpolation(sol.u[:, 1], sol.t; cache_parameters=true)
     A(t)
 end
 
 b_avg(t) = mean(sols) do sol
-    A = LinearInterpolation(sol.u[:, 2], sol.t)
+    A = LinearInterpolation(sol.u[:, 2], sol.t; cache_parameters=true)
     A(t)
 end
 
@@ -128,15 +128,15 @@ end
 params = [:k1 => 1.0, :k2 => 0.5]
 u0 = [:A => 200, :B => 0]
 tspan = (0.0, 10.0)
-jinput = JumpInputs(two_state_model, u0, tspan, params)
+prob = DiscreteProblem(two_state_model, u0, tspan, params)
+jump_prob = JumpProblem(two_state_model, prob, Direct())
 
 # In this case, we would like to solve a `JumpProblem` using [Gillespie's Direct stochastic simulation algorithm (SSA)](https://doi.org/10.1016/0021-9991(76)90041-3).
-jprob = JumpProblem(jinput)
-@time sol = solve(jprob)
+@time sol = solve(jump_prob, SSAStepper())
 plot(sol) |> PNG
 
 # Parallel ensemble simulation
-ensprob = EnsembleProblem(jprob)
+ensprob = EnsembleProblem(jump_prob)
 @time sim = solve(ensprob, SSAStepper(), EnsembleThreads(); trajectories=50)
 
 #---
@@ -146,6 +146,65 @@ plot(sim, alpha=0.1, color=[:blue :red]) |> PNG
 summ = EnsembleSummary(sim, 0:0.1:10)
 plot(summ, fillalpha=0.5) |> PNG
 
+# ### SIR model
+sir_model = @reaction_network begin
+    beta, S + I --> 2I
+    gamma, I --> R
+end
+
+p = (:beta => 0.1 / 1000, :gamma => 0.01)
+u0 = [:S => 990, :I => 10, :R => 0]
+tspan = (0.0, 250.0)
+prob = DiscreteProblem(sir_model, u0, tspan, p)
+jump_prob = JumpProblem(sir_model, prob, Direct())
+#---
+@time sol = solve(jump_prob, SSAStepper())
+
+#---
+plot(sol) |> PNG
+
 #===
 **See also** the [JumpProcesses.jl docs](https://docs.sciml.ai/JumpProcesses/stable/) about discrete stochastic algorithm examples.
 ===#
+
+# ## Grid simulation
+# https://docs.sciml.ai/Catalyst/stable/spatial_modelling/lattice_reaction_systems/
+# https://docs.sciml.ai/JumpProcesses/stable/tutorials/spatial/
+using Catalyst
+using JumpProcesses
+using Plots
+
+sir_model = @reaction_network begin
+    beta, S + I --> 2I
+    gamma, I --> R
+end
+
+dS = @transport_reaction D S
+dI = @transport_reaction D I
+lattice = CartesianGrid((3,3))
+lrs = LatticeReactionSystem(sir_model, [dS, dI], lattice)
+
+s0 = ones(Int, 3, 3) .* 110
+i0 = zeros(Int, 3, 3)
+i0[1, 1] = 10
+r0 = zeros(Int, 3, 3)
+u0 = [:S => s0, :I => i0, :R => r0]
+ps = [:beta => 0.1 / 100, :gamma => 0.03, :D => 1.0]
+tspan = (0.0, 250.0)
+prob = DiscreteProblem(lrs, u0, tspan, ps)
+jump_prob = JumpProblem(lrs, prob, NSM())
+
+@time sol = solve(jump_prob, SSAStepper())
+#---
+lat_getu(sol, :S, lrs)
+#---
+lat_getu(sol, :I, lrs)
+#---
+lat_getu(sol, :R, lrs)
+
+#---
+t = sol.t
+s = sum.(lat_getu(sol, :S, lrs))
+i = sum.(lat_getu(sol, :I, lrs))
+r = sum.(lat_getu(sol, :R, lrs))
+plot(t, [s i r], label=["S" "I" "R"], lw=1.5) |> PNG
