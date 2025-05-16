@@ -136,7 +136,7 @@ jump_prob = JumpProblem(two_state_model, prob, Direct())
 plot(sol) |> PNG
 
 # Parallel ensemble simulation
-ensprob = EnsembleProblem(jprob)
+ensprob = EnsembleProblem(jump_prob)
 @time sim = solve(ensprob, SSAStepper(), EnsembleThreads(); trajectories=50)
 
 #---
@@ -174,31 +174,39 @@ using Catalyst
 using JumpProcesses
 using Plots
 
-rn = @reaction_network begin
-    (k1, k2), A + B <--> C
+sir_model = @reaction_network begin
+    beta, S + I --> 2I
+    gamma, I --> R
 end
 
-dA = @transport_reaction D A
-dB = @transport_reaction D B
-lattice = CartesianGrid((5,5))
-lrs = LatticeReactionSystem(rn, [dA, dB], lattice)
+dS = @transport_reaction D S
+dI = @transport_reaction D I
+lattice = CartesianGrid((3,3))
+lrs = LatticeReactionSystem(sir_model, [dS, dI], lattice)
 
 # Initial conditions
-a0 = zeros(Int, 5, 5)
-a0[1, 1] = 25
-b0 = zeros(Int, 5, 5)
-b0[5, 5] = 25
-u0 = [:A => a0, :B => b0, :C => 0]
-ps = [:k1 => 6.0, :k2=> 0.05, :D => 1.0]
-tspan = (0.0, 10.0)
+s0 = ones(Int, 3, 3) .* 110
+i0 = zeros(Int, 3, 3)
+i0[1, 1] = 10
+r0 = zeros(Int, 3, 3)
+u0 = [:S => s0, :I => i0, :R => r0]
+ps = [:beta => 0.1 / 100, :gamma => 0.01, :D => 1.0]
+tspan = (0.0, 250.0)
 prob = DiscreteProblem(lrs, u0, tspan, ps)
 jump_prob = JumpProblem(lrs, prob, NSM())
 
 @time sol = solve(jump_prob, SSAStepper())
 
 #---
-lat_getu(sol, :A, lrs)
+lat_getu(sol, :S, lrs)
 #---
-lat_getu(sol, :B, lrs)
+lat_getu(sol, :I, lrs)
 #---
-lat_getu(sol, :C, lrs)
+lat_getu(sol, :R, lrs)
+
+#---
+t = sol.t
+s = sum.(lat_getu(sol, :S, lrs))
+i = sum.(lat_getu(sol, :I, lrs))
+r = sum.(lat_getu(sol, :R, lrs))
+plot(t, [s i r], label=["S" "I" "R"], lw=1.5) |> PNG
