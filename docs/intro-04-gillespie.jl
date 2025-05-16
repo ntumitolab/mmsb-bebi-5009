@@ -189,7 +189,7 @@ i0 = zeros(Int, 3, 3)
 i0[1, 1] = 10
 r0 = zeros(Int, 3, 3)
 u0 = [:S => s0, :I => i0, :R => r0]
-ps = [:beta => 0.1 / 100, :gamma => 0.01, :D => 1.0]
+ps = [:beta => 0.1 / 100, :gamma => 0.03, :D => 1.0]
 tspan = (0.0, 250.0)
 prob = DiscreteProblem(lrs, u0, tspan, ps)
 jump_prob = JumpProblem(lrs, prob, NSM())
