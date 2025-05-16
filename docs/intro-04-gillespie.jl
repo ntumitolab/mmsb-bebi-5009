@@ -86,12 +86,12 @@ end;
 # Average values and interpolation
 ts = range(0, tend, 101)
 a_avg(t) = mean(sols) do sol
-    A = LinearInterpolation(sol.u[:, 1], sol.t)
+    A = LinearInterpolation(sol.u[:, 1], sol.t; cache_parameters=true)
     A(t)
 end
 
 b_avg(t) = mean(sols) do sol
-    A = LinearInterpolation(sol.u[:, 2], sol.t)
+    A = LinearInterpolation(sol.u[:, 2], sol.t; cache_parameters=true)
     A(t)
 end
 
@@ -128,11 +128,11 @@ end
 params = [:k1 => 1.0, :k2 => 0.5]
 u0 = [:A => 200, :B => 0]
 tspan = (0.0, 10.0)
-jinput = JumpInputs(two_state_model, u0, tspan, params)
+prob = DiscreteProblem(two_state_model, u0, tspan, params)
+jump_prob = JumpProblem(two_state_model, prob, Direct())
 
 # In this case, we would like to solve a `JumpProblem` using [Gillespie's Direct stochastic simulation algorithm (SSA)](https://doi.org/10.1016/0021-9991(76)90041-3).
-jprob = JumpProblem(jinput)
-@time sol = solve(jprob)
+@time sol = solve(jump_prob, SSAStepper())
 plot(sol) |> PNG
 
 # Parallel ensemble simulation
@@ -146,6 +146,26 @@ plot(sim, alpha=0.1, color=[:blue :red]) |> PNG
 summ = EnsembleSummary(sim, 0:0.1:10)
 plot(summ, fillalpha=0.5) |> PNG
 
+# ### SIR model
+sir_model = @reaction_network begin
+    beta, S + I --> 2I
+    gamma, I --> R
+end
+
+p = (:beta => 0.1 / 1000, :gamma => 0.01)
+u0 = [:S => 990, :I => 10, :R => 0]
+tspan = (0.0, 250.0)
+prob = DiscreteProblem(sir_model, u0, tspan, p)
+jump_prob = JumpProblem(sir_model, prob, Direct())
+#---
+@time sol = solve(jump_prob, SSAStepper())
+
+#---
+plot(sol) |> PNG
+
 #===
 **See also** the [JumpProcesses.jl docs](https://docs.sciml.ai/JumpProcesses/stable/) about discrete stochastic algorithm examples.
 ===#
+
+# ## Grid simulation
+# https://docs.sciml.ai/Catalyst/stable/spatial_modelling/lattice_reaction_systems/
