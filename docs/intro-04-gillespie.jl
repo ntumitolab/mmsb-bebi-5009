@@ -123,7 +123,7 @@ two_state_model = @reaction_network begin
     k2, B --> A
 end
 
-# The system with *integer* state variables belongs to `DiscreteProblem`. A `DiscreteProblem` could be further dispatched into other types of problems, such as `ODEProblem`, `SDEProblem`, and `JumpProblem`.
+# State variables are *integers*
 
 params = [:k1 => 1.0, :k2 => 0.5]
 u0 = [:A => 200, :B => 0]
