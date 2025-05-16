@@ -184,7 +184,6 @@ dI = @transport_reaction D I
 lattice = CartesianGrid((3,3))
 lrs = LatticeReactionSystem(sir_model, [dS, dI], lattice)
 
-# Initial conditions
 s0 = ones(Int, 3, 3) .* 110
 i0 = zeros(Int, 3, 3)
 i0[1, 1] = 10
@@ -196,7 +195,6 @@ prob = DiscreteProblem(lrs, u0, tspan, ps)
 jump_prob = JumpProblem(lrs, prob, NSM())
 
 @time sol = solve(jump_prob, SSAStepper())
-
 #---
 lat_getu(sol, :S, lrs)
 #---
