@@ -40,10 +40,8 @@ jobs:
     - name: Install Python dependencies
       run: uv pip install -r requirements.txt
     - name: Read Julia version
-      uses: julia-actions/julia-version@main
       id: julia-version
-      with:
-        versions: 'manifest'
+      run: python -c 'import tomllib; from pathlib import Path; print("resolved=", tomllib.loads(Path("Manifest.toml").read_text())["julia_version"])' >> "$GITHUB_OUTPUT"
     - name: Get environment hash
       id: hash
       run: |
