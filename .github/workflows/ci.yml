@@ -12,8 +12,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  LITERATE_PROC: '6'
-  NBCONVERT_JOBS: '6'
+  LITERATE_PROC: '8'
+  NBCONVERT_JOBS: '8'
   JULIA_NUM_THREADS: '2'
   ALLOWERRORS: 'false'
   NBCACHE: '.cache'
