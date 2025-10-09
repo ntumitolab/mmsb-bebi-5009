@@ -13,11 +13,11 @@ concurrency:
 
 env:
   LITERATE_PROC: '2'
-  NBCONVERT_JOBS: '2'
   JULIA_NUM_THREADS: '2'
   ALLOWERRORS: 'false'
   NBCACHE: '.cache'
   JULIA_CONDAPKG_BACKEND: 'Null'
+  JULIA_CONDAPKG_OFFLINE: 'true'
   JULIA_CI: 'true'
   UV_SYSTEM_PYTHON: 1
 
@@ -31,17 +31,16 @@ jobs:
       uses: actions/setup-python@v6
       id: setup-python
       with:
-        python-version: '3.x'
-        check-latest: true
-    - name: Install the latest version of uv
+        python-version: '3.13'
+    - name: Setup uv
       uses: astral-sh/setup-uv@v6
       with:
-        version: "latest"
+        enable-cache: true
     - name: Install Python dependencies
       run: uv pip install -r requirements.txt
     - name: Read Julia version
       id: julia-version
-      run: python -c 'import tomllib; from pathlib import Path; print("resolved=", tomllib.loads(Path("Manifest.toml").read_text())["julia_version"])' >> "$GITHUB_OUTPUT"
+      run: python -c 'import tomllib; from pathlib import Path; print("resolved=", tomllib.loads(Path("Manifest.toml").read_text())["julia_version"], sep="")' >> "$GITHUB_OUTPUT"
     - name: Get environment hash
       id: hash
       run: |
@@ -75,7 +74,7 @@ jobs:
       shell: julia --color=yes {0}
       run: |
         using Pkg
-        Pkg.add(["Literate", "Tables", "MarkdownTables", "JSON", "IJulia"])
+        Pkg.add(["Literate", "JSON", "Tables", "MarkdownTables", "SHA"])
         Pkg.activate(".")
         Pkg.instantiate()
         Pkg.precompile()
@@ -94,8 +93,8 @@ jobs:
     - name: Run notebooks
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' }}
       run: julia --project=@. --color=yes -p ${{ env.LITERATE_PROC }} .github/ci.jl
-    - name: Copy back built notebooks
-      run: cp --verbose -rf ${{ env.NBCACHE }}/docs/* docs/
+    # - name: Copy back built notebooks
+    #   run: cp --verbose -rf ${{ env.NBCACHE }}/docs/* docs/
     - name: Build website
       run: jupyter-book build docs/
     - name: Upload pages artifact
