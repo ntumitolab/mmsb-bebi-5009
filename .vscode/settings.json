@@ -15,4 +15,5 @@
         "tspan",
         "xlabel"
     ],
+    "julia.executablePath": "julia +lts"
 }
