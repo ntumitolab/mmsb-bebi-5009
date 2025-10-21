@@ -96,7 +96,7 @@ jobs:
     - name: Copy back built notebooks
       run: cp --verbose -rf ${{ env.NBCACHE }}/docs/* docs/
     - name: Build website
-      run: jupyter-book build docs/
+      run: uvx jupyter-book build docs/
     - name: Upload pages artifact
       if: ${{ github.ref == 'refs/heads/main' }}
       uses: actions/upload-pages-artifact@v4
