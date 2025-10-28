@@ -12,8 +12,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  LITERATE_PROC: '6'
-  JULIA_NUM_THREADS: '2'
+  LITERATE_PROC: '4'
+  JULIA_NUM_THREADS: '1'
   ALLOWERRORS: 'false'
   NBCACHE: '.cache'
   JULIA_CONDAPKG_BACKEND: 'Null'
@@ -23,7 +23,7 @@ env:
 
 jobs:
   CI:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
       uses: actions/checkout@v5
