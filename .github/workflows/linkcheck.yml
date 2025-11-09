@@ -29,7 +29,6 @@ jobs:
         id: setup-python
         with:
           python-version: '3.x'
-          check-latest: true
       - name: Install nbconvert
         run: pip install nbconvert
       - name: Convert ipynb files to markdown
