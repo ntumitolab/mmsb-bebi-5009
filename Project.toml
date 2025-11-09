@@ -17,5 +17,6 @@ StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 SteadyStateDiffEq = "9672c7b4-1e72-59bd-8a11-6ac3964bc41f"
 
 [compat]
+DataFrames = "1.8.1"
 OrdinaryDiffEq = "6.103.0"
 ModelingToolkit = "10.26.1"
