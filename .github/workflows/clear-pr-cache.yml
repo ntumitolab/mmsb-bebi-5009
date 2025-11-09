@@ -1,18 +1,18 @@
-name: Manually clear cache
+name: Cleanup github runner caches on closed pull requests
 on:
-  workflow_dispatch:
+  pull_request:
+    types:
+      - closed
 
 jobs:
   cleanup:
+    runs-on: ubuntu-latest
     permissions:
       actions: write
-    runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
       - name: Cleanup
         run: |
-          echo "Fetching list of cache keys from $BRANCH"
+          echo "Fetching list of cache keys"
           cacheKeysForPR=$(gh cache list --ref $BRANCH --limit 100 --json id --jq '.[].id')
 
           ## Setting this to not fail the workflow while deleting cache keys.
@@ -24,6 +24,6 @@ jobs:
           done
           echo "Done"
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO: ${{ github.repository }}
-          BRANCH: ${{ github.ref }}
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          BRANCH: refs/pull/${{ github.event.pull_request.number }}/merge

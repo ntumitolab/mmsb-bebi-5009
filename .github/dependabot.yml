@@ -1,15 +1,26 @@
 version: 2
+enable-beta-ecosystems: true
 updates:
-  - package-ecosystem: github-actions
+  - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: weekly
+      interval: "weekly"
     groups:
       gha-dependencies:
         applies-to: "version-updates"
         patterns:
           - "*"
-  - package-ecosystem: pip
+    labels:
+      - "automerge"
+  - package-ecosystem: "pip"
     directory: "/"
     schedule:
-      interval: weekly
+      interval: "weekly"
+    labels:
+      - "automerge"
+  - package-ecosystem: "julia" # See documentation for possible values
+    directory: "/" # Location of package manifests
+    schedule:
+      interval: "weekly"
+    labels:
+      - "automerge"
