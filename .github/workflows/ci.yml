@@ -12,18 +12,20 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  LITERATE_PROC: '2'
-  JULIA_NUM_THREADS: '2'
-  ALLOWERRORS: 'false'
-  NBCACHE: '.cache'
+  BASE_URL: /${{ github.event.repository.name }}
+  JULIA_CI: 'true'
   JULIA_CONDAPKG_BACKEND: 'Null'
   JULIA_CONDAPKG_OFFLINE: 'true'
-  JULIA_CI: 'true'
+  JULIA_NUM_THREADS: '2'
+  LITERATE_PROC: '2'
+  NBCACHE: '.cache'
   UV_SYSTEM_PYTHON: 1
 
 jobs:
   CI:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
     - name: Checkout repository
       uses: actions/checkout@v5
@@ -34,16 +36,21 @@ jobs:
         python-version: '3.13'
     - name: Setup uv
       uses: astral-sh/setup-uv@v7
+      with:
+        enable-cache: true
     - name: Install Python dependencies
       run: uv pip install -r requirements.txt
     - name: Read Julia version
+      uses: SebRollen/toml-action@v1.2.0
       id: julia-version
-      run: python -c 'import tomllib; from pathlib import Path; print("resolved=", tomllib.loads(Path("Manifest.toml").read_text())["julia_version"], sep="")' >> "$GITHUB_OUTPUT"
+      with:
+        file: 'Manifest.toml'
+        field: 'julia_version'
     - name: Get environment hash
       id: hash
       run: |
         echo "value=${{ hashFiles('Project.toml', 'Manifest.toml', 'src/**') }}" >> "$GITHUB_OUTPUT"
-        echo "ver=${{ runner.os }}-julia-${{ steps.julia-version.outputs.resolved }}" >> "$GITHUB_OUTPUT"
+        echo "ver=${{ runner.os }}-julia-${{ steps.julia-version.outputs.value }}" >> "$GITHUB_OUTPUT"
     - name: Cache executed notebooks
       uses: actions/cache@v4
       id: cache-nb
@@ -57,7 +64,7 @@ jobs:
     - name: Setup Julia
       uses: julia-actions/setup-julia@v2
       with:
-        version: ${{ steps.julia-version.outputs.resolved }}
+        version: ${{ steps.julia-version.outputs.value }}
     - name: Restore Julia packages
       uses: actions/cache/restore@v4
       if: ${{ runner.environment == 'github-hosted' }}
@@ -93,49 +100,27 @@ jobs:
       run: julia --project=@. --color=yes -p ${{ env.LITERATE_PROC }} .github/ci.jl
     - name: Copy back built notebooks
       run: cp --verbose -rf ${{ env.NBCACHE }}/docs/* docs/
-    - name: Build website
-      run: uvx jupyter-book build docs/
-    - name: Upload pages artifact
-      if: ${{ github.ref == 'refs/heads/main' }}
-      uses: actions/upload-pages-artifact@v4
-      with:
-        path: docs/_build/html/
-
-  # Notebook branch
-  notebook:
-    name: Deploy notebook branch
-    needs: CI
-    if: ${{ github.ref == 'refs/heads/main' }}
-    permissions:
-      contents: write
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v5
-    - name: Setup Julia
-      uses: julia-actions/setup-julia@v2
-    - name: Convert literate files to Jupyter notebooks
-      shell: julia --color=yes {0}
-      working-directory: docs
-      run: |
-        import Pkg
-        Pkg.add("Literate")
-        using Literate
-        for (root, dirs, files) in walkdir(pwd())
-          for file in files
-            if endswith(file, ".jl")
-              nb = joinpath(root, file)
-              Literate.notebook(nb, dirname(nb); mdstrings=true, execute=false)
-            end
-          end
-        end
-    - name: Deploy pages
+    - name: Deploy notebooks to another branch
       uses: JamesIves/github-pages-deploy-action@v4
       if: ${{ github.ref == 'refs/heads/main' }}
       with:
         folder: .
         branch: ipynb
+        single-commit: true
         commit-message: ${{ github.event.head_commit.message }}
+    - name: Setup NodeJS (required by Jupyter Book 2)
+      uses: actions/setup-node@v6
+      with:
+        node-version: 18.x
+    - name: Install Jupyter Book (via myst)
+      run: npm install -g jupyter-book
+    - name: Build website
+      run: jupyter-book build --html
+    - name: Upload pages artifact
+      if: ${{ github.ref == 'refs/heads/main' }}
+      uses: actions/upload-pages-artifact@v4
+      with:
+        path: './_build/html'
 
   # Deployment job
   deploy:
@@ -146,7 +131,7 @@ jobs:
     permissions:
       pages: write    # to deploy to Pages
       id-token: write # to verify the deployment originates from an appropriate source
-      actions: read   # to download an artifact uploaded by `actions/upload-pages-artifact@v3`
+      actions: read   # to download an artifact uploaded by `actions/upload-pages-artifact`
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
