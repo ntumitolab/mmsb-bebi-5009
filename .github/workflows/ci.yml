@@ -101,14 +101,6 @@ jobs:
       run: julia --project=@. --color=yes -p ${{ env.LITERATE_PROC }} .github/ci.jl
     - name: Copy back built notebooks
       run: cp --verbose -rf ${{ env.NBCACHE }}/docs/* docs/
-    - name: Deploy notebooks to another branch
-      uses: JamesIves/github-pages-deploy-action@v4
-      if: ${{ github.ref == 'refs/heads/main' }}
-      with:
-        folder: .
-        branch: ipynb
-        single-commit: true
-        commit-message: ${{ github.event.head_commit.message }}
     - name: Setup NodeJS (required by Jupyter Book 2)
       uses: actions/setup-node@v6
       with:
