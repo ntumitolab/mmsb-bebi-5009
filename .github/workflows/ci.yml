@@ -17,15 +17,13 @@ env:
   JULIA_CONDAPKG_BACKEND: 'Null'
   JULIA_CONDAPKG_OFFLINE: 'true'
   JULIA_NUM_THREADS: '2'
-  LITERATE_PROC: '2'
+  LITERATE_PROC: '6'
   NBCACHE: '.cache'
   UV_SYSTEM_PYTHON: 1
 
 jobs:
-  CI:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
+  execute:
+    runs-on: self-hosted
     steps:
     - name: Checkout repository
       uses: actions/checkout@v5
@@ -99,6 +97,22 @@ jobs:
     - name: Run notebooks
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' }}
       run: julia --project=@. --color=yes -p ${{ env.LITERATE_PROC }} .github/ci.jl
+    - name: Upload Notebooks
+      uses: actions/upload-artifact@v5
+      with:
+        path: ${{ env.NBCACHE }}/**/*.ipynb
+        include-hidden-files: true
+        retention-days: 1
+  render:
+    needs: execute
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v5
+    - name: Download notebooks
+      uses: actions/download-artifact@v6
+      with:
+        path: ${{ env.NBCACHE }}
     - name: Copy back built notebooks
       run: cp --verbose -rf ${{ env.NBCACHE }}/docs/* docs/
     - name: Setup NodeJS (required by Jupyter Book 2)
@@ -115,10 +129,26 @@ jobs:
       with:
         path: './_build/html'
 
+  # CI conclusion for GitHub status check
+  # Adaped from https://brunoscheufler.com/blog/2022-04-09-the-required-github-status-check-that-wasnt
+  CI:
+    needs: render
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          if [[ ${{ needs.render.result }} == "success" ]]; then
+            echo "Tests passed"
+            exit 0
+          else
+            echo "Tests failed"
+            exit 1
+          fi
+
   # Deployment job
   deploy:
     name: Deploy to GitHub pages
-    needs: CI
+    needs: render
     if: ${{ github.ref == 'refs/heads/main' }}
     # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
     permissions:
