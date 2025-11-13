@@ -3,7 +3,7 @@ name: Auto update Julia manifest dependencies
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 1 * *' # Every month
+    - cron: '0 0 * * 0' # Every week
   push:
     branches:
       - main
@@ -48,5 +48,9 @@ jobs:
         with:
           title: Julia Dependency Update
           token: ${{ steps.generate-token.outputs.token }}
-          labels: |
-            automerge
+      - name: Add to merge quque / automerge
+        if: ${{ steps.cpr.outputs.pull-request-number }}
+        run: gh pr merge --auto --squash "$PR_NUM"
+        env:
+          PR_NUM: ${{ steps.cpr.outputs.pull-request-number }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

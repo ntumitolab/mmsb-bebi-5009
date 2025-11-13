@@ -18,13 +18,13 @@ env:
   JULIA_CONDAPKG_BACKEND: 'Null'
   JULIA_CONDAPKG_OFFLINE: 'true'
   JULIA_NUM_THREADS: '2'
-  LITERATE_PROC: '6'
+  LITERATE_PROC: '2'
   NBCACHE: '.cache'
   UV_SYSTEM_PYTHON: 1
 
 jobs:
   execute:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
       uses: actions/checkout@v5
