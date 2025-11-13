@@ -2,7 +2,7 @@
 
 julia_version = "1.12.1"
 manifest_format = "2.0"
-project_hash = "d2a8111d81e0b1713687765a3e9f0aea765c339b"
+project_hash = "a5fa77b772ccaaa650ca62e297298b24313636b6"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "27cecae79e5cc9935255f90c53bb831cc3c870d7"
@@ -1575,12 +1575,6 @@ deps = ["Artifacts", "JLLWrappers", "Libdl"]
 git-tree-sha1 = "b6aa4566bb7ae78498a5e68943863fa8b5231b59"
 uuid = "e7412a2a-1a6e-54c0-be00-318e2571c051"
 version = "1.3.6+0"
-
-[[deps.OhMyREPL]]
-deps = ["Crayons", "JLFzf", "JuliaSyntax", "Markdown", "Pkg", "Printf", "REPL"]
-git-tree-sha1 = "1884e964b4da2afe26983a3298cdc6d41b228ddd"
-uuid = "5fb14364-9ced-5910-84b2-373655c76a03"
-version = "0.5.29"
 
 [[deps.OpenBLAS_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "Libdl"]
