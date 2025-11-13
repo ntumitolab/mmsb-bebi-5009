@@ -1,0 +1,34 @@
+# See docs at: https://mystmd.org/guide/frontmatter
+version: 1
+project:
+  title: BEBI-5009
+  description: Modeling and Simulations of Systems Biology
+  # keywords: []
+  authors: ["Wen-Wei Tseng"]
+  github: https://github.com/ntumitolab/mmsb-bebi-5009
+  jupyter:
+    binder:
+      ref: ipynb
+
+  # bibliography:
+  #   - docs/references.bib
+  # To autogenerate a Table of Contents, run "jupyter book init --write-toc"
+  # https://mystmd.org/guide/table-of-contents
+  toc:
+    - file: docs/index.md
+    - file: docs/intro-00-start.md
+      children:
+        - pattern: docs/intro-*.ipynb
+    - title: Homework
+      children:
+        - file: docs/hw-00.md
+        - file: docs/hw-01.ipynb
+    - title: Textbook Figures
+      children:
+        - pattern: docs/figs/*.ipynb
+    - file: docs/runtime.ipynb
+site:
+  template: book-theme
+  # options:
+  #   favicon: favicon.ico
+  #   logo: site_logo.png
