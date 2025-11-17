@@ -10,10 +10,14 @@ updates:
         applies-to: "version-updates"
         patterns:
           - "*"
+    labels:
+      - automerge
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
       interval: "weekly"
+    labels:
+      - automerge
   # - package-ecosystem: "julia" # See documentation for possible values
   #   directory: "/" # Location of package manifests
   #   schedule:

@@ -6,7 +6,6 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
-  merge_group:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -18,13 +17,12 @@ env:
   JULIA_CONDAPKG_BACKEND: 'Null'
   JULIA_CONDAPKG_OFFLINE: 'true'
   # JULIA_NUM_THREADS: '2'
-  LITERATE_PROC: '8'
+  LITERATE_PROC: '2'
   NBCACHE: '.cache'
-  UV_SYSTEM_PYTHON: 1
 
 jobs:
   execute:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
       uses: actions/checkout@v5
@@ -33,12 +31,8 @@ jobs:
       id: setup-python
       with:
         python-version: '3.13'
-    - name: Setup uv
-      uses: astral-sh/setup-uv@v7
-      with:
-        enable-cache: true
     - name: Install Python dependencies
-      run: uv pip install -r requirements.txt
+      run: pip install -r requirements.txt
     - name: Read Julia version
       uses: SebRollen/toml-action@v1.2.0
       id: julia-version
@@ -48,7 +42,7 @@ jobs:
     - name: Get environment hash
       id: hash
       run: |
-        echo "value=${{ hashFiles('Project.toml', 'Manifest.toml', 'src/**') }}" >> "$GITHUB_OUTPUT"
+        echo "value=${{ hashFiles('Project.toml', 'Manifest.toml') }}" >> "$GITHUB_OUTPUT"
         echo "ver=${{ runner.os }}-julia-${{ steps.julia-version.outputs.value }}" >> "$GITHUB_OUTPUT"
     - name: Cache executed notebooks
       uses: actions/cache@v4
@@ -81,12 +75,7 @@ jobs:
         Pkg.add(["Literate", "JSON", "Tables", "MarkdownTables", "SHA"])
         Pkg.activate(".")
         Pkg.instantiate()
-    - name: Clean Julia package directory
-      if: ${{ runner.environment == 'github-hosted' && steps.cache-julia.outputs.cache-hit != 'true' }}
-      shell: julia --color=yes {0}
-      run: |
-        using Pkg, Dates
-        Pkg.gc(collect_delay=Day(0))
+        Pkg.precompile()
     - name: Save Julia packages
       uses: actions/cache/save@v4
       if: ${{ runner.environment == 'github-hosted' && steps.cache-julia.outputs.cache-hit != 'true' }}
@@ -101,6 +90,7 @@ jobs:
       with:
         path: ${{ env.NBCACHE }}/**/*.ipynb
         include-hidden-files: true
+        name: notebooks
         retention-days: 1
   render:
     needs: execute
@@ -111,6 +101,7 @@ jobs:
     - name: Download notebooks
       uses: actions/download-artifact@v6
       with:
+        name: notebooks
         path: ${{ env.NBCACHE }}
     - name: Copy back built notebooks
       run: cp --verbose -rf ${{ env.NBCACHE }}/docs/* docs/
@@ -146,7 +137,7 @@ jobs:
 
   # Deployment job
   deploy:
-    name: Deploy to GitHub pages
+    name: Deploy to GitHub pages and Notebook branch
     needs: render
     if: ${{ github.ref == 'refs/heads/main' }}
     # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
@@ -154,11 +145,39 @@ jobs:
       pages: write    # to deploy to Pages
       id-token: write # to verify the deployment originates from an appropriate source
       actions: read   # to download an artifact uploaded by `actions/upload-pages-artifact`
+      contents: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Download notebooks
+        uses: actions/download-artifact@v6
+        with:
+          name: notebooks
+          path: ${{ env.NBCACHE }}
+      - name: Copy back built notebooks
+        run: |
+          cp --verbose -rf ${{ env.NBCACHE }}/docs/* docs/
+          rm -rf ${{ env.NBCACHE }}
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        id: setup-python
+        with:
+          python-version: '3.13'
+      - name: Install nbconvert
+        run: pip install nbconvert
+      - name: Find notebooks
+        run: find docs/ -type f -name '*.ipynb' | parallel jupyter nbconvert --clear-output --inplace {}
+      - name: Deploy notebooks
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          publish_dir: .
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: ipynb
+          commit_message: ${{ github.event.head_commit.message }}
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

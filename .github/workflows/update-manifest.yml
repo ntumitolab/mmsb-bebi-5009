@@ -48,9 +48,4 @@ jobs:
         with:
           title: Julia Dependency Update
           token: ${{ steps.generate-token.outputs.token }}
-      - name: Add to merge quque / automerge
-        if: ${{ steps.cpr.outputs.pull-request-number }}
-        run: gh pr merge --auto --squash "$PR_NUM"
-        env:
-          PR_NUM: ${{ steps.cpr.outputs.pull-request-number }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          labels: automerge
