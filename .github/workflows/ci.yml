@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
     - name: Setup Python
       uses: actions/setup-python@v6
       id: setup-python
@@ -104,7 +104,7 @@ jobs:
       BASE_URL: /${{ github.event.repository.name }}
     steps:
     - name: Checkout
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
     - name: Download notebooks
       uses: actions/download-artifact@v6
       with:
@@ -158,7 +158,7 @@ jobs:
     runs-on: ubuntu-slim
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Download notebooks
         uses: actions/download-artifact@v6
         with:
