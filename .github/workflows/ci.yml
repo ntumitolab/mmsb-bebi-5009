@@ -12,13 +12,14 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  BASE_URL: /${{ github.event.repository.name }}
   JULIA_CI: 'true'
   JULIA_CONDAPKG_BACKEND: 'Null'
   JULIA_CONDAPKG_OFFLINE: 'true'
-  # JULIA_NUM_THREADS: '2'
-  LITERATE_PROC: '2'
+  JULIA_NUM_THREADS: '2'
   NBCACHE: '.cache'
+  LITERATE_PROC: '2'
+  PY_VER: '3.13'
+
 
 jobs:
   execute:
@@ -30,20 +31,18 @@ jobs:
       uses: actions/setup-python@v6
       id: setup-python
       with:
-        python-version: '3.13'
+        python-version: ${{ env.PY_VER }}
+    - name: Install the latest version of uv
+      uses: astral-sh/setup-uv@v7
     - name: Install Python dependencies
-      run: pip install -r requirements.txt
+      run: uv pip install --system -r requirements.txt
     - name: Read Julia version
-      uses: SebRollen/toml-action@v1.2.0
       id: julia-version
-      with:
-        file: 'Manifest.toml'
-        field: 'julia_version'
+      run: python -c 'import tomllib; from pathlib import Path; print("value=", tomllib.loads(Path("Manifest.toml").read_text())["julia_version"], sep="")' >> "$GITHUB_OUTPUT"
     - name: Get environment hash
       id: hash
       run: |
-        echo "value=${{ hashFiles('Project.toml', 'Manifest.toml') }}" >> "$GITHUB_OUTPUT"
-        echo "ver=${{ runner.os }}-julia-${{ steps.julia-version.outputs.value }}" >> "$GITHUB_OUTPUT"
+        echo "value=${{ hashFiles('Project.toml', 'Manifest.toml', 'src/**') }}" >> "$GITHUB_OUTPUT"
     - name: Cache executed notebooks
       uses: actions/cache@v4
       id: cache-nb
@@ -51,31 +50,37 @@ jobs:
         path: |
           ${{ env.NBCACHE }}/**/*.ipynb
           ${{ env.NBCACHE }}/**/*.sha
-        key: notebook-${{ steps.hash.outputs.value }}-${{ hashFiles('docs/**/*.ipynb', 'docs/**/*.jl') }}
+        key: notebook-${{ steps.hash.outputs.value }}-${{ hashFiles('docs/**') }}
         restore-keys: |
           notebook-${{ steps.hash.outputs.value }}-
     - name: Setup Julia
       uses: julia-actions/setup-julia@v2
       with:
         version: ${{ steps.julia-version.outputs.value }}
+        arch: ${{ runner.arch }}
     - name: Restore Julia packages
       uses: actions/cache/restore@v4
       if: ${{ runner.environment == 'github-hosted' }}
       id: cache-julia
       with:
         path: ~/.julia
-        key: ${{ steps.hash.outputs.ver }}-${{ steps.hash.outputs.value }}
+        key: ${{ runner.os }}-julia-${{ steps.julia-version.outputs.value }}-${{ steps.hash.outputs.value }}
         restore-keys: |
-          ${{ steps.hash.outputs.ver }}-
+          ${{ runner.os }}-julia-${{ steps.julia-version.outputs.value }}
     - name: Install Julia packages
       if: ${{ runner.environment == 'self-hosted' || steps.cache-julia.outputs.cache-hit != 'true' }}
       shell: julia --color=yes {0}
+      env:
+        JULIA_DEBUG: loading
       run: |
-        using Pkg
+        using Pkg, Dates
         Pkg.add(["Literate", "JSON", "Tables", "MarkdownTables", "SHA"])
         Pkg.activate(".")
         Pkg.instantiate()
         Pkg.precompile()
+        if ENV["RUNNER_ENVIRONMENT"] == "github-hosted"
+            Pkg.gc(;collect_delay=Day(0))
+        end
     - name: Save Julia packages
       uses: actions/cache/save@v4
       if: ${{ runner.environment == 'github-hosted' && steps.cache-julia.outputs.cache-hit != 'true' }}
@@ -95,6 +100,8 @@ jobs:
   render:
     needs: execute
     runs-on: ubuntu-latest
+    env:
+      BASE_URL: /${{ github.event.repository.name }}
     steps:
     - name: Checkout
       uses: actions/checkout@v5
@@ -108,7 +115,7 @@ jobs:
     - name: Setup NodeJS (required by Jupyter Book 2)
       uses: actions/setup-node@v6
       with:
-        node-version: 18.x
+        node-version: lts/*
     - name: Install Jupyter Book (via myst)
       run: npm install -g jupyter-book
     - name: Build website
@@ -124,7 +131,7 @@ jobs:
   CI:
     needs: render
     if: always()
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - run: |
           if [[ ${{ needs.render.result }} == "success" ]]; then
@@ -144,12 +151,11 @@ jobs:
     permissions:
       pages: write    # to deploy to Pages
       id-token: write # to verify the deployment originates from an appropriate source
-      actions: read   # to download an artifact uploaded by `actions/upload-pages-artifact`
       contents: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -166,7 +172,7 @@ jobs:
         uses: actions/setup-python@v6
         id: setup-python
         with:
-          python-version: '3.13'
+          python-version: ${{ env.PY_VER }}
       - name: Install nbconvert
         run: pip install nbconvert
       - name: Find notebooks
