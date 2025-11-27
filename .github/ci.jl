@@ -127,7 +127,6 @@ function main(;
         ts_lit = pmap(litnbs; on_error=identity) do nb
             @elapsed run_literate(nb, cachedir; rmsvg)
         end
-        rmprocs(workers()) # Remove worker processes to release some memory
         failed = false
         for (nb, t) in zip(litnbs, ts_lit)
             if t isa ErrorException

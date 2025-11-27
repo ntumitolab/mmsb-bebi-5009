@@ -1,4 +1,4 @@
-# https://docs.github.com/en/code-security/dependabot/working-with-dependabot/automating-dependabot-with-github-actions
+# A variant of https://docs.github.com/en/code-security/dependabot/working-with-dependabot/automating-dependabot-with-github-actions
 name: Dependabot auto-merge
 on: pull_request
 
@@ -8,7 +8,7 @@ permissions:
 
 jobs:
   dependabot:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     if: github.event.pull_request.user.login == 'dependabot[bot]'
     steps:
       - name: Dependabot metadata
@@ -17,7 +17,7 @@ jobs:
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
       - name: Enable auto-merge for Dependabot PRs
-        run: gh pr merge --auto --squash "$PR_URL"
+        run: gh pr edit "$PR_URL" --add-label "automerge"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
