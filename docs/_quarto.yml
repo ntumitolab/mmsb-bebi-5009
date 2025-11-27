@@ -1,0 +1,47 @@
+# https://quarto.org/docs/projects/quarto-projects.html
+project:
+  type: website
+  output-dir: ../_site
+
+# https://quarto.org/docs/websites/
+website:
+  title: Mathematical Modeling for Systems Biology
+  page-navigation: true
+  back-to-top-navigation: true
+  repo-url: https://github.com/ntumitolab/mmsb-bebi-5009
+  site-url: https://ntumitolab.github.io/mmsb-bebi-5009/
+  sidebar:
+    style: docked
+    search: true
+    contents:
+      - index.qmd
+      - intro-00-start.qmd
+      - intro-*.ipynb
+      - hw-00.qmd
+      - hw-01.ipynb
+      - section: "Textbook figures"
+        contents:
+          - figs/*.ipynb
+      - runtime.ipynb
+    tools:
+      - icon: github
+        href: https://github.com/ntumitolab/mmsb-bebi-5009
+
+# bibliography: references.bib
+
+# https://quarto.org/docs/output-formats/html-basics.html
+format:
+  html:
+    toc: true
+    theme:
+      light: cosmo
+      dark: darkly
+    # css: styles.css
+
+# Default options
+# notebook-links: true
+
+# Execution
+# execute:
+#   cache: true
+# engines: ['julia']
