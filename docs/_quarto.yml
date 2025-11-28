@@ -36,6 +36,7 @@ format:
     theme:
       light: cosmo
       dark: darkly
+    html-math-method: mathjax
     # css: styles.css
 
 # Default options
