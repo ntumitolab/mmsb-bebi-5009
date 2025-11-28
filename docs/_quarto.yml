@@ -16,11 +16,12 @@ website:
     contents:
       - index.qmd
       - intro-00-start.qmd
-      - intro-*.ipynb
+      - auto: "intro-*.ipynb"
       - hw-00.qmd
       - hw-01.ipynb
       - section: "Textbook figures"
-        contents: figs
+        contents:
+          - auto: "figs/*.ipynb"
       - runtime.ipynb
     tools:
       - icon: github
