@@ -16,9 +16,12 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  PY_VER: '3.13'
+
 jobs:
   linkcheck:
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-latest
     permissions:
       issues: write # required for peter-evans/create-issue-from-file
     steps:
@@ -28,7 +31,7 @@ jobs:
         uses: actions/setup-python@v6
         id: setup-python
         with:
-          python-version: '3.13'
+          python-version: ${{ env.PY_VER }}
       - name: Install nbconvert
         run: pip install nbconvert
       - name: Convert ipynb files to markdown
@@ -48,7 +51,7 @@ jobs:
         with:
           fail: false
           failIfEmpty: false
-          args: '--accept 200,204,429 --verbose --no-progress --cache --max-cache-age 1d "docs/**/*.md" "docs/**/*.qmd"'
+          args: '--accept 200,204,429 --verbose --no-progress --cache --max-cache-age 1d "docs/**/*.md" "docs/**/*.jl"'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Create Issue From File
