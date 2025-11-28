@@ -21,7 +21,7 @@ website:
       - hw-01.ipynb
       - section: "Textbook figures"
         contents:
-          - "figs/*"
+          - figs
       - runtime.ipynb
     tools:
       - icon: github
