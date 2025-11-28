@@ -20,8 +20,7 @@ website:
       - hw-00.qmd
       - hw-01.ipynb
       - section: "Textbook figures"
-        contents:
-          - figs
+        contents: figs
       - runtime.ipynb
     tools:
       - icon: github
