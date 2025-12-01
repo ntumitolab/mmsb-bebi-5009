@@ -16,7 +16,7 @@ env:
   JULIA_CONDAPKG_BACKEND: 'Null'
   JULIA_CONDAPKG_OFFLINE: 'true'
   JULIA_NUM_THREADS: '2'
-  JULIA_CPU_TARGET: 'generic;icelake-server,clone_all;znver3,clone_all'
+  # JULIA_CPU_TARGET: 'generic;icelake-server,clone_all;znver3,clone_all'
   NBCACHE: '.cache'
   LITERATE_PROC: '6'
   PY_VER: '3.13'
