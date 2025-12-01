@@ -18,12 +18,12 @@ env:
   JULIA_NUM_THREADS: '2'
   JULIA_CPU_TARGET: 'generic;icelake-server,clone_all;znver3,clone_all'
   NBCACHE: '.cache'
-  LITERATE_PROC: '2'
+  LITERATE_PROC: '6'
   PY_VER: '3.13'
 
 jobs:
   execute:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
     - name: Checkout repository
       uses: actions/checkout@v6
