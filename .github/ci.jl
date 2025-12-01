@@ -8,8 +8,6 @@ using SHA
     using Literate, JSON
 end
 
-
-
 # Strip SVG output from a Jupyter notebook
 @everywhere function strip_svg(nbpath)
     oldfilesize = filesize(nbpath)
@@ -22,6 +20,9 @@ end
             if haskey(datadict, "image/png") || haskey(datadict, "image/jpeg")
                 delete!(datadict, "text/html")
                 delete!(datadict, "image/svg+xml")
+            end
+            if haskey(datadict, "text/latex")
+                delete!(datadict, "text/plain")
             end
         end
     end
@@ -129,7 +130,6 @@ function main(;
         ts_lit = pmap(litnbs; on_error=identity) do nb
             @elapsed run_literate(nb, cachedir; rmsvg)
         end
-        rmprocs(workers()) # Remove worker processes to release some memory
         failed = false
         for (nb, t) in zip(litnbs, ts_lit)
             if t isa ErrorException
