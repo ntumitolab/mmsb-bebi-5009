@@ -22,7 +22,7 @@ env:
   PY_VER: '3.13'
 
 jobs:
-  CI:
+  execute:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
@@ -42,28 +42,31 @@ jobs:
     - name: Get environment hash
       id: hash
       run: |
-        echo "ver=${{ runner.os }}-julia-${{ steps.julia-version.outputs.value }}" >> "$GITHUB_OUTPUT"
         echo "value=${{ hashFiles('Project.toml', 'Manifest.toml', 'src/**') }}" >> "$GITHUB_OUTPUT"
     - name: Cache executed notebooks
       uses: actions/cache@v4
       id: cache-nb
       with:
-        path: docs/**/.cache/
-        key: notebook-${{ steps.hash.outputs.value }}
+        path: |
+          ${{ env.NBCACHE }}/**/*.ipynb
+          ${{ env.NBCACHE }}/**/*.sha
+        key: notebook-${{ steps.hash.outputs.value }}-${{ hashFiles('docs/**') }}
+        restore-keys: |
+          notebook-${{ steps.hash.outputs.value }}-
     - name: Setup Julia
       uses: julia-actions/setup-julia@v2
       with:
         version: ${{ steps.julia-version.outputs.value }}
         arch: ${{ runner.arch }}
-    - name: Cache Julia packages
-      uses: actions/cache@v4
+    - name: Restore Julia packages
+      uses: actions/cache/restore@v4
       if: ${{ runner.environment == 'github-hosted' }}
       id: cache-julia
       with:
         path: ~/.julia
-        key: ${{ steps.hash.outputs.ver }}-${{ steps.hash.outputs.value }}
+        key: ${{ runner.os }}-julia-${{ steps.julia-version.outputs.value }}-${{ steps.hash.outputs.value }}
         restore-keys: |
-          ${{ steps.hash.outputs.ver }}-
+          ${{ runner.os }}-julia-${{ steps.julia-version.outputs.value }}
     - name: Install Julia packages
       if: ${{ runner.environment == 'self-hosted' || steps.cache-julia.outputs.cache-hit != 'true' }}
       shell: julia --color=yes {0}
@@ -85,10 +88,30 @@ jobs:
     - name: Run notebooks
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' }}
       run: julia --project=@. --color=yes -p ${{ env.LITERATE_PROC }} .github/ci.jl
+    - name: Upload Notebooks
+      uses: actions/upload-artifact@v5
+      with:
+        path: ${{ env.NBCACHE }}/**/*.ipynb
+        include-hidden-files: true
+        name: notebooks
+        retention-days: 1
+  render:
+    needs: execute
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v6
+    - name: Download notebooks
+      uses: actions/download-artifact@v6
+      with:
+        name: notebooks
+        path: ${{ env.NBCACHE }}
     - name: Copy back built notebooks
       run: cp --verbose -rf ${{ env.NBCACHE }}/docs/* docs/
     - name: Setup Quarto
       uses: quarto-dev/quarto-actions/setup@v2
+    - name: Remove all jl files preventing Quarto from rendering them
+      run: find docs/ -type f -name '*.jl' -delete
     - name: Render Quarto Project
       run: quarto render docs/ --to html
     - name: Upload pages artifact
@@ -97,9 +120,25 @@ jobs:
       with:
         path: _site/
 
+  # CI conclusion for GitHub status check
+  # Adaped from https://brunoscheufler.com/blog/2022-04-09-the-required-github-status-check-that-wasnt
+  CI:
+    needs: render
+    if: always()
+    runs-on: ubuntu-slim
+    steps:
+      - run: |
+          if [[ ${{ needs.render.result }} == "success" ]]; then
+            echo "Tests passed"
+            exit 0
+          else
+            echo "Tests failed"
+            exit 1
+          fi
+
   deploy:
     name: Deploy to GitHub pages
-    needs: CI
+    needs: render
     if: ${{ github.ref == 'refs/heads/main'}}
     # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
     permissions:
