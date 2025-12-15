@@ -46,7 +46,7 @@ jobs:
         echo "value=${{ hashFiles('Project.toml', 'Manifest.toml', 'src/**') }}" >> "$GITHUB_OUTPUT"
         echo "nb=${{ hashFiles('docs/**/*.jl', 'docs/**/*.ipynb') }}" >> "$GITHUB_OUTPUT"
     - name: Cache executed notebooks
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       id: cache-nb
       with:
         path: |
@@ -62,7 +62,7 @@ jobs:
         arch: ${{ runner.arch }}
         show-versioninfo: 'true'
     - name: Restore Julia packages
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       if: ${{ runner.environment == 'github-hosted' }}
       id: cache-julia
       with:
@@ -83,7 +83,7 @@ jobs:
             Pkg.gc(;collect_delay=Day(0))
         end
     - name: Save Julia packages
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       if: ${{ runner.environment == 'github-hosted' && steps.cache-julia.outputs.cache-hit != 'true' }}
       with:
         path: ~/.julia
@@ -92,7 +92,7 @@ jobs:
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' }}
       run: julia --project=@. --color=yes -p ${{ env.LITERATE_PROC }} .github/ci.jl
     - name: Upload Notebooks
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       if: ${{ github.ref == 'refs/heads/main' }}
       with:
         path: ${{ env.NBCACHE }}/**/*.ipynb
@@ -127,7 +127,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Download notebooks
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: notebooks
           path: ${{ env.NBCACHE }}
