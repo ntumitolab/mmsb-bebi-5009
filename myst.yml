@@ -1,7 +1,7 @@
 # See docs at: https://mystmd.org/guide/frontmatter
 version: 1
 project:
-  # title: Julia Jupyter Book Template
+  title: MMSB
   description: Math modeling of biological systems
   # keywords: []
   authors: ["Wen-Wei Tseng"]
@@ -34,5 +34,4 @@ site:
     folders: true
   #   favicon: favicon.ico
   #   logo: site_logo.png
-  nav:
-    title: MMSB
+  nav: []
