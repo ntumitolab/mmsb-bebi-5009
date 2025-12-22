@@ -1,2 +1,2 @@
-matplotlib==3.10.8
+# matplotlib==3.10.8
 jupyter-book==2.1.0
