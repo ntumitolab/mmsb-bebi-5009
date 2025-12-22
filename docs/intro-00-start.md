@@ -4,10 +4,10 @@ See [Julia in Visual Studio Code](https://code.visualstudio.com/docs/languages/j
 
 ## Tools
 
-- Install [Julia](https://julialang.org/downloads/) in the official website or via the [Windows store](https://www.microsoft.com/zh-tw/p/julia/9njnww8pvkmn?rtc=1&activetab=pivot:overviewtab).
+- Install [Julia](https://julialang.org/downloads/) in the official website or via the [Windows store](https://apps.microsoft.com/detail/9njnww8pvkmn).
 - Install [VS Code](https://code.visualstudio.com/).
-- Install the [Julia extension for VS Code](https://www.julia-vscode.org/). See also [Julia extension's website]().
-- (Optional) Install the [Jupyter extension for VS Code](https://marketplace.visualstudio.com/items?itemName=ms-toolsai.jupyter) for opening and running Jupyter notebooks in VS Code.
+- Install the [Julia extension for VS Code](https://www.julia-vscode.org/)
+- (Optional) Install the [Jupyter extension for VS Code](https://marketplace.visualstudio.com/items?itemName=ms-toolsai.jupyter) for opening and running Jupyter notebooks with Julia kernels in VS Code.
 
 ## Running Julia in VS Code
 
