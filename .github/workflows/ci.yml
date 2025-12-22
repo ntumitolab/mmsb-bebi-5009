@@ -19,10 +19,10 @@ env:
   JULIA_NUM_THREADS: '2'
   NBCACHE: '.cache'
   LITERATE_PROC: '2'
-  PY_VER: '3.13'
+  PY_VER: '3.14'
 
 jobs:
-  execute:
+  CI:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
@@ -56,12 +56,13 @@ jobs:
           notebook-${{ steps.hash.outputs.value }}-
     - name: Setup Julia
       uses: julia-actions/setup-julia@v2
+      if: ${{ steps.cache-nb.outputs.cache-hit != 'true' }}
       with:
         version: ${{ steps.julia-version.outputs.value }}
         arch: ${{ runner.arch }}
     - name: Restore Julia packages
       uses: actions/cache/restore@v5
-      if: ${{ runner.environment == 'github-hosted' }}
+      if: ${{ steps.cache-nb.outputs.cache-hit != 'true' && runner.environment == 'github-hosted'}}
       id: cache-julia
       with:
         path: ~/.julia
@@ -69,12 +70,10 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-julia-${{ steps.julia-version.outputs.value }}
     - name: Install Julia packages
-      if: ${{ runner.environment == 'self-hosted' || steps.cache-julia.outputs.cache-hit != 'true' }}
-      shell: julia --color=yes {0}
+      if: ${{ steps.cache-nb.outputs.cache-hit != 'true' && (runner.environment == 'self-hosted' || steps.cache-julia.outputs.cache-hit != 'true') }}
+      shell: julia --color=yes --project=@. {0}
       run: |
         using Pkg, Dates
-        Pkg.add(["Literate", "JSON", "Tables", "MarkdownTables", "SHA"])
-        Pkg.activate(".")
         Pkg.instantiate()
         Pkg.precompile()
         if ENV["RUNNER_ENVIRONMENT"] == "github-hosted"
@@ -82,72 +81,29 @@ jobs:
         end
     - name: Save Julia packages
       uses: actions/cache/save@v5
-      if: ${{ runner.environment == 'github-hosted' && steps.cache-julia.outputs.cache-hit != 'true' }}
+      if: ${{ steps.cache-nb.outputs.cache-hit != 'true' && runner.environment == 'github-hosted' && steps.cache-julia.outputs.cache-hit != 'true' }}
       with:
         path: ~/.julia
         key: ${{ steps.cache-julia.outputs.cache-primary-key }}
     - name: Run notebooks
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' }}
       run: julia --project=@. --color=yes -p ${{ env.LITERATE_PROC }} .github/ci.jl
-    - name: Upload Notebooks
-      uses: actions/upload-artifact@v6
-      with:
-        path: ${{ env.NBCACHE }}/**/*.ipynb
-        include-hidden-files: true
-        name: notebooks
-        retention-days: 1
-  render:
-    needs: execute
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v6
-    - name: Download notebooks
-      uses: actions/download-artifact@v7
-      with:
-        name: notebooks
-        path: ${{ env.NBCACHE }}
     - name: Copy back built notebooks
       run: cp --verbose -rf ${{ env.NBCACHE }}/docs/* docs/
-    - name: Setup Python
-      uses: actions/setup-python@v6
-      id: setup-python
-      with:
-        python-version: ${{ env.PY_VER }}
-    - name: Install the latest version of uv
-      uses: astral-sh/setup-uv@v7
-    - name: Install Python dependencies
-      run: uv pip install --system -r requirements.txt
     - name: Build website
       env:
         BASE_URL: /${{ github.event.repository.name }}
-      run: jupyter-book build --html
+      run: jupyter book build --html --strict
     - name: Upload pages artifact
       if: ${{ github.ref == 'refs/heads/main' }}
       uses: actions/upload-pages-artifact@v4
       with:
         path: './_build/html'
 
-  # CI conclusion for GitHub status check
-  # Adaped from https://brunoscheufler.com/blog/2022-04-09-the-required-github-status-check-that-wasnt
-  CI:
-    needs: render
-    if: always()
-    runs-on: ubuntu-slim
-    steps:
-      - run: |
-          if [[ ${{ needs.render.result }} == "success" ]]; then
-            echo "Tests passed"
-            exit 0
-          else
-            echo "Tests failed"
-            exit 1
-          fi
-
   # Deployment job
   deploy:
     name: Deploy to GitHub pages and Notebook branch
-    needs: render
+    needs: CI
     if: ${{ github.ref == 'refs/heads/main' }}
     # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
     permissions:
