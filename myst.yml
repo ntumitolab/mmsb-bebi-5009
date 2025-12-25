@@ -8,9 +8,6 @@ project:
   license: CC-BY-4.0
   open_access: true
   github: https://github.com/ntumitolab/mmsb-bebi-5009
-  # jupyter:
-  #   binder:
-  #     ref: ipynb
   # bibliography:
   #   - docs/references.bib
   # To autogenerate a Table of Contents, run "jupyter book init --write-toc"
