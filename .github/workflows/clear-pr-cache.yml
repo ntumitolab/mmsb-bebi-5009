@@ -6,9 +6,9 @@ on:
 
 jobs:
   cleanup:
-    runs-on: ubuntu-slim
     permissions:
       actions: write
+    runs-on: ubuntu-slim
     steps:
       - name: Cleanup
         run: |
