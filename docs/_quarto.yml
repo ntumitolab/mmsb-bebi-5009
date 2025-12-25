@@ -1,0 +1,58 @@
+# https://quarto.org/docs/projects/quarto-projects.html
+project:
+  type: website
+  output-dir: _site
+
+# https://quarto.org/docs/websites/
+website:
+  title: MMSB
+  page-navigation: true
+  bread-crumbs: true
+  back-to-top-navigation: true
+  reader-mode: true
+  repo-url: https://github.com/ntumitolab/mmsb-bebi-5009
+  site-url: https://ntumitolab.github.io/mmsb-bebi-5009
+  search:
+    show-item-context: true
+    type: overlay
+  # https://quarto.org/docs/websites/website-navigation.html
+  navbar:
+    search: true
+    tools:
+      - icon: github
+        href: https://github.com/ntumitolab/mmsb-bebi-5009
+  sidebar:
+    title: false
+    style: floating
+    collapse-level: 2
+    align: left
+    contents:
+      - index.qmd
+      - section: Intro
+        href: intro-00-start.qmd
+        contents:
+        - auto: intro-*.ipynb
+      - section: Homework
+        href: hw-00.qmd
+        contents:
+        - hw-01.ipynb
+      - section: Textbook figures
+        contents: figs
+      - runtime.ipynb
+
+# bibliography: references.bib
+
+# https://quarto.org/docs/output-formats/html-basics.html
+format:
+  html:
+    respect-user-color-scheme: true
+    toc: true
+    theme: simplex
+    code-copy: true
+    code-overflow: wrap
+    grid:
+      sidebar-width: 300px
+      body-width: 1000px
+      margin-width: 350px
+    # keep-md: true
+    # css: styles.css

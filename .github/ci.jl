@@ -8,8 +8,8 @@ using SHA
     using Literate, JSON
 end
 
-# Strip SVG output from a Jupyter notebook
-@everywhere function strip_svg(nbpath)
+# Post-process Jupyter notebook
+@everywhere function postprocess(nbpath)
     oldfilesize = filesize(nbpath)
     nb = open(JSON.parse, nbpath, "r")
     for cell in nb["cells"]
@@ -17,15 +17,23 @@ end
         for output in cell["outputs"]
             !haskey(output, "data") && continue
             datadict = output["data"]
+            ## Remove SVG to reduce file size
             if haskey(datadict, "image/png") || haskey(datadict, "image/jpeg")
                 delete!(datadict, "text/html")
                 delete!(datadict, "image/svg+xml")
+            end
+            ## Process LaTeX output, wrap in an array if needed
+            if haskey(datadict, "text/latex")
+                latexcode = datadict["text/latex"]
+                if (! (latexcode isa Vector))
+                    datadict["text/latex"] = [latexcode]
+                end
             end
         end
     end
     rm(nbpath; force=true)
     write(nbpath, JSON.json(nb, 2))
-    @info "Stripped SVG in $(nbpath). The original size is $(Base.format_bytes(oldfilesize)). The new size is $(Base.format_bytes(filesize(nbpath)))."
+    @info "$(nbpath) is processed. The original size is $(Base.format_bytes(oldfilesize)). The new size is $(Base.format_bytes(filesize(nbpath)))."
     return nbpath
 end
 
@@ -41,7 +49,7 @@ function clean_cache(cachedir)
                 if !isfile(nb) && !isfile(lit)
                     cachepath = joinpath(root, fn)
                     @info "Notebook $(nb) or $(lit) not found. Removing $(cachepath) SHA and notebook."
-                    rm(cachepath * ".sha")
+                    rm(cachepath * ".sha"; force=true)
                     rm(cachepath * ".ipynb"; force=true)
                 end
             end
@@ -104,11 +112,11 @@ function list_notebooks(basedir, cachedir)
 end
 
 # Run a Literate notebook
-@everywhere function run_literate(file, cachedir; rmsvg=true)
+@everywhere function run_literate(file, cachedir; dopostproc=true)
     outpath = joinpath(abspath(pwd()), cachedir, dirname(file))
     mkpath(outpath)
     ipynb = Literate.notebook(file, dirname(file); mdstrings=true, execute=true)
-    rmsvg && strip_svg(ipynb)
+    dopostproc && postprocess(ipynb)
     cp(ipynb, joinpath(outpath, basename(ipynb)); force=true)
     return ipynb
 end
@@ -116,18 +124,18 @@ end
 function main(;
     basedir=get(ENV, "DOCDIR", "docs"),
     cachedir=get(ENV, "NBCACHE", ".cache"),
-    rmsvg=true)
+    dopostproc=true)
 
     mkpath(cachedir)
     clean_cache(cachedir)
     litnbs = list_notebooks(basedir, cachedir)
 
     if !isempty(litnbs)
-        # Execute literate notebooks in worker process(es)
+        ## Execute literate notebooks in worker process(es)
         ts_lit = pmap(litnbs; on_error=identity) do nb
-            @elapsed run_literate(nb, cachedir; rmsvg)
+            @elapsed run_literate(nb, cachedir; dopostproc)
         end
-        rmprocs(workers()) # Remove worker processes to release some memory
+        rmprocs(workers()) ## Remove worker processes to release some memory
         failed = false
         for (nb, t) in zip(litnbs, ts_lit)
             if t isa ErrorException
@@ -137,9 +145,9 @@ function main(;
         end
 
         if failed
-            error("Please check literate notebook error(s).")
+            error("Please check error(s).")
         else
-            # Print execution result
+            ## Print execution result
             Tables.table([litnbs ts_lit]; header=["Notebook", "Elapsed (s)"]) |> markdown_table(String) |> print
         end
     end

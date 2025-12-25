@@ -17,7 +17,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  PY_VER: '3.13'
+  PY_VER: '3.14'
 
 jobs:
   linkcheck:
@@ -51,7 +51,7 @@ jobs:
         with:
           fail: false
           failIfEmpty: false
-          args: '--accept 200,204,429 --verbose --no-progress --cache --max-cache-age 1d "docs/**/*.md" "docs/**/*.jl"'
+          args: '--accept 200,204,429 --verbose --no-progress --cache --max-cache-age 1d "docs/**/*.md" "docs/**/*.qmd" "docs/**/*.jl"'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Create Issue From File
