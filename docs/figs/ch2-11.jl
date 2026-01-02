@@ -4,69 +4,82 @@
 Model reduction of ODE metabolic networks.
 ===#
 using OrdinaryDiffEq
-using Catalyst
-using ModelingToolkit
+using ComponentArrays
+using SimpleUnPack
 using Plots
 Plots.default(linewidth=2)
 
 #---
-rn211 = @reaction_network begin
-    k0, 0 --> A
-    (k1, km1), A <--> B
-    k2, B --> 0
+function model211!(du, u, p, t)
+    @unpack k0, k1, km1, k2 = p
+    @unpack A, B = u
+    v0 = k0
+    v1 = k1 * A - km1 * B
+    v2 = k2 * B
+    du.A = v0 - v1
+    du.B = v1 - v2
+    nothing
 end
 
 #---
-@unpack k0, k1, km1, k2, A, B = rn211
-ps1 = [k0 => 0.0, k1 => 9.0, km1 => 12.0, k2 => 2.0]
-u0 = [A => 0.0, B => 10.0]
+ps211 = ComponentArray(
+    k0 = 0.0,
+    k1 = 9.0,
+    km1 = 12.0,
+    k2 = 2.0
+)
+
+u0 = ComponentArray(
+    A = 0.0,
+    B = 10.0
+)
+
 tend = 3.0
-prob = ODEProblem(rn211, u0, tend, ps1)
-@time sol211 = solve(prob)
+prob211 = ODEProblem(model211!, u0, tend, ps211)
+
+#---
+@time sol211 = solve(prob211)
 
 # Fig 2.11
 plot(
     sol211,
     xlabel="Time (AU)",
     ylabel="Concentration (AU)",
-    title="Fig. 2.11 (Full model)"
+    title="Fig. 2.11 (Full model)",
+    labels=["A" "B"]
 )
 
-# ## Figure 2.12 : Rapid equilibrium assumption
-
-function make_212(; name)
-    @parameters k0 k1 km1 k2
-    @independent_variables t
-    @variables A(t) B(t) C(t)
-    D = Differential(t)
-    eqs = [
-        C ~ A + B
-        B ~ C * k1 / (km1 + k1)
-        D(C) ~ k0 - k2 * B
-    ]
-    return ODESystem(eqs, t; name)
+# ## Figure 2.12
+# Rapid equilibrium assumption
+_a212(u, p, t) =  u.C * p.k1 / (p.km1 + p.k1)
+function model212!(du, u, p, t)
+    @unpack k0, k1, km1, k2 = p
+    @unpack C = u
+    A = _a212(u, p, t)
+    B = C - A
+    v0 = k0
+    v2 = k2 * B
+    du.C = v0 - v2
+    nothing
 end
 
 #---
-@mtkbuild model212 = make_212()
-
-#---
-unknowns(model212)
-
-#---
-observed(model212)
-
-#---
-@unpack k0, k1, km1, k2, C, A, B = model212
-ps1 = [k0 => 0.0, k1 => 9.0, km1 => 12.0, k2 => 2.0]
-u0 = [C => 10.0]
+ps212 = ps211
+u0212 = ComponentArray(C = sum(u0))
 tend = 3.0
-prob = ODEProblem(model212, u0, tend, ps1)
-@time sol212 = solve(prob)
+prob212 = ODEProblem(model212!, u0212, tend, ps212)
+
+#---
+@time sol212 = solve(prob212)
 
 #---
 fig = plot(sol211, line=(:dash, 1), label=["A (full solution)" "B (full solution)"])
-plot!(fig, sol212, idxs=[A, B], label=["A (rapid equilibrium)" "B (rapid equilibrium)"])
+ts = sol212.t
+cs = sol212[1, :]
+as = _a212.(sol212.u, Ref(ps212), ts)
+bs = cs .- as
+plot!(fig, ts, [as bs], label=["A (rapid equilibrium)" "B (rapid equilibrium)"])
+
 plot!(fig,
     title="Fig. 2.12 (Rapid equilibrium model)",
     xlabel="Time (AU)",
