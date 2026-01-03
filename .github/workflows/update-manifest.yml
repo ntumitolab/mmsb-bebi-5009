@@ -2,8 +2,8 @@ name: Auto update Julia manifest dependencies
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 0 * * 0' # Every week
+  # schedule:
+  #   - cron: '0 0 * * 0' # Every week
   push:
     branches:
       - main
