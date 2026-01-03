@@ -3,62 +3,80 @@
 
 Model of calcium-induced calcium release in hepatocytes
 ===#
-using Catalyst
-using ModelingToolkit
+using ComponentArrays
+using SimpleUnPack
 using OrdinaryDiffEq
+using DiffEqCallbacks
 using Plots
 Plots.default(linewidth=2)
 
 #---
-rn = @reaction_network begin
-    @parameters I(t)
-    (k1 * I, km1), R <--> RI
-    (k2 * C, km2), RI <--> RIC
-    (k3 * C, km3), RIC <--> RICC
-    vr * (γ0 + γ1 * RIC) * (Cer - C), 0 --> C
-    hill(C, p1, p2, 4), C => 0
+hil(x, k) = x / (k + x)
+hil(x, k, n) = hil(x^n, k^n)
+_r618(u, p, t) = p.Rtot - u.RI - u.RIC - u.RICC
+function model618!(D, u, p, t)
+    @unpack k1, km1, k2, km2, k3, km3, vr, γ0, γ1, p1, p2, Cer, I, Rtot = p
+    @unpack RI, RIC, RICC, C = u
+    R = _r618(u, p, t)
+    v1 = k1 * I * R - km1 * RI
+    v2 = k2 * C * RI - km2 * RIC
+    v3 = k3 * C * RIC - km3 * RICC
+    v4 = vr * (γ0 + γ1 * RIC) * (Cer - C) - p1 * hil(C, p2, 4)
+    D.RI = v1 - v2
+    D.RIC = v2 - v3
+    D.RICC = v3
+    D.C = v4
+    nothing
 end
 
 #---
-setdefaults!(rn, [
-    :γ0 => 0.1,
-    :γ1 => 20.5,
-    :p1 => 8.5,
-    :p2 => 0.065,
-    :k1 => 12,
-    :k2 => 15,
-    :k3 => 1.8,
-    :km1 => 8,
-    :km2 => 1.65,
-    :km3 => 0.21,
-    :Cer => 8.37,
-    :vr => 0.185,
-    :I => 0,
-    :C => 0,
-    :R => 1,
-    :RI => 0,
-    :RIC => 0,
-    :RICC => 0
-])
+ps618 = ComponentArray(
+    k1 = 12.0,
+    km1 = 8.0,
+    k2 = 15.0,
+    km2 = 1.65,
+    k3 = 1.8,
+    km3 = 0.21,
+    vr = 0.185,
+    γ0 = 0.1,
+    γ1 = 20.5,
+    p1 = 8.5,
+    p2 = 0.065,
+    Cer = 8.37,
+    I = 0.0,
+    Rtot = 1.0
+)
 
-osys = convert(ODESystem, rn; remove_conserved = true) |> structural_simplify
-equations(osys)
+u0618 = ComponentArray(
+    C = 0.0,
+    RIC = 0.0,
+    RICC = 0.0,
+    RI = 0.0
+)
 
 # ## Fig 6.18 (A)
-@unpack I = osys
-prob = ODEProblem(osys, [], (0., 25.), [I => 2.0])
-sol = solve(prob)
+ps618a = ComponentArray(ps618; I = 2.0)
+tend = 25.0
+prob618a = ODEProblem(model618!, u0618, tend, ps618a)
+@time sol618a = solve(prob618a)
 
-@unpack C, RIC, RICC = osys
-plot(sol, idxs=[C, RIC, RICC], title="Fig 6.18 (A)", xlabel="Time", ylabel="Abundance", legend=:topright)
+#---
+plot(sol618a, idxs=[2, 3, 1], title="Fig 6.18 (A)", xlabel="Time", ylabel="Abundance", legend=:topright, labels=["RIC" "RICC" "C"])
 
 # ## Fig 6.18 (B)
-
-discrete_events = [[20] => [I ~ 0.7], [60] => [I ~ 1.2], [90] => [I ~ 4.0]]
-osys618 = convert(ODESystem, rn; discrete_events, remove_conserved = true) |> structural_simplify
+affect_i1!(integrator) = integrator.p.I = 0.7
+affect_i2!(integrator) = integrator.p.I = 1.2
+affect_i3!(integrator) = integrator.p.I = 4.0
+event_1 = PresetTimeCallback(20.0, affect_i1!)
+event_2 = PresetTimeCallback(60.0, affect_i2!)
+event_3 = PresetTimeCallback(90.0, affect_i3!)
+cbs = CallbackSet(event_1, event_2, event_3)
 
 tend = 120.
-prob = ODEProblem(osys618, [], tend)
-sol = solve(prob)
+prob618b = ODEProblem(model618!, u0618, tend, ps618)
 
-plot(sol, idxs=[osys.C], title="Fig 6.18 (B)", xlabel="Time", ylabel="Ca concentration", legend=false, ylim=(0, 2.5))
+#---
+@time sol618b = solve(prob618b, callback=cbs)
+
+#---
+plot(sol618b, idxs=[1], title="Fig 6.18 (B)", xlabel="Time", ylabel="Ca concentration", legend=false, ylim=(0, 2.5))
