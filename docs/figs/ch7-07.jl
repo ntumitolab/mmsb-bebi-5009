@@ -95,8 +95,8 @@ eprob_mod = EnsembleProblem(prob707b;
 
 alg = DynamicSS(FBDF())
 opts = (trajectories=length(lerange), abstol=1e-9, reltol=1e-9)
-sim = solve(eprob, alg; opts...)
-sim_mod = solve(eprob_mod, alg; opts...)
+@time sim = solve(eprob, alg; opts...)
+@time sim_mod = solve(eprob_mod, alg; opts...)
 
 fig = plot(lerange, sim.u, label="Original")
 fig = plot!(fig, lerange, sim_mod.u, label="Modified")
