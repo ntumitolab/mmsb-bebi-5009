@@ -38,7 +38,7 @@ tend = 3.0
 prob211 = ODEProblem(model211!, u0, tend, ps211)
 
 #---
-@time sol211 = solve(prob211)
+@time sol211 = solve(prob211, Tsit5())
 
 # Fig 2.11
 plot(
@@ -68,13 +68,12 @@ tend = 3.0
 prob212 = ODEProblem(model212!, ComponentArray(C = sum(u0)), tend, ps211)
 
 #---
-@time sol212 = solve(prob212)
-
+@time sol212 = solve(prob212, Tsit5())
 #---
 fig = plot(sol211, line=(:dash, 1), label=["A (full solution)" "B (full solution)"])
 ts = sol212.t
 cs = sol212[1, :]
-as = _a212.(sol212.u, Ref(ps212), ts)
+as = _a212.(sol212.u, Ref(ps211), ts)
 bs = cs .- as
 plot!(fig, ts, [as bs], label=["A (rapid equilibrium)" "B (rapid equilibrium)"])
 
@@ -94,12 +93,12 @@ Rapid equilibrium (take 2)
 When another set of parameters is not suitable for rapid equilibrium assumption.
 ===#
 
-ps213 =ComponentArray(k0 = 9.0, k1 = 20.0, km1 = 12.0, k2 = 2.0)
+ps213 = ComponentArray(k0 = 9.0, k1 = 20.0, km1 = 12.0, k2 = 2.0)
 u0 = ComponentArray(A = 8.0, B = 4.0)
 tend = 3.0
 
-@time sol213full = solve(ODEProblem(model211!, u0, tend, ps213))
-@time sol213re = solve(ODEProblem(model212!, ComponentArray(C = sum(u0)), tend, ps213))
+@time sol213full = solve(ODEProblem(model211!, u0, tend, ps213), Tsit5())
+@time sol213re = solve(ODEProblem(model212!, ComponentArray(C = sum(u0)), tend, ps213), Tsit5())
 
 #---
 
@@ -136,7 +135,7 @@ ps214 = ps213
 u0214= ComponentArray(B = _u0214(sum(u0), ps214))
 
 # Solve QSSA model
-@time sol214 = solve(ODEProblem(model214!, u0214, tend, ps214))
+@time sol214 = solve(ODEProblem(model214!, u0214, tend, ps214), Tsit5())
 
 fig = plot(sol213full, line=(:dash), label=["A (full solution)" "B (full solution)"])
 ts = sol214.t

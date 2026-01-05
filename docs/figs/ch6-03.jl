@@ -5,6 +5,7 @@ Two component pathway
 using ComponentArrays
 using SimpleUnPack
 using OrdinaryDiffEq
+using DiffEqCallbacks
 using SteadyStateDiffEq
 using Plots
 Plots.default(linewidth=2)
