@@ -7,27 +7,38 @@ See also [BifurcationKit.jl](https://github.com/bifurcationkit/BifurcationKit.jl
 ===#
 using OrdinaryDiffEq
 using SteadyStateDiffEq
-using ModelingToolkit
+using ComponentArrays
+using SimpleUnPack
 using Plots
 Plots.default(linewidth=2)
 
 # Model
-@independent_variables t
-@variables A(t) B(t)
-@parameters k1 k2 k3 k4 k5 n
-D = Differential(t)
+function model418!(D, u, p, t)
+    @unpack k1, k2, k3, k4, k5, n = p
+    @unpack A, B = u
+    D.A = k1 / (1 + B^n) - (k3 + k5) * A
+    D.B = k2 + k5 * A - k4 * B
+    return nothing
+end
 
-eqs = [
-    D(A) ~ k1 / (1 + B^n) - (k3 + k5) * A,
-    D(B) ~ k2 + k5 * A - k4 * B
-]
-@mtkbuild osys = ODESystem(eqs, t)
-ps = Dict(k1 => 0, k2 => 5, k3 => 5, k4 => 5, k5 => 2, n => 4)
-alg = DynamicSS(Rodas5P())
-prob = SteadyStateProblem(osys, [0.0, 0.0], ps)
+#---
+ps418 = ComponentArray(
+    k1 = 0.0,
+    k2 = 5.0,
+    k3 = 5.0,
+    k4 = 5.0,
+    k5 = 2.0,
+    n = 4.0
+)
+u0418 = ComponentArray(
+    A = 0.0,
+    B = 0.0
+)
+
+prob = SteadyStateProblem(model418!, u0418, ps418)
 
 function ainf(k1val)
-    sol = solve(remake(prob, p=[k1 => k1val]), alg)
+    sol = solve(remake(prob, p=ComponentArray(ps418; k1=k1val)))
     return sol.u[1]
 end
 

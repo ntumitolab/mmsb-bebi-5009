@@ -3,61 +3,75 @@
 
 Model of E. coli chemotaxis signalling pathway
 ===#
-using ModelingToolkit
-using Catalyst
+using ComponentArrays
+using SimpleUnPack
 using OrdinaryDiffEq
+using DiffEqCallbacks
 using Plots
 Plots.default(linewidth=2)
 
 #---
-rn = @reaction_network begin
-    @parameters L(t)
-    mm(Am, k1 * BP, KM1), Am => A
-    mm(AmL, k2 * BP, KM2), AmL => AL
-    km1 * R , A => Am
-    km2 * R , AL => AmL
-    (k3 * L, km3), Am <--> AmL
-    (k4 * L, km4), A <--> AL
-    (k5 * Am, km5), B <--> BP
+hil(x, k) = x / (k + x)
+hil(x, k, n) = hil(x^n, k^n)
+function model614!(D, u, p, t)
+    @unpack k1, k2, k3, km1, km2, km3, k4, km4, k5, km5, KM1, KM2, L, R, Atotal, Btotal = p
+    @unpack Am, AmL, AL, BP = u
+    A = Atotal - Am - AmL - AL
+    B = Btotal - BP
+    v1 = k1 * BP * hil(Am, KM1)
+    v2 = k2 * BP * hil(AmL, KM2)
+    v3 = km1 * R
+    v4 = km2 * R
+    v5 = k3 * L * Am - km3 * AmL
+    v6 = k4 * L * A - km4 * AL
+    v7 = k5 * Am * B - km5 * BP
+    D.Am = v3 - v1 - v5
+    D.AmL = v4 - v2 + v5
+    D.AL = v2 + v6
+    D.BP = v7
+    nothing
 end
 
 #---
-setdefaults!(rn, [
-    :Am => 0.0360,
-    :AmL => 1.5593,
-    :A => 0.0595,
-    :AL => 0.3504,
-    :B => 0.7356,
-    :BP => 0.2644,
-    :k1 => 200,
-    :k2 => 1,
-    :k3 => 1,
-    :km1 => 1,
-    :km2 => 1,
-    :km3 => 1,
-    :k5 => 0.05,
-    :km5 => 0.005,
-    :k4 => 1,
-    :km4 => 1,
-    :KM1 => 1,
-    :KM2 => 1,
-    :R => 1,
-    :L => 20
-])
+ps614 = ComponentArray(
+    k1 = 200.0,
+    k2 = 1.0,
+    k3 = 1.0,
+    km1 = 1.0,
+    km2 = 1.0,
+    km3 = 1.0,
+    k4 = 1.0,
+    km4 = 1.0,
+    k5 = 0.05,
+    km5 = 0.005,
+    KM1 = 1.0,
+    KM2 = 1.0,
+    L = 20.0,
+    R = 1.0,
+    Atotal = 2.0,
+    Btotal = 1.0
+)
 
-@unpack L = rn
-osys = convert(ODESystem, rn; remove_conserved = true, discrete_events = [[10] => [L ~ 40], [30] => [L ~ 80]]) |> complete
+u0614 = ComponentArray(
+    Am = 0.0360,
+    AmL = 1.5593,
+    AL = 0.3504,
+    BP = 0.2644
+)
 
-#---
-observed(osys)
-
-#---
-equations(osys)
+# Events to increase L
+affect_L1!(integrator) = integrator.p.L = 40.0
+affect_L2!(integrator) = integrator.p.L = 80.0
+event_L1 = PresetTimeCallback([10.0], affect_L1!)
+event_L2 = PresetTimeCallback([30.0], affect_L2!)
+cbs = CallbackSet(event_L1, event_L2)
 
 #---
 tend = 50.0
-prob = ODEProblem(osys, [], tend);
-sol = solve(prob)
+prob614 = ODEProblem(model614!, u0614, tend, ps614)
 
 #---
-plot(sol, idxs=[osys.Am], title="Fig 6.14", xlabel="Time", ylabel="Active CheA ([Am])", ylims=(0.01, 0.04), legend=false)
+@time sol614 = solve(prob614, Tsit5(), callback=cbs)
+
+#---
+plot(sol614, idxs=[1], title="Fig 6.14", xlabel="Time", ylabel="Active CheA ([Am])", ylims=(0.01, 0.04), legend=false)

@@ -3,108 +3,100 @@
 
 model of lac operon in E. coli
 ===#
-using Catalyst
-using ModelingToolkit
+using ComponentArrays
+using SimpleUnPack
+using DiffEqCallbacks
 using OrdinaryDiffEq
 using SteadyStateDiffEq
 using Plots
 Plots.default(linewidth=2)
 
 #---
-rn = @reaction_network begin
-    @parameters Le(t)
-    a1 / (1 + RToverK1 * (K2 / (K2 + L))^4), 0 --> M
-    δM, M --> 0
-    (c1 * M, δY), 0 <--> Y
-    mm(Le, kL * Y, KML), 0 --> L
-    mm(L, 2 * kg * (Y / 4), KMg), L => 0
-    δL, L --> 0
+hil(x, k) = x / (x + k)
+hil(x, k, n) = hil(x^n, k^n)
+function model707!(D, u, p, t)
+    @unpack Le, a1, RToverK1, K2, δM, δY, δL, c1, kL, KML, kg, KMg = p
+    @unpack M, Y, L = u
+    D.M = a1 / (1 + RToverK1 * (K2 / (K2 + L))^4) - δM * M
+    D.Y = c1 * M - δY * Y
+    D.L = kL * Y * hil(Le, KML) - 2kg * (Y/4) * hil(L, KMg) - δL * L
+    nothing
 end
 
 #---
-setdefaults!(rn, [
-    :δM => 0.48,
-    :δY => 0.03,
-    :δL => 0.02,
-    :a1 => 0.29,
-    :K2 => 2.92 * 1e6,
-    :RToverK1 => 213.2,
-    :c1 => 18.8,
-    :kL => 6 * 1e4,
-    :KML => 680,
-    :kg => 3.6 * 1e3,
-    :KMg => 7 * 1e5,
-    :Le => 0.0,
-    :M => 0.01,
-    :Y => 0.1,
-    :L => 0.0
-])
+ps707 = ComponentArray(
+    δM = 0.48,
+    δY = 0.03,
+    δL = 0.02,
+    a1 = 0.29,
+    K2 = 2.92e6,
+    RToverK1 = 213.2,
+    c1 = 18.8,
+    kL = 6e4,
+    KML = 680.0,
+    kg = 3.6e3,
+    KMg = 7e5,
+    Le = 0.0,
+)
 
-@unpack Le = rn
-discrete_events = [[500.0] => [Le ~ 50], [1000.0] => [Le ~ 100], [1500.0] => [Le ~ 150], [2000.0] => [Le ~ 0]]
-osys = convert(ODESystem, rn; discrete_events, remove_conserved=true) |> structural_simplify
+ics707 = ComponentArray(
+    M = 0.01,
+    Y = 0.1,
+    L = 0.0,
+)
+
+# Events
+affect_le1!(integrator) = integrator.p.Le = 50
+affect_le2!(integrator) = integrator.p.Le = 100
+affect_le3!(integrator) = integrator.p.Le = 150
+affect_le4!(integrator) = integrator.p.Le = 0
+event_le1 = PresetTimeCallback([500.0], affect_le1!)
+event_le2 = PresetTimeCallback([1000.0], affect_le2!)
+event_le3 = PresetTimeCallback([1500.0], affect_le3!)
+event_le4 = PresetTimeCallback([2000.0], affect_le4!)
+cbs = CallbackSet(event_le1, event_le2, event_le3, event_le4)
 
 # ## Fig 7.07 (A)
 tend = 2500.0
-prob = ODEProblem(osys, [], tend)
-sol = solve(prob)
+prob707a = ODEProblem(model707!, ics707, tend, ps707)
+@time sol = solve(prob707a, Tsit5(), callback=cbs)
 
-@unpack M, Y, L, Le = osys
-plot(sol, idxs=[Y, Le], xlabel="Time (min)", title="Fig 7.7 (A)", label=["β-galactosidase monomer" "External lactose (μM)"])
+#---
+plot(sol, idxs=[2], label="β-galactosidase monomer")
+plot!(t -> 50 * (500<=t<1000) + 100 * (1000<=t<1500) + 150 * (1500<=t<2000), 0, tend, xlabel="Time (min)", title="Fig 7.7 (A)", label="External lactose")
 
 # ## Fig 7.07 (B)
 # Compare the original model and the modified model
-rn_mod = @reaction_network begin
-    @parameters Le(t)
-    a1 / (1 + RToverK1 * (K2 / (K2 + L))^4), 0 --> M
-    δM, M --> 0
-    (c1 * M, δY), 0 <--> Y
-    mm(Le, kL * 4 * Enz, KML), 0 --> L
-    mm(L, 2 * kg * Enz, KMg), L ⇒ 0
-    δL, L --> 0
+function model707b!(D, u, p, t)
+    @unpack Le, a1, RToverK1, K2, δM, δY, δL, c1, kL, KML, kg, KMg, Enz = p
+    @unpack M, Y, L = u
+    D.M = a1 / (1 + RToverK1 * (K2 / (K2 + L))^4) - δM * M
+    D.Y = c1 * M - δY * Y
+    D.L = 4kL * Enz * hil(Le, KML) - 2kg * Enz * hil(L, KMg) - δL * L
+    nothing
 end
 
 #---
-setdefaults!(rn_mod, [
-    :δM => 0.48,
-    :δY => 0.03,
-    :δL => 0.02,
-    :a1 => 0.29,
-    :K2 => 2.92 * 1e6,
-    :RToverK1 => 213.2,
-    :c1 => 18.8,
-    :kL => 6 * 1e4,
-    :KML => 680,
-    :kg => 3.6 * 1e3,
-    :KMg => 7 * 1e5,
-    :Le => 0.0,
-    :M => 0.01,
-    :Y => 0.1,
-    :L => 0.0,
-    :Enz => 40.0
-])
+ps707b = ComponentArray(ps707; Enz=40.0)
+prob707a = SteadyStateProblem(model707!, ics707, ps707)
+prob707b = SteadyStateProblem(model707b!, ics707, ps707b)
 
-osys_mod = convert(ODESystem, rn_mod; remove_conserved=true) |> structural_simplify
-
-#---
-prob = SteadyStateProblem(rn, [])
-prob_mod = SteadyStateProblem(rn_mod, [])
-
-@unpack Le, Y = osys
 lerange = range(0, 100, 101)
 
-eprob = EnsembleProblem(prob;
-    prob_func=(prob, i, repeat) -> remake(prob, p=[Le=>lerange[i]]),
-    output_func=(sol, i) -> (sol[Y] / 4, false)
+eprob = EnsembleProblem(prob707a;
+    prob_func=(prob, i, repeat) -> remake(prob, p=ComponentArray(ps707; Le=lerange[i])),
+    output_func=(sol, i) -> (sol.u.Y / 4, false)
 )
 
-eprob_mod = EnsembleProblem(prob_mod;
-    prob_func=(prob, i, repeat) -> remake(prob, p=[Le=>lerange[i]]),
-    output_func=(sol, i) -> (sol[Y] / 4, false)
+eprob_mod = EnsembleProblem(prob707b;
+    prob_func=(prob, i, repeat) -> remake(prob, p=ComponentArray(ps707b; Le=lerange[i])),
+    output_func=(sol, i) -> (sol.u.Y / 4, false)
 )
 
-sim = solve(eprob, DynamicSS(Rodas5()); trajectories=length(lerange), abstol=1e-9, reltol=1e-9)
-sim_mod = solve(eprob_mod, DynamicSS(Rodas5()); trajectories=length(lerange), abstol=1e-9, reltol=1e-9)
+alg = DynamicSS(FBDF())
+opts = (trajectories=length(lerange), abstol=1e-9, reltol=1e-9)
+@time sim = solve(eprob, alg; opts...)
+@time sim_mod = solve(eprob_mod, alg; opts...)
 
 fig = plot(lerange, sim.u, label="Original")
 fig = plot!(fig, lerange, sim_mod.u, label="Modified")

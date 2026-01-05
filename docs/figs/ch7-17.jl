@@ -3,40 +3,48 @@
 
 Goodwin oscillator model: https://en.wikipedia.org/wiki/Goodwin_model_(biology)
 ===#
-using Catalyst
-using ModelingToolkit
+using ComponentArrays
+using SimpleUnPack
 using OrdinaryDiffEq
 using Plots
 Plots.default(linewidth=2)
 
 #---
-rn = @reaction_network begin
-    (a / (k^n + Z^n), b), 0 <--> X
-    (α * X, β), 0 <--> Y
-    (γ * Y, δ), 0 <--> Z
+function model717!(D, u, p, t)
+    @unpack a, k, b, α, β, γ, δ, n = p
+    @unpack X, Y, Z = u
+    D.X = a / (k^n + Z^n) - b * X
+    D.Y = α * X - β * Y
+    D.Z = γ * Y - δ * Z
+    nothing
 end
 
 #---
-ps = [
-    :a => 360,
-    :k => 1.368,
-    :b => 1,
-    :α => 1,
-    :β => 0.6,
-    :γ => 1,
-    :δ => 0.8,
-    :n => 12
-]
+ps717 = ComponentArray(
+    a = 360.0,
+    k = 1.368,
+    b = 1.0,
+    α = 1.0,
+    β = 0.6,
+    γ = 1.0,
+    δ = 0.8,
+    n = 12.0
+)
 
-u0 = zeros(3)
+u0 = ComponentArray(
+    X = 0.0,
+    Y = 0.0,
+    Z = 0.0
+)
+
 tend = 35.0
+prob717 = ODEProblem(model717!, u0, tend, ps717)
 
 #---
-prob = ODEProblem(rn, u0, tend, ps);
-sol = solve(prob)
+@time sol = solve(prob717)
 
 #---
-plot(sol, title="Fig 7.17 (A)", xlabel="Time", ylabel="Concentration")
+plot(sol, title="Fig 7.17 (A)", xlabel="Time", ylabel="Concentration", labels=["X" "Y" "Z"])
 
 #---
-plot(sol, idxs=(rn.X, rn.Y, rn.Z), title="Fig 7.17 (B)", legend=false, size=(600, 600))
+plot(sol, idxs=(1, 2, 3), title="Fig 7.17 (B)", legend=false, size=(600, 600))

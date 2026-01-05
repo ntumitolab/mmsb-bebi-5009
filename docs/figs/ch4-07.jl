@@ -1,22 +1,19 @@
 # # Fig 4.7, 4.8
 # Symmetric (bistable) biological networks.
 using OrdinaryDiffEq
-using ModelingToolkit
+using ComponentArrays
+using SimpleUnPack
 using Plots
 Plots.default(linewidth=2)
 
 # Model
-@independent_variables t
-@variables A(t) B(t)
-@parameters k1 k2 k3 k4 n1 n2
-D = Differential(t)
-
-eqs = [
-    D(A) ~ k1 / (1 + B^n1) - k3 * A,
-    D(B) ~ k2 / (1 + A^n2) - k4 * B,
-]
-
-@mtkbuild osys = ODESystem(eqs, t)
+_dA407(u, p, t) = p.k1 / (1 + u.B^p.n1) - p.k3 * u.A
+_dB407(u, p, t) = p.k2 / (1 + u.A^p.n2) - p.k4 * u.B
+function model407!(D, u, p, t)
+    D.A = _dA407(u, p, t)
+    D.B = _dB407(u, p, t)
+    nothing
+end
 
 #===
 ## Fig 4.7 A
@@ -24,20 +21,34 @@ eqs = [
 Asymmetric parameter set
 ===#
 
-ps1 = Dict(k1=>20, k2=>20, k3=>5, k4=>5, n1=>4, n2=>1)
+ps407 = ComponentArray(
+    k1 = 20.0,
+    k2 = 20.0,
+    k3 = 5.0,
+    k4 = 5.0,
+    n1 = 4.0,
+    n2 = 1.0
+)
+
+ics407 = ComponentArray(
+    A = 3.0,
+    B = 1.0
+)
+
 tend = 4.0
-prob47 = ODEProblem(osys, [3, 1], tend, ps1)
+prob407 = ODEProblem(model407!, ics407, (0.0, tend), ps407)
+#---
+@time sol1 = solve(prob407, Tsit5())
+@time sol2 = solve(remake(prob407, u0=ComponentArray(A=1.0, B=3.0)), Tsit5())
 
-sol1 = solve(prob47)
-sol2 = solve(remake(prob47, u0=[1, 3]))
-
-ax1 = plot(sol1, xlabel="Time", ylabel="Concentration", legend=:right, title= "Fig 4.7A (1)")
-ax2 = plot(sol2, xlabel="Time", ylabel="Concentration", legend=:right, title= "Fig 4.7A (2)")
+ax1 = plot(sol1, xlabel="Time", ylabel="Concentration", legend=:right, title= "Fig 4.7A (1)", labels=["A" "B"])
+ax2 = plot(sol2, xlabel="Time", ylabel="Concentration", legend=:right, title= "Fig 4.7A (2)", labels=["A" "B"])
 plot(ax1, ax2, layout=(2, 1), size=(600, 600))
 
 # ## Fig 4.7 B
 ∂F47 = function (x, y; scale=20)
-    da, db = prob47.f([x, y], prob47.p, nothing)
+    da = _dA407(ComponentArray(A=x, B=y), ps407, nothing)
+    db = _dB407(ComponentArray(A=x, B=y), ps407, nothing)
     s = sqrt(hypot(da, db)) * scale
     return (da / s, db / s)
 end
@@ -50,9 +61,8 @@ yy = [y for y in r, x in r];
 fig = plot(title="Fig 4.7 B (Vector field with nullclines)")
 quiver!(fig, xx, yy, quiver=∂F47, line=(:lightgrey), arrow=(:closed), aspect_ratio=:equal)
 
-∂A47 = (x, y) -> prob47.f([x, y], prob47.p, nothing)[1]
-∂B47 = (x, y) -> prob47.f([x, y], prob47.p, nothing)[2]
-
+∂A47 = (x, y) -> _dA407(ComponentArray(A=x, B=y), ps407, nothing)
+∂B47 = (x, y) -> _dB407(ComponentArray(A=x, B=y), ps407, nothing)
 contour!(fig, 0:0.01:5, 0:0.01:5, ∂A47, levels=[0], cbar=false, line=(:black))
 plot!(fig, Float64[], Float64[], line=(:black), label="A nullcline")
 contour!(fig, 0:0.01:5, 0:0.01:5, ∂B47, levels=[0], cbar=false, line=(:black, :dash))
@@ -64,27 +74,39 @@ plot!(fig, xlim=(0, 5), ylim=(0, 5), legend=:topright, size=(600, 600), xlabel="
 
 Symmetric parameter set
 ===#
+ps408 = ComponentArray(
+    k1 = 20.0,
+    k2 = 20.0,
+    k3 = 5.0,
+    k4 = 5.0,
+    n1 = 4.0,
+    n2 = 4.0
+)
 
-ps2 = Dict(k1=>20, k2=>20, k3=>5, k4=>5, n1=>4, n2=>4)
+ics408 = ComponentArray(
+    A = 3.0,
+    B = 1.0
+)
+
 tend = 4.0
-prob48 = ODEProblem(osys, [3, 1], tend, ps2)
+prob408 = ODEProblem(model407!, ics408, (0.0, tend), ps408)
 
-sol1 = solve(prob48)
-sol2 = solve(remake(prob48, u0=[1, 3]))
-
-ax1 = plot(sol1, xlabel="Time", ylabel="Concentration", legend=:right, title= "Fig 4.8A (1)")
-ax2 = plot(sol2, xlabel="Time", ylabel="Concentration", legend=:right, title= "Fig 4.8A (2)")
+@time sol1 = solve(prob408, Tsit5())
+@time sol2 = solve(remake(prob408, u0=ComponentArray(A=1.0, B=3.0)), Tsit5())
+ax1 = plot(sol1, xlabel="Time", ylabel="Concentration", legend=:right, title= "Fig 4.8A (1)", labels=["A" "B"])
+ax2 = plot(sol2, xlabel="Time", ylabel="Concentration", legend=:right, title= "Fig 4.8A (2)", labels=["A" "B"])
 plot(ax1, ax2, layout=(2, 1), size=(600, 600))
 
 #---
 ∂F48 = function (x, y; scale=20)
-    da, db = prob48.f([x, y], prob48.p, nothing)
+    da = _dA407(ComponentArray(A=x, B=y), ps408, nothing)
+    db = _dB407(ComponentArray(A=x, B=y), ps408, nothing)
     s = sqrt(hypot(da, db)) * scale
     return (da / s, db / s)
 end
 
-∂A48 = (x, y) -> prob48.f([x, y], prob48.p, nothing)[1]
-∂B48 = (x, y) -> prob48.f([x, y], prob48.p, nothing)[2]
+∂A48 = (x, y) -> _dA407(ComponentArray(A=x, B=y), ps408, nothing)
+∂B48 = (x, y) -> _dB407(ComponentArray(A=x, B=y), ps408, nothing)
 
 #---
 fig = plot(title="Fig 4.8 B")
