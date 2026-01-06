@@ -14,9 +14,10 @@ Plots.default(linewidth=2)
 #---
 function model605!(D, u, p, t)
     @unpack kRL, kRLm, kGa, kGd0, kG1, L, Rtotal, Gtotal = p
-    @unpack RL, Ga, Gd, Gbg = u
+    @unpack RL, Ga, Gd = u
     R = Rtotal - RL
-    G = Gtotal - Ga - Gbg
+    G = Gtotal - Ga - Gd
+    Gbg = Ga + Gd
     v1 = kRL * R * L - kRLm * RL
     v2 = kGa * G * RL
     v3 = kGd0 * Ga
@@ -24,7 +25,6 @@ function model605!(D, u, p, t)
     D.RL = v1
     D.Ga = v2 - v3
     D.Gd = v3 - v4
-    D.Gbg = v2 - v4
     nothing
 end
 
@@ -44,7 +44,6 @@ u0605 = ComponentArray(
     RL = 0.0,
     Ga = 0.0,
     Gd = 0.0,
-    Gbg = 0.0
 )
 
 # Events
