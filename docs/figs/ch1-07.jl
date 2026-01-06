@@ -1,5 +1,5 @@
 #===
-# Collins toggle switch
+# Fig 1.7
 
 For Figures 1.7, 7.13, 7.14, 7.15.
 ===#
