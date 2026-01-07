@@ -1,6 +1,5 @@
 # # Fig 7.21
 # repressilator model
-
 using OrdinaryDiffEq
 using ComponentArrays
 using SimpleUnPack
@@ -42,7 +41,6 @@ prob721 = ODEProblem(model721!, u0721, tspan, ps721)
 
 #---
 @time sol721 = solve(prob721, Tsit5())
-
 #---
 plot(t -> sol721(t).A, 0, tspan[2], labels="A")
 plot!(t -> sol721(t).B, 0, tspan[2], labels="B")
