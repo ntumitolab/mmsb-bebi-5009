@@ -44,9 +44,9 @@ tend = 10.0
 prob = ODEProblem(model209!, u0, tend, ps)
 
 # Solve the problem
-@time sol = solve(prob)
+@time sol = solve(prob, Tsit5())
 
-# Visual
+# Visualize the results
 plot(sol, legend=:bottomright, title="Fig 2.9",
     xlims=(0., 4.), ylims=(0., 1.),
     xlabel="Time (sec)", ylabel="Concentration (mM)",

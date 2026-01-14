@@ -67,7 +67,7 @@ tspan = (0.0, 100.0)
 
 prob = ODEProblem(hh_neuron!, u0, tspan, ps)
 
-# Callbacks for stimulation current
+# Callbacks for external current and solve the problem
 affect_stim_on1!(integrator) = integrator.p.iStim = -6.6
 affect_stim_off1!(integrator) = integrator.p.iStim = 0.0
 affect_stim_on2!(integrator) = integrator.p.iStim = -6.9
@@ -77,9 +77,7 @@ cb_stim_off1 = PresetTimeCallback(21.0, affect_stim_off1!)
 cb_stim_on2 = PresetTimeCallback(60.0, affect_stim_on2!)
 cb_stim_off2 = PresetTimeCallback(61.0, affect_stim_off2!)
 cbs = CallbackSet(cb_stim_on1, cb_stim_off1, cb_stim_on2, cb_stim_off2)
+@time sol = solve(prob, Tsit5(), callback=cbs)
 
-# Solve the problem
-@time sol = solve(prob, callback=cbs)
-
-# Visual
-plot(sol.t, sol[1, :], xlabel="Time (ms)", ylabel="Membrane potential (mV)", title="Fig 1.9", label=false, legend=:topleft)
+# Visualization
+plot(t->sol(t).v, 0, 100, xlabel="Time (ms)", ylabel="Membrane potential (mV)", title="Fig 1.9", label=false, legend=:topleft)

@@ -52,6 +52,7 @@ plot(
 # ## Figure 2.12
 # Rapid equilibrium assumption
 _a212(u, p, t) =  u.C * p.km1 / (p.km1 + p.k1)
+_b212(u, p, t) =  u.C * p.k1 / (p.km1 + p.k1)
 function model212!(du, u, p, t)
     @unpack k0, k2 = p
     @unpack C = u
@@ -65,25 +66,21 @@ end
 
 #---
 tend = 3.0
-prob212 = ODEProblem(model212!, ComponentArray(C = sum(u0)), tend, ps211)
+u0212 = ComponentArray(C = sum(u0))
+prob212 = ODEProblem(model212!, u0212, tend, ps211)
 
 #---
 @time sol212 = solve(prob212, Tsit5())
 #---
 fig = plot(sol211, line=(:dash, 1), label=["A (full solution)" "B (full solution)"])
-ts = sol212.t
-cs = sol212[1, :]
-as = _a212.(sol212.u, Ref(ps211), ts)
-bs = cs .- as
-plot!(fig, ts, [as bs], label=["A (rapid equilibrium)" "B (rapid equilibrium)"])
-
+a212_t = t -> _a212(sol212(t), ps211, t)
+b212_t = t -> _b212(sol212(t), ps211, t)
+plot!(fig, [a212_t b212_t], 0, tend, label=["A (rapid equilibrium)" "B (rapid equilibrium)"])
 plot!(fig,
     title="Fig. 2.12 (Rapid equilibrium model)",
     xlabel="Time (AU)",
     ylabel="Concentration (AU)"
 )
-
-fig
 
 #===
 ## Figure 2.13
@@ -103,18 +100,14 @@ tend = 3.0
 #---
 
 fig = plot(sol213full, line=(:dash, 1), label=["A (full solution)" "B (full solution)"])
-ts = sol213re.t
-cs = sol213re[1, :]
-as = _a212.(sol213re.u, Ref(ps213), ts)
-bs = cs .- as
-plot!(fig, ts, [as bs], label=["A (rapid equilibrium)" "B (rapid equilibrium)"])
+a213re_t = t -> _a212(sol213re(t), ps213, t)
+b213re_t = t -> _b212(sol213re(t), ps213, t)
+plot!(fig, [a213re_t b213re_t], 0, tend, label=["A (rapid equilibrium)" "B (rapid equilibrium)"])
 plot!(fig,
     title="Fig. 2.13 (Rapid equilibrium model)",
     xlabel="Time (AU)",
     ylabel="Concentration (AU)"
 )
-
-fig
 
 #===
 ## Figure 2.14 : QSSA
@@ -138,10 +131,9 @@ u0214= ComponentArray(B = _u0214(sum(u0), ps214))
 @time sol214 = solve(ODEProblem(model214!, u0214, tend, ps214), Tsit5())
 
 fig = plot(sol213full, line=(:dash), label=["A (full solution)" "B (full solution)"])
-ts = sol214.t
-as = _a214.(sol214.u, Ref(ps214), ts)
-bs = sol214[1, :]
-plot!(fig, ts, [as bs], label=["A (QSSA)" "B (QSSA)"])
+a214_t = t -> _a214(sol214(t), ps214, t)
+b214_t = t -> sol214(t).B
+plot!(fig, [a214_t b214_t], 0, tend, label=["A (QSSA)" "B (QSSA)"])
 plot!(fig,
     xlabel="Time (AU)",
     ylabel="Concentration (AU)",

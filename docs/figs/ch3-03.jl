@@ -39,16 +39,12 @@ tend = 1.0
 prob303 = ODEProblem(model303!, u0, tend, ps303)
 
 #---
-@time sol = solve(prob303)
+@time sol = solve(prob303, Tsit5())
 
 #---
-
 pl303 = plot(sol, xlabel="Time (AU)", ylabel="Concentration (AU)", legend=:right, title="Fig 3.03", labels=["S (full)" "ES (full)" "P (full)"])
-
-let ts = 0:0.01:tend
-    es = (t) -> _e303(sol(t), ps303, t)
-    plot!(pl303, ts, es, label="E (full)")
-end
+e303_t = t -> _e303(sol(t), ps303, t)
+plot!(pl303, e303_t, 0, tend, label="E (full)")
 
 # ## QSSA of ES complex
 _s303mm(u, p, t) = p.S0 - u.P
@@ -66,21 +62,11 @@ ps303mm = ComponentArray(ps303; S0=5.0)
 prob303mm = ODEProblem(model303mm!, ComponentArray(P=0.0), tend, ps303mm)
 
 #---
-@time sol303mm = solve(prob303mm)
+@time sol303mm = solve(prob303mm, Tsit5())
 
 #---
-ts = 0:0.01:tend
+plot(sol, idxs=[1, 3], label=["S (full)" "P (full)"], line=(:dash))
+p303mm_t = t -> sol303mm(t).P
+s303mm_t = t -> _s303mm(sol303mm(t), ps303mm, t)
 
-#---
-let ts = 0:0.01:tend
-    ss = sol(ts, idxs=1).u
-    pp = sol(ts, idxs=3).u
-    ss_mm = _s303mm.(sol303mm(ts).u, Ref(ps303mm), ts)
-    pp_mm = sol303mm(ts, idxs=1).u
-    fig = plot(ts, [ss pp], label=["S (full)" "P (full)"], line=(:dash))
-    plot!(fig, ts, [ss_mm pp_mm], label=["S (MM)" "P (MM)"])
-    plot!(fig, title="Fig. 3.03",
-    xlabel="Time (AU)", ylabel="Concentration (AU)",
-    xlims=(0., tend), ylims=(0., 5.), legend=:right)
-    fig
-end
+plot!([s303mm_t p303mm_t], 0, tend, label=["S (MM)" "P (MM)"], title="Fig. 3.03", xlabel="Time (AU)", ylabel="Concentration (AU)", xlims=(0., tend), ylims=(0., 5.), legend=:right)
