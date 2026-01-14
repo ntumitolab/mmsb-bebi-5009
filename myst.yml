@@ -1,0 +1,40 @@
+# See docs at: https://mystmd.org/guide/frontmatter
+version: 1
+project:
+  title: MMSB
+  description: Publish Julia Notebooks via Jupyter Book
+  # keywords: []
+  authors: ["Wen-Wei Tseng"]
+  license: CC-BY-4.0
+  open_access: true
+  settings:
+    output_matplotlib_strings: remove
+  github: https://github.com/ntumitolab/mmsb-bebi-5009
+  # bibliography:
+  #   - docs/references.bib
+  # To autogenerate a Table of Contents, run "jupyter book init --write-toc"
+  # https://mystmd.org/guide/table-of-contents
+  toc:
+    - file: docs/index.md
+    - title: Introduction
+      children:
+        - file: docs/intro-00-start.md
+        - pattern: docs/*.ipynb
+    - title: Homework
+      children:
+        - file: docs/hw-00.md
+        - file: docs/hw-01.ipynb
+    - title: Textbook figures
+      children:
+        - pattern: docs/figs/*.ipynb
+    - file: docs/runtime.ipynb
+
+site:
+  template: book-theme
+  options:
+    folders: true
+    logo_text: "MMSB"
+  # favicon: favicon.ico
+  # logo: site_logo.png
+  # style: ./my-style.css
+  nav: []
