@@ -1,4 +1,4 @@
-name: Build notebooks and publish
+name: CI
 
 on:
   workflow_dispatch:
@@ -39,10 +39,11 @@ jobs:
     - name: Read Julia version
       id: julia-version
       run: python -c 'import tomllib; from pathlib import Path; print("value=", tomllib.loads(Path("Manifest.toml").read_text())["julia_version"], sep="")' >> "$GITHUB_OUTPUT"
-    - name: Get environment hash
+    - name: Get hashes
       id: hash
       run: |
         echo "value=${{ hashFiles('Project.toml', 'Manifest.toml', 'src/**') }}" >> "$GITHUB_OUTPUT"
+        echo "nb=${{ hashFiles('docs/**/*.jl', 'docs/**/*.ipynb') }}" >> "$GITHUB_OUTPUT"
     - name: Cache executed notebooks
       uses: actions/cache@v5
       id: cache-nb
@@ -50,7 +51,7 @@ jobs:
         path: |
           ${{ env.NBCACHE }}/**/*.ipynb
           ${{ env.NBCACHE }}/**/*.sha
-        key: notebook-${{ steps.hash.outputs.value }}-${{ hashFiles('docs/**') }}
+        key: notebook-${{ steps.hash.outputs.value }}-${{ steps.hash.outputs.nb }}
         restore-keys: |
           notebook-${{ steps.hash.outputs.value }}-
     - name: Setup Julia
@@ -88,27 +89,30 @@ jobs:
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' }}
       run: julia --project=@. --color=yes -p ${{ env.LITERATE_PROC }} .github/ci.jl
     - name: Copy back built notebooks
-      run: |
-        cp --verbose -rf ${{ env.NBCACHE }}/docs/* docs/
-        find docs/ -type f -name "*.jl" -delete
-    - name: Setup Quarto
-      if: ${{ runner.environment == 'github-hosted' }}
-      uses: quarto-dev/quarto-actions/setup@v2
-    - name: Render Quarto Project
-      run: quarto render docs/
-    - name: Upload pages artifact
-      uses: actions/upload-pages-artifact@v4
-      if: ${{ github.ref == 'refs/heads/main' }}
+      run: cp --verbose -rf ${{ env.NBCACHE }}/docs/* docs/
+    - name: Setup NodeJS
+      uses: actions/setup-node@v6
       with:
-        path: docs/_site/
+        node-version: 'lts/*'
+    - name: Build website
+      env:
+        BASE_URL: /${{ github.event.repository.name }}
+      run: |
+        npm install -g "jupyter-book"
+        jupyter-book build --html
+    - name: Upload pages artifact
+      if: ${{ github.ref == 'refs/heads/main' }}
+      uses: actions/upload-pages-artifact@v4
+      with:
+        path: './_build/html'
 
   deploy:
     name: Deploy to GitHub pages
     needs: CI
-    if: ${{ github.ref == 'refs/heads/main'}}
+    if: ${{ github.ref == 'refs/heads/main' }}
     # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
     permissions:
-      pages: write # to deploy to Pages
+      pages: write    # to deploy to Pages
       id-token: write # to verify the deployment originates from an appropriate source
     environment:
       name: github-pages
