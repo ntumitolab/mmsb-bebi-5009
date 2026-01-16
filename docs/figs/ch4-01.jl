@@ -4,10 +4,9 @@
 Steady states and phase plots in an asymmetric network.
 ===#
 using OrdinaryDiffEq
-using ComponentArrays
+import ComponentArrays as CA
 using SimpleUnPack
-using Plots
-Plots.default(linewidth=2)
+using CairoMakie
 
 # The model for figure 4.1, 4.2, and 4.3.
 _dA401(u, p, t) = p.k1 / (1 + u.B^p.n) - (p.k3 + p.k5) * u.A
@@ -21,7 +20,7 @@ end
 
 # ## Fig 4.2 A
 tend = 1.5
-ps402a = ComponentArray(
+ps402a = CA.ComponentArray(
     k1 = 20.0,
     k2 = 5.0,
     k3 = 5.0,
@@ -29,14 +28,14 @@ ps402a = ComponentArray(
     k5 = 2.0,
     n = 4.0
 )
-ics402a = ComponentArray(
+ics402a = CA.ComponentArray(
     A = 0.0,
     B = 0.0
 )
-prob401 = ODEProblem(model401!, ics402a, (0.0, tend), ps402a)
+prob401 = ODEProblem(model401!, ics402a, tend, ps402a)
 
 u0s = [
-    ComponentArray(
+    CA.ComponentArray(
         A = a,
         B = b
     ) for (a, b) in [
@@ -53,59 +52,83 @@ u0s = [
 end
 
 #---
-plot(sols[1], xlabel="Time", ylabel="Concentration", title="Fig. 4.2 A (Time series)", labels=["A" "B"], legend=:right)
+fig = Figure()
+ax = Axis(fig[1, 1],
+    xlabel = "Time",
+    ylabel = "Concentration",
+    title = "Fig. 4.2 A (Time series)"
+)
+lines!(ax, 0..tend, t-> sols[1](t).A, label = "A")
+lines!(ax, 0..tend, t-> sols[1](t).B, label = "B")
+axislegend(ax, position = :rt)
+fig
 
 # ## Fig. 4.2 B (Phase plot)
-plot(
-    sols[1], idxs=(1, 2),
-    xlabel="[A]", ylabel="[B]",
-    aspect_ratio=:equal, legend=nothing,
-    title="Fig. 4.2 B (Phase plot)",
-    ylims=(0.0, 2.0), xlims=(0.0, 2.0),
-    size=(600, 600)
+fig = Figure(size = (600, 600))
+ax = Axis(fig[1, 1],
+    xlabel = "[A]",
+    ylabel = "[B]",
+    title = "Fig. 4.2 B (Phase plot)",
+    aspect = 1,
 )
+lines!(ax, sols[1], idxs=(1, 2))
+xlims!(ax, 0.0, 2.0)
+ylims!(ax, 0.0, 2.0)
+fig
 
 # ## Fig. 4.3 A (Multiple time series)
-fig = plot(title="Fig. 4.3A (Multiple time series)")
-
+fig = Figure()
+ax = Axis(fig[1, 1],
+    xlabel = "Time",
+    ylabel = "Concentration",
+    title = "Fig. 4.3A (Multiple time series)"
+)
 for sol in sols
-    plot!(fig, sol, linealpha=0.5, legend=nothing)
+    lines!(ax, 0..tend, t-> sol(t).A, alpha=0.7)
+    lines!(ax, 0..tend, t-> sol(t).B, alpha=0.7)
 end
 
-plot!(fig, xlabel="Time", ylabel="Concentration")
+fig
 
 # ## Fig. 4.3 B (Phase plot)
-fig = plot(title="Fig. 4.3 B (Phase plot)")
+fig = Figure(size=(600, 600))
+ax = Axis(fig[1, 1],
+    xlabel = "[A]",
+    ylabel = "[B]",
+    title = "Fig. 4.3 B (Phase plot)",
+    aspect = 1,
+)
 
-for sol in sols
-    plot!(fig, sol, idxs=(1, 2), legend=nothing)
+for (i, sol) in enumerate(sols)
+    lines!(ax, sol, idxs=(1, 2), color = Cycled(i))
 end
 
-plot!(fig, xlabel="[A]", ylabel="[B]", xlims=(0.0, 2.0), ylims=(0.0, 2.0), aspect_ratio=:equal, size=(600, 600))
+fig
 
-# Let's sketch vector fields in phase plots.
-∂F44 = function (x, y; scale=20)
-    da = _dA401(ComponentArray(A=x, B=y), ps402a, nothing)
-    db = _dB401(ComponentArray(A=x, B=y), ps402a, nothing)
-    s = sqrt(hypot(da, db)) * scale
-    return (da / s, db / s)
+# Let's sketch vector fields in phase plots
+∂F44 = function (x, y)
+    da = _dA401(CA.ComponentArray(A=x, B=y), ps402a, nothing)
+    db = _dB401(CA.ComponentArray(A=x, B=y), ps402a, nothing)
+    Point2d(da, db)
 end
 
-# Grid points
-rxy = range(0.0, 2.0, 11)
-xx = [x for y in rxy, x in rxy]
-yy = [y for y in rxy, x in rxy];
+fig = Figure(size=(600, 600))
+ax = Axis(fig[1, 1],
+    xlabel = "[A]",
+    ylabel = "[B]",
+    title = "Fig. 4.4 A (Phase plot with vector field)",
+    aspect = 1,
+)
 
-# ## Figure 4.4A
-fig = plot(title="Fig. 4.4 A (Phase plot with vector field)")
-
-quiver!(fig, xx, yy, quiver=∂F44, line=(:lightgrey), arrow=(:closed), aspect_ratio=:equal)
-
-for sol in sols
-    plot!(fig, sol, idxs=(1, 2), linealpha=0.7, legend=nothing)
+streamplot!(ax, ∂F44, 0.0..2.0, 0.0..2.0)
+for (i, sol) in enumerate(sols)
+    lines!(ax, sol, idxs=(1, 2), color =:black)
 end
 
-plot!(fig, size=(600, 600), xlims=(rxy[1], rxy[end]), ylims=(rxy[1], rxy[end]), xlabel="[A]", ylabel="[B]")
+xlims!(ax, 0.0, 2.0)
+ylims!(ax, 0.0, 2.0)
+
+fig
 
 # ## Figure 4.5A
 fig = plot(title="Fig. 4.5 A (Phase plot with nullclines)")
