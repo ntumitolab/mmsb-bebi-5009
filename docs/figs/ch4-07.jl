@@ -1,7 +1,7 @@
 # # Fig 4.7, 4.8
 # Symmetric (bistable) biological networks.
 using OrdinaryDiffEq
-import ComponentArrays as CA
+using ComponentArrays: ComponentArray as CA
 using SimpleUnPack
 using CairoMakie
 
@@ -20,8 +20,7 @@ end
 
 Asymmetric parameter set
 ===#
-
-ps407 = CA.ComponentArray(
+ps407 = CA(
     k1 = 20.0,
     k2 = 20.0,
     k3 = 5.0,
@@ -30,17 +29,16 @@ ps407 = CA.ComponentArray(
     n2 = 1.0
 )
 
-ics407 = CA.ComponentArray(
+ics407 = CA(
     A = 3.0,
     B = 1.0
 )
 
 tend = 4.0
-prob407 = ODEProblem(model407!, ics407, tend, ps407)
+prob407 = ODEProblem(model407!, ics407, (0.0, tend), ps407)
 #---
 @time sol1 = solve(prob407, Tsit5())
-@time sol2 = solve(remake(prob407, u0=CA.ComponentArray(A=1.0, B=3.0)), Tsit5())
-
+@time sol2 = solve(remake(prob407, u0=CA(A=1.0, B=3.0)), Tsit5())
 fig = Figure(size=(600, 600))
 ax1 = Axis(fig[1, 1], xlabel="Time", ylabel="Concentration", title= "Fig 4.7A (1)")
 lines!(ax1, 0..tend, t-> sol1(t).A, label="A")
@@ -74,10 +72,8 @@ ax = Axis(fig[1, 1],
 )
 
 ## Nullclines
-contour!(ax, xs, ys, zA47, levels=[0], color=:red)
-lines!(ax, Float64[], Float64[], color=:red, label="A nullcline")
-contour!(ax, xs, ys, zB47, levels=[0], color=:blue)
-lines!(ax, Float64[], Float64[], color=:blue, label="B nullcline")
+contour!(ax, xs, ys, zA47, levels=[0], color=:black, label="A nullcline", linewidth=2, linestyle=:solid)
+contour!(ax, xs, ys, zB47, levels=[0], color=:black, label="B nullcline", linewidth=2, linestyle=:dash)
 
 ## Vector field
 streamplot!(ax, ∂F47, 0..5, 0..5)
@@ -90,7 +86,7 @@ fig
 
 Symmetric parameter set
 ===#
-ps408 = CA.ComponentArray(
+ps408 = CA(
     k1 = 20.0,
     k2 = 20.0,
     k3 = 5.0,
@@ -99,7 +95,7 @@ ps408 = CA.ComponentArray(
     n2 = 4.0
 )
 
-ics408 = CA.ComponentArray(
+ics408 = CA(
     A = 3.0,
     B = 1.0
 )
@@ -108,7 +104,7 @@ tend = 4.0
 prob408 = ODEProblem(model407!, ics408, (0.0, tend), ps408)
 
 @time sol1 = solve(prob408, Tsit5())
-@time sol2 = solve(remake(prob408, u0=CA.ComponentArray(A=1.0, B=3.0)), Tsit5())
+@time sol2 = solve(remake(prob408, u0=CA(A=1.0, B=3.0)), Tsit5())
 
 fig = Figure(size=(600, 600))
 ax1 = Axis(fig[1, 1], xlabel="Time", ylabel="Concentration", title= "Fig 4.8A (1)")
@@ -140,10 +136,8 @@ ax = Axis(fig[1, 1],
 )
 
 streamplot!(ax, ∂F48, 0..5, 0..5)
-contour!(ax, xs, ys, zA48, levels=[0], color=:red)
-lines!(ax, Float64[], Float64[], color=:red, label="A nullcline")
-contour!(ax, xs, ys, zB48, levels=[0], color=:blue)
-lines!(ax, Float64[], Float64[], color=:blue, label="B nullcline")
+contour!(ax, xs, ys, zA48, levels=[0], color=:black, label="A nullcline", linewidth=2, linestyle=:solid)
+contour!(ax, xs, ys, zB48, levels=[0], color=:black, label="B nullcline", linewidth=2, linestyle=:dash)
 limits!(ax, 0.0, 5.0, 0.0, 5.0)
 axislegend(ax, position = :rc)
 fig
@@ -167,16 +161,13 @@ zA48c = [_dA407(x, y, ps408, nothing) for x in xs, y in ys]
 zB48c = [_dB407(x, y, ps408, nothing) for x in xs, y in ys]
 
 streamplot!(ax, ∂F48, 1.0..1.5, 1.0..1.5)
-contour!(ax, xs, ys, zA48c, levels=[0], color=:red)
-lines!(ax, Float64[], Float64[], color=:red, label="A nullcline")
-contour!(ax, xs, ys, zB48c, levels=[0], color=:blue)
-lines!(ax, Float64[], Float64[], color=:blue, label="B nullcline")
+contour!(ax, xs, ys, zA48c, levels=[0], color=:black, label="A nullcline", linewidth=2, linestyle=:solid)
+contour!(ax, xs, ys, zB48c, levels=[0], color=:black, label="B nullcline", linewidth=2, linestyle=:dash)
 limits!(ax, 1.0, 1.5, 1.0, 1.5)
 axislegend(ax, position = :rc)
 fig
 
 # Another way to draw nullclines is to find the analytical solutions for dA (or dB) is zero. And then sketch the nullclines in a parameteric plot.
-
 nca47(b, p) = p.k1 / p.k3 / (1 + b^p.n1)
 ncb47(a, p) = p.k2 / p.k4 / (1 + a^p.n2)
 
@@ -197,5 +188,4 @@ for (i, k1) in enumerate((8.0, 16.0, 20.0, 35.0))
     limits!(ax, 0, 7, 0, 7)
     axislegend(ax, position = :rc)
 end
-
 fig

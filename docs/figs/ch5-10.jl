@@ -4,10 +4,9 @@
 Methionine model
 ===#
 using OrdinaryDiffEq
-using ComponentArrays
+using ComponentArrays: ComponentArray as CArray
 using SimpleUnPack
-using Plots
-Plots.default(linewidth=2)
+using CairoMakie
 
 #---
 hil(x, k=one(x)) = x / (x + k)
@@ -36,7 +35,7 @@ function model510!(D, u, p, t)
 end
 
 #---
-ps510 = ComponentArray(
+ps510 = CArray(
     K_AHC = 0.1,
     Adenosine = 1.0,
     v_MATI_max = 561.0,
@@ -53,7 +52,7 @@ ps510 = ComponentArray(
     alpha_d = 1333.0
 )
 
-ics510 = ComponentArray(
+ics510 = CArray(
     AdoMet = 10.0,
     AdoHcy = 10.0
 )
@@ -63,86 +62,72 @@ tend = 5.0
 prob510 = ODEProblem(model510!, ics510, (0.0, tend), ps510)
 
 #---
-@time sol510 = solve(prob510, Tsit5())
+@time sol510 = solve(prob510, TRBDF2())
 
 #---
-plot(sol510, title="Figure 5.10", xlabel="Time (hr)", ylabel="Concentration (μM)", xlims=(0, 1), legend=:right, labels=["AdoMet" "AdoHcy"])
+fig = Figure()
+ax = Axis(fig[1, 1],
+    xlabel = "Time (hr)",
+    ylabel = "Concentration (μM)",
+    title = "Fig. 5.10\nTime series"
+)
+lines!(ax, 0..tend, t -> sol510(t).AdoMet, label = "AdoMet")
+lines!(ax, 0..tend, t -> sol510(t).AdoHcy, label = "AdoHcy")
+axislegend(ax, position = :rc)
+fig
 
 # ## Figure 5.11 A
-rx = range(0, 1200, 101)
-ry = range(0, 6, 101)
+xx = range(0, 1200, 101)
+yy = range(0, 6, 101)
 
-∂A1 = (x, y) -> model510!(ComponentArray(AdoMet=0.0, AdoHcy=0.0), ComponentArray(AdoMet=x, AdoHcy=y), ps510, nothing)[1]
-∂B1 = (x, y) -> model510!(ComponentArray(AdoMet=0.0, AdoHcy=0.0), ComponentArray(AdoMet=x, AdoHcy=y), ps510, nothing)[2]
-
-fig = plot(title="Figure 5.11A")
-contour!(fig, rx, ry, ∂A1, levels=[0], cbar=false, line=(:black))
-plot!(fig, Float64[], Float64[], line=(:black), label="AdoMet nullcline")
-contour!(fig, rx, ry, ∂B1, levels=[0], cbar=false, line=(:black, :dash))
-plot!(fig, Float64[], Float64[], line=(:black, :dash), label="AdoHcy nullcline")
-
-#---
-tend = 15.0
-u0s = [
-    ComponentArray(AdoMet=500.0, AdoHcy=1.5),
-    ComponentArray(AdoMet=900.0, AdoHcy=2.5),
-    ComponentArray(AdoMet=1100.0, AdoHcy=3.5),
-    ComponentArray(AdoMet=400.0, AdoHcy=5.0),
-    ComponentArray(AdoMet=800.0, AdoHcy=5.5),
-    ComponentArray(AdoMet=1000.0, AdoHcy=5.75),
-    ComponentArray(AdoMet=300.0, AdoHcy=1.0),
-    ComponentArray(AdoMet=700.0, AdoHcy=2.0),
-    ComponentArray(AdoMet=200.0, AdoHcy=5.0),
-    ComponentArray(AdoMet=600.0, AdoHcy=5.25)
-]
-
-#---
-@time sols510 = map(u0s) do u0
-    sol = solve(remake(prob510, u0=u0, tspan=tend))
-end;
-
-#---
-for sol in sols510
-    plot!(fig, sol, idxs=(1, 2), label=false, alpha=0.5)
+∂A1 = [model510!(CArray(AdoMet=0.0, AdoHcy=0.0), CArray(AdoMet=x, AdoHcy=y), ps510, nothing)[1] for x in xx, y in yy]
+∂B1 = [model510!(CArray(AdoMet=0.0, AdoHcy=0.0), CArray(AdoMet=x, AdoHcy=y), ps510, nothing)[2] for x in xx, y in yy]
+∂F1 = function (x, y)
+    du = CArray(AdoMet=0.0, AdoHcy=0.0)
+    u = CArray(AdoMet=x, AdoHcy=y)
+    model510!(du, u, ps510, nothing)
+    return Point2d(du.AdoMet, du.AdoHcy)
 end
 
-plot!(fig, xlims=(0, 1200), ylims=(0, 6), xlabel="AdoMet (μM)", ylabel="AdoHcy (μM)", legend=:bottomright)
+fig = Figure()
+ax = Axis(fig[1, 1],
+    xlabel = "AdoMet (μM)",
+    ylabel = "AdoHcy (μM)",
+    title = "Fig. 5.11 A\nPhase plot"
+)
+streamplot!(ax, ∂F1, 0..1200, 0..6,)
+contour!(ax, xx, yy, ∂A1, levels=[0], color=:black, label="AdoMet nullcline")
+contour!(ax, xx, yy, ∂B1, levels=[0], color=:black, linestyle=:dash, label="AdoHcy nullcline")
+axislegend(ax, position = :rb)
+limits!(ax, 0, 1200, 0, 6)
+fig
 
 # ## Figure 5.11 B
 # Increase methionine level
-ps511b = ComponentArray(ps510; Met=51.0)
+ps511b = CArray(ps510; Met=51.0)
 prob511b = remake(prob510, p=ps511b)
 
-rx = range(0, 1200, 101)
-ry = range(0, 6, 101)
+xx = range(0, 1200, 101)
+yy = range(0, 6, 101)
 
-∂A2 = (x, y) -> model510!(ComponentArray(AdoMet=0.0, AdoHcy=0.0), ComponentArray(AdoMet=x, AdoHcy=y), ps511b, nothing)[1]
-∂B2 = (x, y) -> model510!(ComponentArray(AdoMet=0.0, AdoHcy=0.0), ComponentArray(AdoMet=x, AdoHcy=y), ps511b, nothing)[2]
-
-fig = plot(title="Figure 5.11B")
-contour!(fig, rx, ry, ∂A2, levels=[0], cbar=false, line=(:black))
-plot!(fig, Float64[], Float64[], line=(:black), label="AdoMet nullcline")
-contour!(fig, rx, ry, ∂B2, levels=[0], cbar=false, line=(:black, :dash))
-plot!(fig, Float64[], Float64[], line=(:black, :dash), label="AdoHcy nullcline")
-
-#---
-tend = 15.0
-u0s = [
-    ComponentArray(AdoMet=420.0, AdoHcy=1.5),
-    ComponentArray(AdoMet=820.0, AdoHcy=2.5),
-    ComponentArray(AdoMet=1120.0, AdoHcy=3.5),
-    ComponentArray(AdoMet=520.0, AdoHcy=5.0),
-    ComponentArray(AdoMet=620.0, AdoHcy=2.0),
-    ComponentArray(AdoMet=240.0, AdoHcy=4.5),
-    ComponentArray(AdoMet=720.0, AdoHcy=5.5)
-]
-
-@time sols = map(u0s) do u0
-    sol = solve(remake(prob511b, u0=u0, tspan=tend))
+∂A2 = [model510!(CArray(AdoMet=0.0, AdoHcy=0.0), CArray(AdoMet=x, AdoHcy=y), ps511b, nothing)[1] for x in xx, y in yy]
+∂B2 = [model510!(CArray(AdoMet=0.0, AdoHcy=0.0), CArray(AdoMet=x, AdoHcy=y), ps511b, nothing)[2] for x in xx, y in yy]
+∂F2 = function (x, y)
+    du = CArray(AdoMet=0.0, AdoHcy=0.0)
+    u = CArray(AdoMet=x, AdoHcy=y)
+    model510!(du, u, ps511b, nothing)
+    return Point2d(du.AdoMet, du.AdoHcy)
 end
 
-for sol in sols
-    plot!(fig, sol, idxs=(1, 2), label=false, alpha=0.5)
-end
-
-plot!(fig, xlims=(0, 1200), ylims=(0, 6), xlabel="AdoMet (μM)", ylabel="AdoHcy (μM)", legend=:bottomright)
+fig = Figure()
+ax = Axis(fig[1, 1],
+    xlabel = "AdoMet (μM)",
+    ylabel = "AdoHcy (μM)",
+    title = "Fig. 5.11 B\nIncreased methionine level",
+)
+streamplot!(ax, ∂F2, 0..1200, 0..6)
+contour!(ax, xx, yy, ∂A2, levels=[0], color=:black, label="AdoMet nullcline")
+contour!(ax, xx, yy, ∂B2, levels=[0], color=:black, linestyle=:dash, label="AdoHcy nullcline")
+axislegend(ax, position = :rb)
+limits!(ax, 0, 1200, 0, 6)
+fig

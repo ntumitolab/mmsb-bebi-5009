@@ -2,13 +2,12 @@
 # Fig 6.3
 Two component pathway
 ===#
-using ComponentArrays
+using ComponentArrays: ComponentArray as CArray
 using SimpleUnPack
 using OrdinaryDiffEq
 using DiffEqCallbacks
 using SteadyStateDiffEq
-using Plots
-Plots.default(linewidth=2)
+using CairoMakie
 
 #---
 function model603!(D, u, p, t)
@@ -25,19 +24,19 @@ function model603!(D, u, p, t)
 end
 
 #---
-ps603 = ComponentArray(
-    k1 = 5.0,
-    km1 = 1.0,
-    k2 = 6.0,
-    k3 = 2.0,
-    L = 0.0,
-    Rtot = 3.0,
-    Ptot = 8.0
+ps603 = CArray(
+    k1=5.0,
+    km1=1.0,
+    k2=6.0,
+    k3=2.0,
+    L=0.0,
+    Rtot=3.0,
+    Ptot=8.0
 )
 
-u0603 = ComponentArray(
-    RL = 0.0,
-    Ps = 0.0
+u0603 = CArray(
+    RL=0.0,
+    Ps=0.0
 )
 
 # Events
@@ -50,24 +49,38 @@ cbs = CallbackSet(event_L1, event_L2)
 # ## Fig. 6.3 A
 tspan = (0., 10.)
 prob603a = ODEProblem(model603!, u0603, tspan, ps603)
-@time sol603a = solve(prob603a, KenCarp47(), callback=cbs)
+@time sol603a = solve(prob603a, TRBDF2(), callback=cbs)
 
 #---
-fig = plot(sol603a, idxs=[1, 2], labels= ["RL" "P*"])
-plot!(fig, t -> 3 * (1<=t<=3), label="Ligand", line=(:black, :dash), linealpha=0.7)
-plot!(fig, title="Fig. 6.3 (A)", xlabel="Time", ylabel="Concentration")
+fig = Figure()
+ax = Axis(fig[1, 1], xlabel="Time", ylabel="Concentration", title="Fig. 6.3 (A)")
+lines!(ax, 0 .. 10, t -> sol603a(t).RL, label="RL")
+lines!(ax, 0 .. 10, t -> sol603a(t).Ps, label="P*")
+lines!(ax, 0 .. 10, t -> 3 * (1 <= t <= 3), label="Ligand", linestyle=:dash, color=:black, alpha=0.7)
+axislegend(ax)
+fig
 
 # ## Fig 6.3 B
 lrange = 0:0.01:1
 
-prob_func = (prob, i, repeat) -> remake(prob, p=ComponentArray(ps603; L=lrange[i]))
+prob_func = (prob, i, repeat) -> remake(prob, p=CArray(ps603; L=lrange[i]))
 prob603b = SteadyStateProblem(model603!, u0603, ps603)
 trajectories = length(lrange)
-alg = DynamicSS(KenCarp47())
+alg = DynamicSS(TRBDF2())
 eprob = EnsembleProblem(prob603b; prob_func)
 @time sim = solve(eprob, alg; trajectories);
 
-pstar = map(s->s.u.Ps, sim)
-rl = map(s->s.u.RL, sim)
-plot(lrange, [pstar rl], label=["P*" "RL"], title="Fig. 6.3 (B)",
-xlabel="Ligand", ylabel="Steady-state concentration", xlims=(0, 1), ylims=(0, 8))
+pstar = map(s -> s.u.Ps, sim)
+rl = map(s -> s.u.RL, sim)
+
+fig = Figure()
+ax = Axis(fig[1, 1],
+    xlabel="Ligand",
+    ylabel="Steady-state concentration",
+    title="Fig. 6.3 (B)"
+)
+lines!(ax, lrange, pstar, label="P*")
+lines!(ax, lrange, rl, label="RL")
+limits!(ax, 0, 1, 0, 8)
+axislegend(ax, position=:rc)
+fig

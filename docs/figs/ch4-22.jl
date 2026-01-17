@@ -3,16 +3,19 @@
 
 Tangent line.
 ===#
-using Plots
-Plots.default(linewidth=2)
+using CairoMakie
 
 # The curve
 f = x -> 3 / (x-2)
 
 #---
-fig = plot(title="Fig 4.22")
-plot!(fig, f, 2.2, 8.0, lab="Curve")
-plot!(fig, x -> -3 / (4 - 2)^2 * (x - 4) + f(4), 2.7, 5.3, lab="Tangent line")
-plot!(fig, xlabel="Reaction rate", ylabel="Inhibitor concentration",
-      xlims=(2., 8.), ylims=(0., 4.)
+fig = Figure()
+ax = Axis(fig[1, 1],
+    title = "Fig 4.22",
+    xlabel = "Reaction rate",
+    ylabel = "Inhibitor concentration"
 )
+lines!(ax, 2.2..8.0, f, label="Curve")
+lines!(ax, 2.7..5.3, x -> -3 / (4 - 2)^2 * (x - 4) + f(4), label="Tangent line")
+axislegend(ax)
+fig

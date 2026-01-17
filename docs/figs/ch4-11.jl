@@ -3,8 +3,7 @@
 
 Surface plots
 ===#
-using Plots
-Plots.default(linewidth=2)
+using CairoMakie
 
 #---
 z1(x, y) = x^2 + 0.5y^2
@@ -12,9 +11,17 @@ z2(x, y) = (.2x^2-1)^2 + y^2
 x1 = y1 = range(-1.0, 1.0, 41)
 x2 = range(-2.75, 2.75, 41)
 y2 = range(-0.75, 0.75, 41)
-p1 = surface(x1, y1, z1, title="Single-well potential")
-p2 = contourf(x1, y1, z1)
-p3 = surface(x2, y2, z2, title="Double-well potential")
-p4 = contourf(x2, y2, z2)
+zz1 = [z1(x, y) for x in x1, y in y1]
+zz2 = [z2(x, y) for x in x2, y in y2];
 
-plot(p1, p2, p3, p4, size=(800, 600))
+#---
+fig = Figure(resolution = (800, 600))
+ax1 = Axis3(fig[1, 1], title="Single-well potential")
+surface!(ax1, x1, y1, zz1, colormap = :viridis)
+ax2 = Axis(fig[2, 1], title="Single-well potential (contour)")
+contourf!(ax2, x1, y1, zz1, colormap = :viridis)
+ax3 = Axis3(fig[1, 2], title="Double-well potential")
+surface!(ax3, x2, y2, zz2, colormap = :viridis)
+ax4 = Axis(fig[2, 2], title="Double-well potential (contour)")
+contourf!(ax4, x2, y2, zz2, colormap = :viridis)
+fig

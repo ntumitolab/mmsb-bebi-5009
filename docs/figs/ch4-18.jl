@@ -7,10 +7,9 @@ See also [BifurcationKit.jl](https://github.com/bifurcationkit/BifurcationKit.jl
 ===#
 using OrdinaryDiffEq
 using SteadyStateDiffEq
-using ComponentArrays
+using ComponentArrays: ComponentArray as CArray
 using SimpleUnPack
-using Plots
-Plots.default(linewidth=2)
+using CairoMakie
 
 # Model
 function model418!(D, u, p, t)
@@ -22,7 +21,7 @@ function model418!(D, u, p, t)
 end
 
 #---
-ps418 = ComponentArray(
+ps418 = CArray(
     k1 = 0.0,
     k2 = 5.0,
     k3 = 5.0,
@@ -30,7 +29,7 @@ ps418 = ComponentArray(
     k5 = 2.0,
     n = 4.0
 )
-u0418 = ComponentArray(
+u0418 = CArray(
     A = 0.0,
     B = 0.0
 )
@@ -38,14 +37,16 @@ u0418 = ComponentArray(
 prob = SteadyStateProblem(model418!, u0418, ps418)
 
 function ainf(k1val)
-    sol = solve(remake(prob, p=ComponentArray(ps418; k1=k1val)))
+    sol = solve(remake(prob, p=CArray(ps418; k1=k1val)))
     return sol.u[1]
 end
 
 #---
-plot(
-    ainf, 0., 1000.,
-    title = "Fig 4.18",
-    xlabel = "K1" , ylabel= "Steady state [A]",
-    legend=nothing, ylim=(0, 4), xlim=(0, 1000)
+fig = Figure()
+ax = Axis(fig[1, 1],
+    xlabel = "K1",
+    ylabel = "Steady state [A]",
+    title = "Fig 4.18\nContinuation diagram"
 )
+lines!(ax, 0.0..1000.0, k1 -> ainf(k1), color=:blue)
+fig
