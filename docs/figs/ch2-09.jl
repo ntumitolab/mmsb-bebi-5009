@@ -4,10 +4,9 @@
 Metabolic network simulation
 ===#
 using OrdinaryDiffEq
-using ComponentArrays
+import ComponentArrays as CA
 using SimpleUnPack
-using Plots
-Plots.default(linewidth=2)
+using CairoMakie
 
 #---
 function model209!(du, u, p, t)
@@ -26,29 +25,37 @@ function model209!(du, u, p, t)
 end
 
 # Setup problem
-ps = ComponentArray(
-    k1 = 3.0,
-    k2 = 2.0,
-    k3 = 2.5,
-    k4 = 3.0,
-    k5 = 4.0
+ps = CA.ComponentArray(
+    k1=3.0,
+    k2=2.0,
+    k3=2.5,
+    k4=3.0,
+    k5=4.0
 )
-u0 = ComponentArray(
-    A = 0.0,
-    B = 0.0,
-    C = 0.0,
-    D = 0.0
+u0 = CA.ComponentArray(
+    A=0.0,
+    B=0.0,
+    C=0.0,
+    D=0.0
 )
 tend = 10.0
-
 prob = ODEProblem(model209!, u0, tend, ps)
 
 # Solve the problem
 @time sol = solve(prob, Tsit5())
 
 # Visualize the results
-plot(sol, legend=:bottomright, title="Fig 2.9",
-    xlims=(0., 4.), ylims=(0., 1.),
-    xlabel="Time (sec)", ylabel="Concentration (mM)",
-    labels=["A" "B" "C" "D"]
+fig = Figure()
+ax = Axis(
+    fig[1, 1],
+    xlabel="Time",
+    ylabel="Concentration",
+    title="Fig 2.9\nMetabolic Network Simulation"
 )
+lines!(ax, 0 .. tend, t -> sol(t).A, label="A")
+lines!(ax, 0 .. tend, t -> sol(t).B, label="B")
+lines!(ax, 0 .. tend, t -> sol(t).C, label="C")
+lines!(ax, 0 .. tend, t -> sol(t).D, label="D")
+axislegend(ax, position=:rb)
+
+fig

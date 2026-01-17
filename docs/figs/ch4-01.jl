@@ -9,12 +9,13 @@ using SimpleUnPack
 using CairoMakie
 
 # The model for figure 4.1, 4.2, and 4.3.
-_dA401(u, p, t) = p.k1 / (1 + u.B^p.n) - (p.k3 + p.k5) * u.A
-_dB401(u, p, t) = p.k2 + p.k5 * u.A - p.k4 * u.B
+_dA401(A, B, p, t) = p.k1 / (1 + B^p.n) - (p.k3 + p.k5) * A
+_dB401(A, B, p, t) = p.k2 + p.k5 * A - p.k4 * B
 
 function model401!(D, u, p, t)
-    D.A = _dA401(u, p, t)
-    D.B = _dB401(u, p, t)
+    @unpack A, B = u
+    D.A = _dA401(A, B, p, t)
+    D.B = _dB401(A, B, p, t)
     return nothing
 end
 
@@ -56,7 +57,7 @@ fig = Figure()
 ax = Axis(fig[1, 1],
     xlabel = "Time",
     ylabel = "Concentration",
-    title = "Fig. 4.2 A (Time series)"
+    title = "Fig. 4.2 A\nTime series"
 )
 lines!(ax, 0..tend, t-> sols[1](t).A, label = "A")
 lines!(ax, 0..tend, t-> sols[1](t).B, label = "B")
@@ -68,12 +69,15 @@ fig = Figure(size = (600, 600))
 ax = Axis(fig[1, 1],
     xlabel = "[A]",
     ylabel = "[B]",
-    title = "Fig. 4.2 B (Phase plot)",
+    title = "Fig. 4.2 B\nPhase plot",
     aspect = 1,
 )
-lines!(ax, sols[1], idxs=(1, 2))
-xlims!(ax, 0.0, 2.0)
-ylims!(ax, 0.0, 2.0)
+let ts = 0:0.01:tend
+    aa = [sols[1](t).A for t in ts]
+    bb = [sols[1](t).B for t in ts]
+    lines!(ax, aa, bb)
+end
+limits!(ax, 0.0, 2.0, 0.0, 2.0)
 fig
 
 # ## Fig. 4.3 A (Multiple time series)
@@ -81,13 +85,12 @@ fig = Figure()
 ax = Axis(fig[1, 1],
     xlabel = "Time",
     ylabel = "Concentration",
-    title = "Fig. 4.3A (Multiple time series)"
+    title = "Fig. 4.3A\nMultiple time series"
 )
 for sol in sols
     lines!(ax, 0..tend, t-> sol(t).A, alpha=0.7)
     lines!(ax, 0..tend, t-> sol(t).B, alpha=0.7)
 end
-
 fig
 
 # ## Fig. 4.3 B (Phase plot)
@@ -95,20 +98,22 @@ fig = Figure(size=(600, 600))
 ax = Axis(fig[1, 1],
     xlabel = "[A]",
     ylabel = "[B]",
-    title = "Fig. 4.3 B (Phase plot)",
+    title = "Fig. 4.3 B\nPhase plot",
     aspect = 1,
 )
-
-for (i, sol) in enumerate(sols)
-    lines!(ax, sol, idxs=(1, 2), color = Cycled(i))
+for sol in sols
+    ts = 0:0.01:tend
+    aa = [sol(t).A for t in ts]
+    bb = [sol(t).B for t in ts]
+    lines!(ax, aa, bb)
 end
-
+limits!(ax, 0.0, 2.0, 0.0, 2.0)
 fig
 
 # Let's sketch vector fields in phase plots
 ∂F44 = function (x, y)
-    da = _dA401(CA.ComponentArray(A=x, B=y), ps402a, nothing)
-    db = _dB401(CA.ComponentArray(A=x, B=y), ps402a, nothing)
+    da = _dA401(x, y, ps402a, nothing)
+    db = _dB401(x, y, ps402a, nothing)
     Point2d(da, db)
 end
 
@@ -116,45 +121,64 @@ fig = Figure(size=(600, 600))
 ax = Axis(fig[1, 1],
     xlabel = "[A]",
     ylabel = "[B]",
-    title = "Fig. 4.4 A (Phase plot with vector field)",
+    title = "Fig. 4.4 A\nPhase plot with vector field",
     aspect = 1,
 )
 
-streamplot!(ax, ∂F44, 0.0..2.0, 0.0..2.0)
-for (i, sol) in enumerate(sols)
-    lines!(ax, sol, idxs=(1, 2), color =:black)
+streamplot!(ax, ∂F44, 0..2, 0..2)
+for sol in sols
+    ts = 0:0.01:tend
+    aa = [sol(t).A for t in ts]
+    bb = [sol(t).B for t in ts]
+    lines!(ax, aa, bb, color=:black)
 end
-
-xlims!(ax, 0.0, 2.0)
-ylims!(ax, 0.0, 2.0)
-
+limits!(ax, 0.0, 2.0, 0.0, 2.0)
 fig
 
 # ## Figure 4.5A
-fig = plot(title="Fig. 4.5 A (Phase plot with nullclines)")
+fig = Figure(size=(600, 600))
+ax = Axis(fig[1, 1],
+    xlabel = "[A]",
+    ylabel = "[B]",
+    title = "Fig. 4.5 A\nPhase plot with nullclines",
+    aspect = 1,
+)
 
 ## Phase plots
 for sol in sols
-    plot!(fig, sol, idxs=(1, 2), linealpha=0.7, label=false)
+    ts = 0:0.01:tend
+    aa = [sol(t).A for t in ts]
+    bb = [sol(t).B for t in ts]
+    lines!(ax, aa, bb, color=:black)
 end
 
 ## nullclines
-∂A44 = (x, y) -> _dA401(ComponentArray(A=x, B=y), ps402a, nothing)
-∂B44 = (x, y) -> _dB401(ComponentArray(A=x, B=y), ps402a, nothing)
-contour!(fig, 0:0.01:2, 0:0.01:2, ∂A44, levels=[0], cbar=false, line=(:black))
-plot!(fig, Float64[], Float64[], line=(:black), label="A nullcline")  ## Adding a fake line for the legend of A nullcline
-contour!(fig, 0:0.01:2, 0:0.01:2, ∂B44, levels=[0], cbar=false, line=(:black, :dash))
-plot!(fig, Float64[], Float64[], line=(:black, :dash), label="B nullcline") ## Adding a fake line for the legend of B nullcline
-plot!(fig, xlim=(0.0, 2.0), ylim=(0.0, 2.0), legend=:bottomright, size=(600, 600), xlabel="[A]", ylabel="[B]", aspect_ratio=:equal)
+xs = 0:0.01:2
+ys = 0:0.01:2
+zA44 = [_dA401(x, y, ps402a, nothing) for x in xs, y in ys]
+zB44 = [_dB401(x, y, ps402a, nothing) for x in xs, y in ys]
+contour!(ax, xs, ys, zA44, levels=[0], color=:red)
+lines!(ax, Float64[], Float64[], color=:red, label="A nullcline")
+contour!(ax, xs, ys, zB44, levels=[0], color=:blue)
+lines!(ax, Float64[], Float64[], color=:blue, label="B nullcline")
+limits!(ax, 0.0, 2.0, 0.0, 2.0)
+axislegend(ax, position = :rb)
+fig
 
 # ## Figure 4.5 B
 # Vector field
-fig = plot(title="Fig. 4.5 B (Vector field with nullclines)")
-quiver!(fig, xx, yy, quiver=∂F44, line=(:lightgrey), arrow=(:closed), aspect_ratio=:equal)
-
-# Nullclines
-contour!(fig, 0:0.01:2, 0:0.01:2, ∂A44, levels=[0], cbar=false, line=(:black))
-plot!(fig, Float64[], Float64[], line=(:black), label="A nullcline")  ## Adding a fake line for the legend of A nullcline
-contour!(fig, 0:0.01:2, 0:0.01:2, ∂B44, levels=[0], cbar=false, line=(:black, :dash))
-plot!(fig, Float64[], Float64[], line=(:black, :dash), label="B nullcline") ## Adding a fake line for the legend of B nullcline
-plot!(fig, xlim=(0.0, 2.0), ylim=(0.0, 2.0), legend=:bottomright, size=(600, 600), xlabel="[A]", ylabel="[B]")
+fig = Figure(size=(600, 600))
+ax = Axis(fig[1, 1],
+    xlabel = "[A]",
+    ylabel = "[B]",
+    title = "Fig. 4.5 B\nVector field with nullclines",
+    aspect = 1,
+)
+## Nullclines
+contour!(ax, xs, ys, zA44, levels=[0], color=:red)
+lines!(ax, Float64[], Float64[], color=:red, label="A nullcline")
+contour!(ax, xs, ys, zB44, levels=[0], color=:blue)
+lines!(ax, Float64[], Float64[], color=:blue, label="B nullcline")
+streamplot!(ax, ∂F44, 0..2, 0..2)
+limits!(ax, 0.0, 2.0, 0.0, 2.0)
+fig
