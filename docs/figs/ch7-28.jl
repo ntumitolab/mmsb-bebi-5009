@@ -1,10 +1,9 @@
 # # Fig 7.28
 # model of synthetic pulse generating system
 using OrdinaryDiffEq
-using ComponentArrays
+using ComponentArrays: ComponentArray
 using SimpleUnPack
-using Plots
-Plots.default(linewidth=2)
+using CairoMakie
 
 #---
 function model728!(D, u, p, t)
@@ -48,4 +47,14 @@ prob728 = ODEProblem(model728!, u0728, (0.0, tend), ps728)
 @time sol728 = solve(prob728, Tsit5())
 
 #---
-plt728 = plot(sol728, labels = ["GFP" "cI" "LuxR:AHL complex"], xlabel="Time (min)", ylabel="Concentration (μM)", title="Fig 7.28", legend=:right)
+fig = Figure()
+ax = Axis(fig[1, 1],
+    xlabel = "Time (min)",
+    ylabel = "Concentration (μM)",
+    title = "Fig 7.28"
+)
+lines!(ax, 0..tend, t-> sol728(t).G, label = "GFP")
+lines!(ax, 0..tend, t-> sol728(t).C, label = "cI")
+lines!(ax, 0..tend, t-> sol728(t).R, label = "LuxR:AHL complex")
+axislegend(ax, position = :rc)
+fig

@@ -3,18 +3,17 @@
 
 model of lac operon in E. coli
 ===#
-using ComponentArrays
+using ComponentArrays: ComponentArray
 using SimpleUnPack
 using DiffEqCallbacks
 using OrdinaryDiffEq
 using SteadyStateDiffEq
-using Plots
-Plots.default(linewidth=2)
+using CairoMakie
 
 #---
-hil(x, k) = x / (x + k)
-hil(x, k, n) = hil(x^n, k^n)
 function model707!(D, u, p, t)
+    hil(x, k) = x / (x + k)
+    hil(x, k, n) = hil(x^n, k^n)
     @unpack Le, a1, RToverK1, K2, δM, δY, δL, c1, kL, KML, kg, KMg = p
     @unpack M, Y, L = u
     D.M = a1 / (1 + RToverK1 * (K2 / (K2 + L))^4) - δM * M
@@ -59,15 +58,21 @@ cbs = CallbackSet(event_le1, event_le2, event_le3, event_le4)
 # ## Fig 7.07 (A)
 tend = 2500.0
 prob707a = ODEProblem(model707!, ics707, tend, ps707)
-@time sol = solve(prob707a, Tsit5(), callback=cbs)
+@time sol = solve(prob707a, TRBDF2(), callback=cbs)
 
 #---
-plot(sol, idxs=[2], label="β-galactosidase monomer")
-plot!(t -> 50 * (500<=t<1000) + 100 * (1000<=t<1500) + 150 * (1500<=t<2000), 0, tend, xlabel="Time (min)", title="Fig 7.7 (A)", label="External lactose")
+fig = Figure()
+ax = Axis(fig[1, 1], xlabel="Time (min)", ylabel="Concentration", title="Fig 7.7 (A)\nLac operon model in E. coli")
+lines!(ax, 0..tend, t -> sol(t).Y, label="β-galactosidase monomer")
+lines!(ax, 0..tend, t -> 50 * (500<=t<1000) + 100 * (1000<=t<1500) + 150 * (1500<=t<2000), label="External lactose")
+axislegend(ax, position=:lt)
+fig
 
 # ## Fig 7.07 (B)
 # Compare the original model and the modified model
 function model707b!(D, u, p, t)
+    hil(x, k) = x / (x + k)
+    hil(x, k, n) = hil(x^n, k^n)
     @unpack Le, a1, RToverK1, K2, δM, δY, δL, c1, kL, KML, kg, KMg, Enz = p
     @unpack M, Y, L = u
     D.M = a1 / (1 + RToverK1 * (K2 / (K2 + L))^4) - δM * M
@@ -93,15 +98,13 @@ eprob_mod = EnsembleProblem(prob707b;
     output_func=(sol, i) -> (sol.u.Y / 4, false)
 )
 
-alg = DynamicSS(FBDF())
-opts = (trajectories=length(lerange), abstol=1e-9, reltol=1e-9)
-@time sim = solve(eprob, alg; opts...)
-@time sim_mod = solve(eprob_mod, alg; opts...)
+alg = DynamicSS(TRBDF2())
+@time sim = solve(eprob, alg; trajectories=length(lerange))
+@time sim_mod = solve(eprob_mod, alg; trajectories=length(lerange))
 
-fig = plot(lerange, sim.u, label="Original")
-fig = plot!(fig, lerange, sim_mod.u, label="Modified")
-fig = plot!(fig,
-    xlabel="External lactose concentration (μM)",
-    ylabel="β-galactosidase",
-    title="Fig 7.7 (B)"
-)
+fig = Figure()
+ax = Axis(fig[1, 1], xlabel="External lactose concentration (μM)", ylabel="β-galactosidase", title="Fig 7.7 (B)\nLac operon model in E. coli")
+lines!(ax, lerange, sim.u, label="Original model")
+lines!(ax, lerange, sim_mod.u, label="Modified model")
+axislegend(ax, position=:lt)
+fig

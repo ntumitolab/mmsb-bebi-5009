@@ -3,16 +3,15 @@
 
 Methionine model
 ===#
+using ComponentArrays: ComponentArray
 using OrdinaryDiffEq
-using ComponentArrays
 using SimpleUnPack
-using Plots
-Plots.default(linewidth=2)
+using CairoMakie
 
 #---
-hil(x, k=one(x)) = x / (x + k)
-hil(x, k, n) = hil(x^n, k^n)
-function model510!(D, u, p, t)
+function model510(u, p, t)
+    hil(x, k=one(x)) = x / (x + k)
+    hil(x, k, n) = hil(x^n, k^n)
     @unpack K_AHC, Adenosine, v_MATI_max, Met, K_MATI_m, K_MATI_i,
             v_MATIII_max, K_MATIII_m2, v_GNMT_max, K_GNMT_m, K_GNMT_i,
             v_MET_max, A_over_K_MET_m2, alpha_d = p
@@ -30,9 +29,15 @@ function model510!(D, u, p, t)
 
     dAdoMet = (v_MATI + v_MATIII) - (v_GNMT + v_MET)
     dAdoHcy = (v_GNMT + v_MET - v_D) * hil(Adenosine, K_AHC)
-    D.AdoMet = dAdoMet
-    D.AdoHcy = dAdoHcy
-    return (; dAdoMet, dAdoHcy, v_MATI, v_MATIII, v_GNMT, v_MET, v_D, Hcy)
+
+    return (; dAdoMet, dAdoHcy)
+end
+
+function model510!(D, u, p, t)
+    res = model510(u, p, t)
+    D.AdoMet = res.dAdoMet
+    D.AdoHcy = res.dAdoHcy
+    return nothing
 end
 
 #---
@@ -61,88 +66,68 @@ ics510 = ComponentArray(
 # ## Figure 5.10
 tend = 5.0
 prob510 = ODEProblem(model510!, ics510, (0.0, tend), ps510)
+@time sol510 = solve(prob510, KenCarp47())
 
 #---
-@time sol510 = solve(prob510, Tsit5())
-
-#---
-plot(sol510, title="Figure 5.10", xlabel="Time (hr)", ylabel="Concentration (μM)", xlims=(0, 1), legend=:right, labels=["AdoMet" "AdoHcy"])
+fig = Figure()
+ax = Axis(fig[1, 1],
+    xlabel = "Time (hr)",
+    ylabel = "Concentration (μM)",
+    title = "Fig. 5.10\nTime series"
+)
+lines!(ax, 0..tend, t -> sol510(t).AdoMet, label = "AdoMet")
+lines!(ax, 0..tend, t -> sol510(t).AdoHcy, label = "AdoHcy")
+axislegend(ax, position = :rc)
+fig
 
 # ## Figure 5.11 A
-rx = range(0, 1200, 101)
-ry = range(0, 6, 101)
+xx = range(0, 1200, 101)
+yy = range(0, 6, 101)
 
-∂A1 = (x, y) -> model510!(ComponentArray(AdoMet=0.0, AdoHcy=0.0), ComponentArray(AdoMet=x, AdoHcy=y), ps510, nothing)[1]
-∂B1 = (x, y) -> model510!(ComponentArray(AdoMet=0.0, AdoHcy=0.0), ComponentArray(AdoMet=x, AdoHcy=y), ps510, nothing)[2]
-
-fig = plot(title="Figure 5.11A")
-contour!(fig, rx, ry, ∂A1, levels=[0], cbar=false, line=(:black))
-plot!(fig, Float64[], Float64[], line=(:black), label="AdoMet nullcline")
-contour!(fig, rx, ry, ∂B1, levels=[0], cbar=false, line=(:black, :dash))
-plot!(fig, Float64[], Float64[], line=(:black, :dash), label="AdoHcy nullcline")
-
-#---
-tend = 15.0
-u0s = [
-    ComponentArray(AdoMet=500.0, AdoHcy=1.5),
-    ComponentArray(AdoMet=900.0, AdoHcy=2.5),
-    ComponentArray(AdoMet=1100.0, AdoHcy=3.5),
-    ComponentArray(AdoMet=400.0, AdoHcy=5.0),
-    ComponentArray(AdoMet=800.0, AdoHcy=5.5),
-    ComponentArray(AdoMet=1000.0, AdoHcy=5.75),
-    ComponentArray(AdoMet=300.0, AdoHcy=1.0),
-    ComponentArray(AdoMet=700.0, AdoHcy=2.0),
-    ComponentArray(AdoMet=200.0, AdoHcy=5.0),
-    ComponentArray(AdoMet=600.0, AdoHcy=5.25)
-]
-
-#---
-@time sols510 = map(u0s) do u0
-    sol = solve(remake(prob510, u0=u0, tspan=tend))
-end;
-
-#---
-for sol in sols510
-    plot!(fig, sol, idxs=(1, 2), label=false, alpha=0.5)
+∂A1 = [model510(ComponentArray(AdoMet=x, AdoHcy=y), ps510, nothing)[1] for x in xx, y in yy]
+∂B1 = [model510(ComponentArray(AdoMet=x, AdoHcy=y), ps510, nothing)[2] for x in xx, y in yy]
+∂F1 = function (x, y)
+    da, db = model510((; AdoMet = x, AdoHcy = y), ps510, nothing)
+    return Point2d(da, db)
 end
 
-plot!(fig, xlims=(0, 1200), ylims=(0, 6), xlabel="AdoMet (μM)", ylabel="AdoHcy (μM)", legend=:bottomright)
+fig = Figure()
+ax = Axis(fig[1, 1],
+    xlabel = "AdoMet (μM)",
+    ylabel = "AdoHcy (μM)",
+    title = "Fig. 5.11 A\nPhase plot"
+)
+streamplot!(ax, ∂F1, 0..1200, 0..6,)
+contour!(ax, xx, yy, ∂A1, levels=[0], color=:black, label="AdoMet nullcline")
+contour!(ax, xx, yy, ∂B1, levels=[0], color=:black, linestyle=:dash, label="AdoHcy nullcline")
+axislegend(ax, position = :rb)
+limits!(ax, 0, 1200, 0, 6)
+fig
 
 # ## Figure 5.11 B
 # Increase methionine level
 ps511b = ComponentArray(ps510; Met=51.0)
 prob511b = remake(prob510, p=ps511b)
 
-rx = range(0, 1200, 101)
-ry = range(0, 6, 101)
+xx = range(0, 1200, 101)
+yy = range(0, 6, 101)
 
-∂A2 = (x, y) -> model510!(ComponentArray(AdoMet=0.0, AdoHcy=0.0), ComponentArray(AdoMet=x, AdoHcy=y), ps511b, nothing)[1]
-∂B2 = (x, y) -> model510!(ComponentArray(AdoMet=0.0, AdoHcy=0.0), ComponentArray(AdoMet=x, AdoHcy=y), ps511b, nothing)[2]
-
-fig = plot(title="Figure 5.11B")
-contour!(fig, rx, ry, ∂A2, levels=[0], cbar=false, line=(:black))
-plot!(fig, Float64[], Float64[], line=(:black), label="AdoMet nullcline")
-contour!(fig, rx, ry, ∂B2, levels=[0], cbar=false, line=(:black, :dash))
-plot!(fig, Float64[], Float64[], line=(:black, :dash), label="AdoHcy nullcline")
-
-#---
-tend = 15.0
-u0s = [
-    ComponentArray(AdoMet=420.0, AdoHcy=1.5),
-    ComponentArray(AdoMet=820.0, AdoHcy=2.5),
-    ComponentArray(AdoMet=1120.0, AdoHcy=3.5),
-    ComponentArray(AdoMet=520.0, AdoHcy=5.0),
-    ComponentArray(AdoMet=620.0, AdoHcy=2.0),
-    ComponentArray(AdoMet=240.0, AdoHcy=4.5),
-    ComponentArray(AdoMet=720.0, AdoHcy=5.5)
-]
-
-@time sols = map(u0s) do u0
-    sol = solve(remake(prob511b, u0=u0, tspan=tend))
+∂A2 = [model510((; AdoMet=x, AdoHcy=y), ps511b, nothing)[1] for x in xx, y in yy]
+∂B2 = [model510((; AdoMet=x, AdoHcy=y), ps511b, nothing)[2] for x in xx, y in yy]
+∂F2 = function (x, y)
+    da, db = model510((; AdoMet = x, AdoHcy = y), ps511b, nothing)
+    return Point2d(da, db)
 end
 
-for sol in sols
-    plot!(fig, sol, idxs=(1, 2), label=false, alpha=0.5)
-end
-
-plot!(fig, xlims=(0, 1200), ylims=(0, 6), xlabel="AdoMet (μM)", ylabel="AdoHcy (μM)", legend=:bottomright)
+fig = Figure()
+ax = Axis(fig[1, 1],
+    xlabel = "AdoMet (μM)",
+    ylabel = "AdoHcy (μM)",
+    title = "Fig. 5.11 B\nIncreased methionine level",
+)
+streamplot!(ax, ∂F2, 0..1200, 0..6)
+contour!(ax, xx, yy, ∂A2, levels=[0], color=:black, label="AdoMet nullcline")
+contour!(ax, xx, yy, ∂B2, levels=[0], color=:black, linestyle=:dash, label="AdoHcy nullcline")
+axislegend(ax, position = :rb)
+limits!(ax, 0, 1200, 0, 6)
+fig

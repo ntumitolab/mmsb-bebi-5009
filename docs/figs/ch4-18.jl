@@ -7,10 +7,9 @@ See also [BifurcationKit.jl](https://github.com/bifurcationkit/BifurcationKit.jl
 ===#
 using OrdinaryDiffEq
 using SteadyStateDiffEq
-using ComponentArrays
+using ComponentArrays: ComponentArray
 using SimpleUnPack
-using Plots
-Plots.default(linewidth=2)
+using CairoMakie
 
 # Model
 function model418!(D, u, p, t)
@@ -43,9 +42,11 @@ function ainf(k1val)
 end
 
 #---
-plot(
-    ainf, 0., 1000.,
-    title = "Fig 4.18",
-    xlabel = "K1" , ylabel= "Steady state [A]",
-    legend=nothing, ylim=(0, 4), xlim=(0, 1000)
+fig = Figure()
+ax = Axis(fig[1, 1],
+    xlabel = "K1",
+    ylabel = "Steady state [A]",
+    title = "Fig 4.18\nContinuation diagram"
 )
+lines!(ax, 0.0..1000.0, k1 -> ainf(k1), color=:blue)
+fig

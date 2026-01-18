@@ -1,11 +1,9 @@
 # # Fig 7.23
 # Hasty synthetic oscillator model
-
 using OrdinaryDiffEq
-using ComponentArrays
+using ComponentArrays: ComponentArray
 using SimpleUnPack
-using Plots
-Plots.default(linewidth=2)
+using CairoMakie
 
 #---
 _dx723(u, p, t) = (1 + u.x^2 + p.alpha * p.sigma * u.x^4) / ((1 + u.x^2 + p.sigma * u.x^4) * (1 + u.y^4)) - p.gammax * u.x
@@ -36,26 +34,40 @@ tend = 300.0
 prob723 = ODEProblem(model723!, ics723, (0.0, tend), ps723)
 
 #---
-@time sol723 = solve(prob723, Tsit5())
+@time sol723 = solve(prob723, KenCarp47())
 
 #---
-plot(sol723, xlabel="Time", ylabel="Concentration", title="Fig 7.23 A", labels=["x" "y"])
+fig = Figure()
+ax = Axis(fig[1, 1],
+    xlabel = "Time",
+    ylabel = "Concentration",
+    title = "Fig 7.23 A"
+)
+lines!(ax, 0..tend, t-> sol723(t).x, label = "x")
+lines!(ax, 0..tend, t-> sol723(t).y, label = "y")
+axislegend(ax, position = :rc)
+fig
 
 #---
-∂X723 = (x, y) -> _dx723(ComponentArray(x=x, y=y), ps723, nothing)
-∂Y723 = (x, y) -> _dy723(ComponentArray(x=x, y=y), ps723, nothing)
-
-# Grid points
-rX = range(0, 1.5, 31)
-rY = range(0, 3, 31)
-xx = [x for y in rY, x in rX]
-yy = [y for y in rY, x in rX];
+xx = range(0, 1.5, 51)
+yy = range(0, 3, 51)
+tt = 0:1:tend
+∂X723 = [_dx723((; x=x, y=y), ps723, nothing) for x in xx, y in yy]
+∂Y723 = [_dy723((; x=x, y=y), ps723, nothing) for x in xx, y in yy]
+aa = [sol723(t).x for t in tt]
+bb = [sol723(t).y for t in tt];
 
 # Vector field
-fig = plot(title="Fig 7.23 B")
-contour!(fig, rX, rY, ∂X723, levels=[0], cbar=false, line=(:black))
-plot!(fig, Float64[], Float64[], line=(:black), label="X nullcline")
-contour!(fig, rX, rY, ∂Y723, levels=[0], cbar=false, line=(:dot, :black))
-plot!(fig, Float64[], Float64[], line=(:dot, :black), label="Y nullcline")
-plot!(sol723, idxs=(1,2), lw=2, label=false)
-plot!(fig, xlims=(0.0, 1.5), ylims=(1.5, 3.0), xlabel="X", ylabel="Y")
+fig = Figure(size=(600, 600))
+ax = Axis(fig[1, 1],
+    xlabel = "X",
+    ylabel = "Y",
+    title = "Fig 7.23 B\nVector field",
+    aspect = 1,
+)
+contour!(ax, xx, yy, ∂X723, levels=[0], color=:black, linestyle=:solid, linewidth=2, label="X nullcline")
+contour!(ax, xx, yy, ∂Y723, levels=[0], color=:black, linestyle=:dash, linewidth=2, label="Y nullcline")
+lines!(ax, aa, bb, color=:tomato, label="Trajectory")
+axislegend(ax, position = :rb)
+limits!(ax, 0.0, 1.5, 1.5, 3.0)
+fig

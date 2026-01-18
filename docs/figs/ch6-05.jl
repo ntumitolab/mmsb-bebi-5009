@@ -3,13 +3,12 @@
 
 Model of G-protein signalling pathway
 ===#
-using ComponentArrays
+using ComponentArrays: ComponentArray
 using SimpleUnPack
 using OrdinaryDiffEq
 using DiffEqCallbacks
 using SteadyStateDiffEq
-using Plots
-Plots.default(linewidth=2)
+using CairoMakie
 
 #---
 function model605!(D, u, p, t)
@@ -55,13 +54,18 @@ cbs = CallbackSet(event_L1, event_L2)
 
 # ## Fig 6.5 A
 tend = 1200.0
-prob605 = ODEProblem(model605!, u0605, (0.0, tend), ps605)
+prob605 = ODEProblem(model605!, u0605, tend, ps605)
 
 #---
 @time sol = solve(prob605, KenCarp47(), callback=cbs)
 
 #---
-plot(sol, idxs=[1, 2], title="Fig 6.05 (A)", xlabel="Time", ylabel="Abundance", labels=["RL" "Ga"], legend=:right)
+fig = Figure()
+ax = Axis(fig[1, 1], xlabel="Time", ylabel="Concentration", title="Fig 6.05 (A)")
+lines!(ax, 0 .. tend, t -> sol(t).RL, label="RL")
+lines!(ax, 0 .. tend, t -> sol(t).Ga, label="Ga")
+axislegend(ax, position=:rc)
+fig
 
 # ## Fig 6.5 B
 lrange = range(0, 20 * 1e-9, 101)
@@ -74,8 +78,17 @@ eprob = EnsembleProblem(prob605b; prob_func)
 @time sim = solve(eprob, alg; trajectories);
 
 #---
-
 ga = map(s->s.u.Ga, sim)
 rl = map(s->s.u.RL, sim)
-plot(lrange .* 1e9, [ga rl], label=["Ga" "RL"], title="Fig. 6.5 (B)",
-xlabel="Ligand (nM)", ylabel="Steady-state abundance", xlims=(0, 20), ylims=(0, 3500))
+fig = Figure()
+ax = Axis(
+    fig[1, 1],
+    xlabel = "Ligand (nM)",
+    ylabel = "Steady-state abundance",
+    title = "Fig. 6.5 (B)"
+)
+
+lines!(ax, lrange .* 1e9, ga, label="Ga")
+lines!(ax, lrange .* 1e9, rl, label="RL")
+axislegend(ax, position=:rc)
+fig

@@ -4,10 +4,9 @@
 Michaelis-Menten kinetics
 ===#
 using OrdinaryDiffEq
-using ComponentArrays
+using ComponentArrays: ComponentArray
 using SimpleUnPack
-using Plots
-Plots.default(linewidth=2)
+using CairoMakie
 
 # Enzyme kinetics full model
 _e303(u, p, t) = p.ET - u.ES
@@ -25,15 +24,15 @@ end
 
 #---
 ps303 = ComponentArray(
-    k1 = 30.0,
-    km1 = 1.0,
-    k2 = 10.0,
-    ET = 1.0
+    k1=30.0,
+    km1=1.0,
+    k2=10.0,
+    ET=1.0
 )
 u0 = ComponentArray(
-    S = 5.0,
-    ES = 0.0,
-    P = 0.0
+    S=5.0,
+    ES=0.0,
+    P=0.0
 )
 tend = 1.0
 prob303 = ODEProblem(model303!, u0, tend, ps303)
@@ -42,9 +41,20 @@ prob303 = ODEProblem(model303!, u0, tend, ps303)
 @time sol = solve(prob303, Tsit5())
 
 #---
-pl303 = plot(sol, xlabel="Time (AU)", ylabel="Concentration (AU)", legend=:right, title="Fig 3.03", labels=["S (full)" "ES (full)" "P (full)"])
-e303_t = t -> _e303(sol(t), ps303, t)
-plot!(pl303, e303_t, 0, tend, label="E (full)")
+fig303 = Figure()
+ax303 = Axis(
+    fig303[1, 1],
+    xlabel="Time",
+    ylabel="Concentration",
+    title="Fig. 3.03 (Full model)"
+)
+lines!(ax303, 0 .. tend, t -> sol(t).S, label="S")
+lines!(ax303, 0 .. tend, t -> sol(t).ES, label="ES")
+lines!(ax303, 0 .. tend, t -> sol(t).P, label="P")
+lines!(ax303, 0 .. tend, t -> _e303(sol(t), ps303, t), label="E")
+axislegend(ax303, position=:rt)
+
+fig303
 
 # ## QSSA of ES complex
 _s303mm(u, p, t) = p.S0 - u.P
@@ -65,8 +75,16 @@ prob303mm = ODEProblem(model303mm!, ComponentArray(P=0.0), tend, ps303mm)
 @time sol303mm = solve(prob303mm, Tsit5())
 
 #---
-plot(sol, idxs=[1, 3], label=["S (full)" "P (full)"], line=(:dash))
-p303mm_t = t -> sol303mm(t).P
-s303mm_t = t -> _s303mm(sol303mm(t), ps303mm, t)
-
-plot!([s303mm_t p303mm_t], 0, tend, label=["S (MM)" "P (MM)"], title="Fig. 3.03", xlabel="Time (AU)", ylabel="Concentration (AU)", xlims=(0., tend), ylims=(0., 5.), legend=:right)
+fig303mm = Figure()
+ax303mm = Axis(
+    fig303mm[1, 1],
+    xlabel="Time",
+    ylabel="Concentration",
+    title="Fig. 3.03 (QSSA)"
+)
+lines!(ax303mm, 0 .. tend, t -> sol(t).S, label="S (full)", linestyle=:dash)
+lines!(ax303mm, 0 .. tend, t -> sol(t).P, label="P (full)", linestyle=:dash)
+lines!(ax303mm, 0 .. tend, t -> _s303mm(sol303mm(t), ps303mm, t), label="S (MM)")
+lines!(ax303mm, 0 .. tend, t -> sol303mm(t).P, label="P (MM)")
+axislegend(ax303mm, position=:rc)
+fig303mm

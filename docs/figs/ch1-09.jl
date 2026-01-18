@@ -4,11 +4,10 @@
 Hodgkin-Huxley model
 ===#
 using OrdinaryDiffEq
-using ComponentArrays
+using ComponentArrays: ComponentArray
 using DiffEqCallbacks
 using SimpleUnPack
-using Plots
-Plots.default(linewidth=2)
+using CairoMakie
 
 # Convenience functions
 hil(x, k) = x / (x + k)
@@ -46,26 +45,26 @@ end
 
 # Problem definition
 ps = ComponentArray(
-    E_N = 55.0,       ## Reversal potential of Na (mV)
-    E_K = -72.0,      ## Reversal potential of K (mV)
-    E_LEAK = -49.0,   ## Reversal potential of leaky channels (mV)
-    G_N_BAR = 120.0,  ## Max. Na channel conductance (mS/cm^2)
-    G_K_BAR = 36.0,   ## Max. K channel conductance (mS/cm^2)
-    G_LEAK = 0.30,    ## Max. leak channel conductance (mS/cm^2)
-    C_M = 1.0,        ## membrane capacitance (uF/cm^2))
-    iStim = 0.0       ## stimulation current
+    E_N=55.0,       ## Reversal potential of Na (mV)
+    E_K=-72.0,      ## Reversal potential of K (mV)
+    E_LEAK=-49.0,   ## Reversal potential of leaky channels (mV)
+    G_N_BAR=120.0,  ## Max. Na channel conductance (mS/cm^2)
+    G_K_BAR=36.0,   ## Max. K channel conductance (mS/cm^2)
+    G_LEAK=0.30,    ## Max. leak channel conductance (mS/cm^2)
+    C_M=1.0,        ## membrane capacitance (uF/cm^2))
+    iStim=0.0       ## stimulation current
 )
 
 u0 = ComponentArray(
-    v = -59.8977,
-    m = 0.0536,
-    h = 0.5925,
-    n = 0.3192,
+    v=-59.8977,
+    m=0.0536,
+    h=0.5925,
+    n=0.3192,
 )
 
-tspan = (0.0, 100.0)
+tend = 100.0
 
-prob = ODEProblem(hh_neuron!, u0, tspan, ps)
+prob = ODEProblem(hh_neuron!, u0, tend, ps)
 
 # Callbacks for external current and solve the problem
 affect_stim_on1!(integrator) = integrator.p.iStim = -6.6
@@ -77,7 +76,17 @@ cb_stim_off1 = PresetTimeCallback(21.0, affect_stim_off1!)
 cb_stim_on2 = PresetTimeCallback(60.0, affect_stim_on2!)
 cb_stim_off2 = PresetTimeCallback(61.0, affect_stim_off2!)
 cbs = CallbackSet(cb_stim_on1, cb_stim_off1, cb_stim_on2, cb_stim_off2)
-@time sol = solve(prob, Tsit5(), callback=cbs)
+@time sol = solve(prob, TRBDF2(), callback=cbs)
 
 # Visualization
-plot(t->sol(t).v, 0, 100, xlabel="Time (ms)", ylabel="Membrane potential (mV)", title="Fig 1.9", label=false, legend=:topleft)
+fig = Figure()
+ax = Axis(
+    fig[1, 1],
+    xlabel="Time (ms)",
+    ylabel="Membrane potential (mV)",
+    title="Fig 1.9\nHodgkin-Huxley Neuron"
+)
+lines!(ax, 0 .. tend, t -> sol(t).v, label="v")
+axislegend(ax, position=:rt)
+
+fig

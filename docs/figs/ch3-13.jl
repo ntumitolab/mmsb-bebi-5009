@@ -3,15 +3,18 @@
 
 Generalized mass action (GMA) vs. Michaelis-Menten rate laws
 ===#
-using Plots
-Plots.default(linewidth=2)
+using CairoMakie
 
 mm = t -> 2t / (1+t)
 gma = t -> t^0.4
 
-fig = plot(
-    [mm, gma], 0., 4.,
-    label = ["MM" "GMA"], title = "Fig 3.13",
-    xlabel= "Substrate concentration (AU)",
-    ylabel="Reaction rate (AU)"
+fig = Figure()
+ax = Axis(fig[1, 1],
+    xlabel = "Substrate concentration (AU)",
+    ylabel = "Reaction rate (AU)",
+    title = "Fig 3.13",
 )
+lines!(ax, 0..4, mm, label = "MM")
+lines!(ax, 0..4, gma, label = "GMA")
+axislegend(ax, position = :rb)
+fig

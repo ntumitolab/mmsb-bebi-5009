@@ -3,12 +3,11 @@
 
 Model of apoptosis signalling pathway
 ===#
-using ComponentArrays
+using ComponentArrays: ComponentArray
 using SimpleUnPack
 using OrdinaryDiffEq
 using DiffEqCallbacks
-using Plots
-Plots.default(linewidth=2)
+using CairoMakie
 
 #---
 function model616!(D, u, p, t)
@@ -77,14 +76,17 @@ affect_i2!(integrator) = integrator.p.I = 0.0
 event_i1 = PresetTimeCallback([100.0], affect_i1!)
 event_i2 = PresetTimeCallback([1200.0], affect_i2!)
 cbs = CallbackSet(event_i1, event_i2)
+tend = 1800.0
+prob = ODEProblem(model616!, u0616, tend, ps616)
 
 #---
-tspan = (0., 1800.)
-prob = ODEProblem(model616!, u0616, tspan, ps616)
+@time sol = solve(prob, TRBDF2(), callback=cbs)
 
 #---
-@time sol = solve(prob, callback=cbs)
-
-#---
-plot(sol, idxs=[2, 4], title="Fig 6.16", xlabel="Time", ylabel="Concentration", legend=:right, labels=["C8s" "C3s"])
-plot!(t -> 100 * 200 * (100<=t<1200), 0, 1800, label="I (×100)")
+fig = Figure()
+ax = Axis(fig[1, 1], xlabel="Time", ylabel="Concentration", title="Fig 6.16\nApoptosis signalling pathway")
+lines!(ax, 0..tend, t -> sol(t).C8s, label="C8s")
+lines!(ax, 0..tend, t -> sol(t).C3s, label="C3s")
+lines!(ax, 0..tend, t -> 100 * 200 * (100<=t<1200), label="I (×100)")
+axislegend(ax, position=:rc)
+fig

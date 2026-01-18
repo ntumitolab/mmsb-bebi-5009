@@ -1,5 +1,4 @@
 #===
-
 # Solving differential equations in Julia
 
 **Standard procedures**
@@ -33,8 +32,7 @@ $$
 
 ===#
 using OrdinaryDiffEq
-using Plots
-Plots.default(linewidth=2)
+using CairoMakie
 
 # The model function is the 3-argument out-of-place form, `f(u, p, t)`.
 decay(u, p, t) = p * u
@@ -56,7 +54,15 @@ sol.t
 sol.u
 
 # Visualize the solution
-plot(sol)
+fig = Figure()
+ax = Axis(fig[1, 1],
+    xlabel = "Time",
+    ylabel = "Concentration",
+    title = "Exponential Decay"
+)
+lines!(ax, sol, label = "C(t)")
+axislegend(ax, position = :rt)
+fig
 
 #===
 ### Three variables: The SIR model
@@ -84,8 +90,7 @@ $$
 
 ===#
 using OrdinaryDiffEq
-using Plots
-Plots.default(linewidth=2)
+using CairoMakie
 
 # SIR model (in-place form can save array allocations and thus faster)
 function sir!(du, u, p, t)
@@ -107,7 +112,13 @@ prob = ODEProblem(sir!, u0, tspan, p)
 sol = solve(prob)
 
 # Visualize the solution
-plot(sol, label=["S" "I" "R"], legend=:right)
+fig = Figure()
+ax = Axis(fig[1, 1])
+lines!(ax, 0..20, t-> sol(t)[1], label="S")
+lines!(ax, 0..20, t-> sol(t)[2], label="I")
+lines!(ax, 0..20, t-> sol(t)[3], label="R")
+axislegend(ax, position = :rc)
+fig
 
 # ## Saving simulation results
 using DataFrames

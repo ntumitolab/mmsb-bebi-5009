@@ -2,13 +2,21 @@
 # Fig 2.04
 Exponential decay
 ===#
-using Plots
-Plots.default(linewidth=2)
+using CairoMakie
 
 #---
-fig = plot(title= "Fig 2.4")
+fig = Figure()
+ax = Axis(
+    fig[1, 1],
+    xlabel="Time",
+    ylabel="Concentration",
+    title="Fig 2.4\nExponential Decay"
+)
+
 for k in 1:3
-    plot!(fig, t -> 3 * exp(-k*t), 0., 5., label = "exp(-$(k)t)")
+    lines!(ax, 0 .. 5, t -> 3 * exp(-k * t), label="exp(-$(k)t)")
 end
 
-plot!(fig, xlim = (0, 5), ylim=(0, 3.2), xlabel="Time", ylabel="Concentration")
+axislegend(ax, position=:rt)
+
+fig

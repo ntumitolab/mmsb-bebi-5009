@@ -3,17 +3,15 @@
 
 Model of E. coli chemotaxis signalling pathway
 ===#
-using ComponentArrays
+using ComponentArrays: ComponentArray
 using SimpleUnPack
 using OrdinaryDiffEq
 using DiffEqCallbacks
-using Plots
-Plots.default(linewidth=2)
+using CairoMakie
 
 #---
-hil(x, k) = x / (k + x)
-hil(x, k, n) = hil(x^n, k^n)
 function model614!(D, u, p, t)
+    hil(x, k) = x / (k + x)
     @unpack k1, k2, k3, km1, km2, km3, k4, km4, k5, km5, KM1, KM2, L, R, Atotal, Btotal = p
     @unpack Am, AmL, AL, BP = u
     A = Atotal - Am - AmL - AL
@@ -65,8 +63,6 @@ affect_L2!(integrator) = integrator.p.L = 80.0
 event_L1 = PresetTimeCallback([10.0], affect_L1!)
 event_L2 = PresetTimeCallback([30.0], affect_L2!)
 cbs = CallbackSet(event_L1, event_L2)
-
-#---
 tend = 50.0
 prob614 = ODEProblem(model614!, u0614, tend, ps614)
 
@@ -74,4 +70,8 @@ prob614 = ODEProblem(model614!, u0614, tend, ps614)
 @time sol614 = solve(prob614, Tsit5(), callback=cbs)
 
 #---
-plot(sol614, idxs=[1], title="Fig 6.14", xlabel="Time", ylabel="Active CheA ([Am])", ylims=(0.01, 0.04), legend=false)
+fig = Figure()
+ax = Axis(fig[1, 1], xlabel="Time", ylabel="Concentration", title="Fig 6.14\nE. coli chemotaxis signalling pathway")
+lines!(ax, 0..tend, t -> sol614(t).Am, color=:blue, label="Am")
+axislegend(ax, position=:rc)
+fig

@@ -1,11 +1,9 @@
 # # Fig 6.19
 # Sine wave response of g-protein signalling pathway
-
 using OrdinaryDiffEq
-using ComponentArrays
+using ComponentArrays: ComponentArray
 using SimpleUnPack
-using Plots
-Plots.default(linewidth=2)
+using CairoMakie
 
 #---
 _l619(p, t) = p.lt + (p.lt / p.l_AMP) * cospi(2t / p.l_per)
@@ -48,12 +46,14 @@ ics619 = ComponentArray(
 )
 
 tend = 1000.0
-prob619 = ODEProblem(model619!, ics619, (0.0, tend), ps619)
+prob619 = ODEProblem(model619!, ics619, tend, ps619)
+#---
+@time sol619 = solve(prob619, KenCarp47())
 
 #---
-@time sol619 = solve(prob619, Tsit5())
-pl1 = plot(t-> sol619(t).Ga, 0.0, tend, label="Ga", xlabel="Time", ylabel="Concentration", title="Fig 6.19 A")
-
-pl2 = plot(t -> _l619(ps619, t) * 1E9, 0.0, tend, label="L", xlabel="Time", ylabel="Concentration (nM)", title="Fig 6.19 B")
-
-plot(pl1, pl2, layout=(2,1))
+fig = Figure()
+ax1 = Axis(fig[1, 1], xlabel="Time", ylabel="Concentration", title="Fig 6.19 A")
+lines!(ax1, 0..tend, t -> sol619(t).Ga, label="Ga")
+lines!(ax1, 0..tend, t -> _l619(ps619, t) * 1E12, label=L"L \cdot 10^{12}")
+axislegend(ax1, position=:rb)
+fig
