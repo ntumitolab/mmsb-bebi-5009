@@ -67,19 +67,17 @@ tend = 10.0
 @time solfirst = ssa_alg(model, u0, tend, parameters, stoich; method=:first)
 
 # Plot the solution from the direct method
-plot(soldirect.t, soldirect.u,
-    xlabel="time", ylabel="# of molecules",
-    title="SSA (direct method)", label=["A" "B"]) |> PNG
+fig, ax, sp = series(soldirect.t, soldirect.u', labels=["A", "B"]; axis=(;  xlabel="time", ylabel="# of molecules", title="SSA (direct method)"))
+axislegend(ax)
+fig
 
 # Plot the solution by the first reaction method
-plot(solfirst.t, solfirst.u,
-    xlabel="time", ylabel="# of molecules",
-    title="SSA (1st reaction method)", label=["A" "B"]) |> PNG
+fig, ax, sp = series(solfirst.t, solfirst.u', labels=["A", "B"]; axis=(;  xlabel="time", ylabel="# of molecules", title="SSA (first reaction method)"))
+axislegend(ax)
+fig
 
 # Running 50 simulations
-numRuns = 50
-
-@time sols = map(1:numRuns) do _
+@time sols = map(1:50) do _
     ssa_alg(model, u0, tend, parameters, stoich; method=:direct)
 end;
 
@@ -91,15 +89,17 @@ a_avg(t) = mean(i-> i(t), a_interp)
 b_avg(t) = mean(i-> i(t), b_interp)
 
 # Plot the solution
-fig1 = plot(xlabel="Time", ylabel="# of molecules", title="SSA (first method) ensemble")
-
+fig = Figure()
+ax = Axis(fig[1, 1],
+    xlabel = "Time",
+    ylabel = "# of molecules",
+    title = "SSA (first method) ensemble"
+)
 for sol in sols
-    plot!(fig1, sol.t, sol.u, linecolor=[:blue :red], linealpha=0.05, label=false)
+    lines!(ax, sol.t, sol.u[:, 1], color = (:blue, 0.05))
+    lines!(ax, sol.t, sol.u[:, 2], color = (:red, 0.05))
 end
-
-fig1 |> PNG
-
-# Plot averages
-plot!(fig1, a_avg, 0.0, tend, linecolor=:black, linewidth=3, linestyle=:solid, label="Average [A]") |> PNG
-plot!(fig1, b_avg, 0.0, tend, linecolor=:black, linewidth=3, linestyle=:dash, label="Average [B]") |> PNG
-fig1 |> PNG
+lines!(ax, ts, a_avg.(ts), color = :black, linewidth = 3, linestyle = :solid, label = "Average [A]")
+lines!(ax, ts, b_avg.(ts), color = :black, linewidth = 3, linestyle = :dash, label = "Average [B]")
+axislegend(ax, position = :rt)
+fig
