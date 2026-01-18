@@ -19,7 +19,7 @@ project:
     - title: Introduction
       children:
         - file: docs/intro-00-start.md
-        - pattern: docs/*.ipynb
+        - pattern: docs/intro-*.ipynb
     - title: Homework
       children:
         - file: docs/hw-00.md
