@@ -87,10 +87,8 @@ yy = range(0, 6, 101)
 ∂A1 = [model510(ComponentArray(AdoMet=x, AdoHcy=y), ps510, nothing)[1] for x in xx, y in yy]
 ∂B1 = [model510(ComponentArray(AdoMet=x, AdoHcy=y), ps510, nothing)[2] for x in xx, y in yy]
 ∂F1 = function (x, y)
-    du = ComponentArray(AdoMet=0.0, AdoHcy=0.0)
-    u = ComponentArray(AdoMet=x, AdoHcy=y)
-    model510!(du, u, ps510, nothing)
-    return Point2d(du.AdoMet, du.AdoHcy)
+    da, db = model510((; AdoMet = x, AdoHcy = y), ps510, nothing)
+    return Point2d(da, db)
 end
 
 fig = Figure()
@@ -108,19 +106,17 @@ fig
 
 # ## Figure 5.11 B
 # Increase methionine level
-ps511b = CArray(ps510; Met=51.0)
+ps511b = ComponentArray(ps510; Met=51.0)
 prob511b = remake(prob510, p=ps511b)
 
 xx = range(0, 1200, 101)
 yy = range(0, 6, 101)
 
-∂A2 = [model510(ComponentArray(AdoMet=x, AdoHcy=y), ps511b, nothing)[1] for x in xx, y in yy]
-∂B2 = [model510(ComponentArray(AdoMet=x, AdoHcy=y), ps511b, nothing)[2] for x in xx, y in yy]
+∂A2 = [model510((; AdoMet=x, AdoHcy=y), ps511b, nothing)[1] for x in xx, y in yy]
+∂B2 = [model510((; AdoMet=x, AdoHcy=y), ps511b, nothing)[2] for x in xx, y in yy]
 ∂F2 = function (x, y)
-    du = ComponentArray(AdoMet=0.0, AdoHcy=0.0)
-    u = ComponentArray(AdoMet=x, AdoHcy=y)
-    model510!(du, u, ps511b, nothing)
-    return Point2d(du.AdoMet, du.AdoHcy)
+    da, db = model510((; AdoMet = x, AdoHcy = y), ps511b, nothing)
+    return Point2d(da, db)
 end
 
 fig = Figure()

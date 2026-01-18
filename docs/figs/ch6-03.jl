@@ -63,7 +63,7 @@ fig
 # ## Fig 6.3 B
 lrange = 0:0.01:1
 
-prob_func = (prob, i, repeat) -> remake(prob, p=CArray(ps603; L=lrange[i]))
+prob_func = (prob, i, repeat) -> remake(prob, p=ComponentArray(ps603; L=lrange[i]))
 prob603b = SteadyStateProblem(model603!, u0603, ps603)
 trajectories = length(lrange)
 alg = DynamicSS(KenCarp47())

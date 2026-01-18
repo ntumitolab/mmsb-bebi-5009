@@ -90,8 +90,8 @@ using CairoMakie
 
 fig = Figure()
 ax = Axis(fig[1, 1])
-lines!(ax, sol01.t, sol01.u, label="Euler (dt=0.1)")
-lines!(ax, sol1.t, sol1.u, label = "Euler (dt=1)")
+lines!(ax, sol01.t, vec(sol01.u), label="Euler (dt=0.1)")
+lines!(ax, sol1.t, vec(sol1.u), label = "Euler (dt=1)")
 lines!(ax, tspan[begin]..tspan[end], t -> analytical(t), label = "Analytical solution", linestyle=:dash)
 axislegend(ax, position = :rc)
 fig
