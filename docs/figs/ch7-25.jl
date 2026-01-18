@@ -2,15 +2,14 @@
 # model of quorum sensing mechanism of Vibrio fischeri
 using OrdinaryDiffEq
 using SteadyStateDiffEq
-using ComponentArrays
+using ComponentArrays: ComponentArray
 using SimpleUnPack
-using Plots
-Plots.default(linewidth=2)
+using CairoMakie
 
 #---
-hil(x, k) = x / (k + x)
-hil(x, k, n) = hil(x^n, k^n)
 function model725!(D, u, p, t; feedback=true)
+    hil(x, k) = x / (k + x)
+    hil(x, k, n) = hil(x^n, k^n)
     @unpack k0, k1, k2, n, a, b, a0, KM, RT, diff, popsize = p
     @unpack A, I, Rstar, Aout = u
     R0 = RT - 2Rstar
@@ -61,11 +60,20 @@ prob_func = (prob, i, repeat) -> remake(prob, p=ComponentArray(ps725; popsize=np
 eprob = EnsembleProblem(prob725; prob_func)
 eprob_nofeed = EnsembleProblem(prob725_nofeed; prob_func)
 
-#---
 @time sim = solve(eprob, alg; trajectories);
 @time sim_nofeed = solve(eprob_nofeed, alg; trajectories);
 
 #---
 luxI = map(s->s.u.I, sim)
 luxI_nofeed = map(s->s.u.I, sim_nofeed)
-plot(npops, [luxI, luxI_nofeed], label=["Original model" "Without Feedback"], xlabel="Population Size", ylabel="LuxI Concentration (μM)", title="Fig. 7.25", legend=:bottomright)
+
+fig = Figure()
+ax = Axis(fig[1, 1],
+    xlabel = "Population Size",
+    ylabel = "LuxI Concentration (μM)",
+    title = "Fig 7.25"
+)
+lines!(ax, npops, luxI, label = "Original model")
+lines!(ax, npops, luxI_nofeed, label = "Without Feedback")
+axislegend(ax, position = :rb)
+fig

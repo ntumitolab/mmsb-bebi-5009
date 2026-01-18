@@ -4,7 +4,7 @@
 Hodgkin-Huxley model
 ===#
 using OrdinaryDiffEq
-import ComponentArrays as CA
+using ComponentArrays: ComponentArray
 using DiffEqCallbacks
 using SimpleUnPack
 using CairoMakie
@@ -44,7 +44,7 @@ function hh_neuron!(du, u, p, t)
 end
 
 # Problem definition
-ps = CA.ComponentArray(
+ps = ComponentArray(
     E_N=55.0,       ## Reversal potential of Na (mV)
     E_K=-72.0,      ## Reversal potential of K (mV)
     E_LEAK=-49.0,   ## Reversal potential of leaky channels (mV)
@@ -55,7 +55,7 @@ ps = CA.ComponentArray(
     iStim=0.0       ## stimulation current
 )
 
-u0 = CA.ComponentArray(
+u0 = ComponentArray(
     v=-59.8977,
     m=0.0536,
     h=0.5925,

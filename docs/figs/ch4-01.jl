@@ -4,7 +4,7 @@
 Steady states and phase plots in an asymmetric network.
 ===#
 using OrdinaryDiffEq
-import ComponentArrays as CA
+using ComponentArrays: ComponentArray
 using SimpleUnPack
 using CairoMakie
 
@@ -21,7 +21,7 @@ end
 
 # ## Fig 4.2 A
 tend = 1.5
-ps402a = CA.ComponentArray(
+ps402a = ComponentArray(
     k1 = 20.0,
     k2 = 5.0,
     k3 = 5.0,
@@ -29,14 +29,14 @@ ps402a = CA.ComponentArray(
     k5 = 2.0,
     n = 4.0
 )
-ics402a = CA.ComponentArray(
+ics402a = ComponentArray(
     A = 0.0,
     B = 0.0
 )
 prob401 = ODEProblem(model401!, ics402a, tend, ps402a)
 
 u0s = [
-    CA.ComponentArray(
+    ComponentArray(
         A = a,
         B = b
     ) for (a, b) in [
@@ -157,10 +157,8 @@ xs = 0:0.01:2
 ys = 0:0.01:2
 zA44 = [_dA401(x, y, ps402a, nothing) for x in xs, y in ys]
 zB44 = [_dB401(x, y, ps402a, nothing) for x in xs, y in ys]
-contour!(ax, xs, ys, zA44, levels=[0], color=:red)
-lines!(ax, Float64[], Float64[], color=:red, label="A nullcline")
-contour!(ax, xs, ys, zB44, levels=[0], color=:blue)
-lines!(ax, Float64[], Float64[], color=:blue, label="B nullcline")
+contour!(ax, xs, ys, zA44, levels=[0], color=:black, linestyle=:solid, linewidth=2, label="A nullcline")
+contour!(ax, xs, ys, zB44, levels=[0], color=:black, linestyle=:dash, linewidth=2, label="B nullcline")
 limits!(ax, 0.0, 2.0, 0.0, 2.0)
 axislegend(ax, position = :rb)
 fig
@@ -175,10 +173,8 @@ ax = Axis(fig[1, 1],
     aspect = 1,
 )
 ## Nullclines
-contour!(ax, xs, ys, zA44, levels=[0], color=:red)
-lines!(ax, Float64[], Float64[], color=:red, label="A nullcline")
-contour!(ax, xs, ys, zB44, levels=[0], color=:blue)
-lines!(ax, Float64[], Float64[], color=:blue, label="B nullcline")
+contour!(ax, xs, ys, zA44, levels=[0], color=:black, linestyle=:solid, linewidth=2, label="A nullcline")
+contour!(ax, xs, ys, zB44, levels=[0], color=:black, linestyle=:dash, linewidth=2, label="B nullcline")
 streamplot!(ax, ∂F44, 0..2, 0..2)
 limits!(ax, 0.0, 2.0, 0.0, 2.0)
 fig

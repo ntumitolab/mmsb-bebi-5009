@@ -1,17 +1,15 @@
 # # Fig 7.19
 # Circadian rhythm model
-
 using OrdinaryDiffEq
-using ComponentArrays
+using ComponentArrays: ComponentArray
 using SimpleUnPack
-using Plots
+using CairoMakie
 using Peaks
-Plots.default(linewidth=2)
 
 #---
-hil(x, k=one(x)) = x / (x + k)
-hil(x, k, n) = hil(x^n, k^n)
 function model719!(D, u, p, t)
+    hil(x, k=one(x)) = x / (x + k)
+    hil(x, k, n) = hil(x^n, k^n)
     @unpack vs, vm, vd, ks, kt1, kt2, v1, v2, v3, v4, k1, k2, k3, k4, ki, km1, kd, n = p
     @unpack M, P0, P1, P2, PN = u
     rM = vs * hil(ki, PN, n) - vm * hil(M, km1)
@@ -61,10 +59,18 @@ tspan = (-50.0, 200.0)
 prob719 = ODEProblem(model719!, ics719, tspan, ps719)
 
 #---
-@time sol719 = solve(prob719, TRBDF2())
+@time sol719 = solve(prob719, KenCarp47())
 
 #---
 _total_P(sol) = sol.P0 .+ sol.P1 .+ sol.P2 .+ sol.PN
-plot(t->sol719(t).M, 0, tspan[2], xlabel="Time", ylabel=" Concentration", title="Fig 7.19 A", label="M")
-plot!(t->sol719(t).PN, 0, tspan[2], label="Nuclear PER")
-plot!(t->_total_P(sol719(t)), 0, tspan[2], label="Total PER")
+fig = Figure()
+ax = Axis(fig[1, 1],
+    xlabel = "Time",
+    ylabel = "Concentration",
+    title = "Fig 7.19 (A)"
+)
+lines!(ax, 0..tspan[2], t-> sol719(t).M, label = "M")
+lines!(ax, 0..tspan[2], t-> sol719(t).PN, label = "Nuclear PER")
+lines!(ax, 0..tspan[2], t->_total_P(sol719(t)), label = "Total PER")
+axislegend(ax, position = :rt)
+fig

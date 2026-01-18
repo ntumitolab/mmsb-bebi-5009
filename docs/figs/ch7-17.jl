@@ -3,11 +3,10 @@
 
 Goodwin oscillator model: https://en.wikipedia.org/wiki/Goodwin_model_(biology)
 ===#
-using ComponentArrays
+using ComponentArrays: ComponentArray
 using SimpleUnPack
 using OrdinaryDiffEq
-using Plots
-Plots.default(linewidth=2)
+using CairoMakie
 
 #---
 function model717!(D, u, p, t)
@@ -39,12 +38,29 @@ u0 = ComponentArray(
 
 tend = 35.0
 prob717 = ODEProblem(model717!, u0, tend, ps717)
+@time sol = solve(prob717, KenCarp47())
 
 #---
-@time sol = solve(prob717)
+fig = Figure()
+ax = Axis(fig[1, 1],
+    xlabel = "Time",
+    ylabel = "Concentration",
+    title = "Fig 7.17 (A)"
+)
+
+lines!(ax, 0..tend, t-> sol(t).X, label = "X")
+lines!(ax, 0..tend, t-> sol(t).Y, label = "Y")
+lines!(ax, 0..tend, t-> sol(t).Z, label = "Z")
+axislegend(ax, position = :rt)
+fig
 
 #---
-plot(sol, title="Fig 7.17 (A)", xlabel="Time", ylabel="Concentration", labels=["X" "Y" "Z"])
-
-#---
-plot(sol, idxs=(1, 2, 3), title="Fig 7.17 (B)", legend=false, size=(600, 600))
+fig = Figure(size=(600, 600))
+ax = Axis3(fig[1, 1],
+    xlabel = "X",
+    ylabel = "Y",
+    zlabel = "Z",
+    title = "Fig 7.17 (B)",
+)
+lines!(ax, sol, idxs=(1, 2, 3), color=:tomato)
+fig

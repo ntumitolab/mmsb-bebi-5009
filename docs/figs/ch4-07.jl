@@ -1,7 +1,7 @@
 # # Fig 4.7, 4.8
 # Symmetric (bistable) biological networks.
 using OrdinaryDiffEq
-using ComponentArrays: ComponentArray as CA
+using ComponentArrays: ComponentArray
 using SimpleUnPack
 using CairoMakie
 
@@ -20,7 +20,7 @@ end
 
 Asymmetric parameter set
 ===#
-ps407 = CA(
+ps407 = ComponentArray(
     k1 = 20.0,
     k2 = 20.0,
     k3 = 5.0,
@@ -29,7 +29,7 @@ ps407 = CA(
     n2 = 1.0
 )
 
-ics407 = CA(
+ics407 = ComponentArray(
     A = 3.0,
     B = 1.0
 )
@@ -38,7 +38,7 @@ tend = 4.0
 prob407 = ODEProblem(model407!, ics407, (0.0, tend), ps407)
 #---
 @time sol1 = solve(prob407, Tsit5())
-@time sol2 = solve(remake(prob407, u0=CA(A=1.0, B=3.0)), Tsit5())
+@time sol2 = solve(remake(prob407, u0=ComponentArray(A=1.0, B=3.0)), Tsit5())
 fig = Figure(size=(600, 600))
 ax1 = Axis(fig[1, 1], xlabel="Time", ylabel="Concentration", title= "Fig 4.7A (1)")
 lines!(ax1, 0..tend, t-> sol1(t).A, label="A")
@@ -86,7 +86,7 @@ fig
 
 Symmetric parameter set
 ===#
-ps408 = CA(
+ps408 = ComponentArray(
     k1 = 20.0,
     k2 = 20.0,
     k3 = 5.0,
@@ -95,7 +95,7 @@ ps408 = CA(
     n2 = 4.0
 )
 
-ics408 = CA(
+ics408 = ComponentArray(
     A = 3.0,
     B = 1.0
 )
@@ -104,7 +104,7 @@ tend = 4.0
 prob408 = ODEProblem(model407!, ics408, (0.0, tend), ps408)
 
 @time sol1 = solve(prob408, Tsit5())
-@time sol2 = solve(remake(prob408, u0=CA(A=1.0, B=3.0)), Tsit5())
+@time sol2 = solve(remake(prob408, u0=ComponentArray(A=1.0, B=3.0)), Tsit5())
 
 fig = Figure(size=(600, 600))
 ax1 = Axis(fig[1, 1], xlabel="Time", ylabel="Concentration", title= "Fig 4.8A (1)")

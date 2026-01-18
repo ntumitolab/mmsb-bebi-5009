@@ -4,7 +4,7 @@
 Michaelis-Menten kinetics
 ===#
 using OrdinaryDiffEq
-import ComponentArrays as CA
+using ComponentArrays: ComponentArray
 using SimpleUnPack
 using CairoMakie
 
@@ -23,13 +23,13 @@ function model303!(du, u, p, t)
 end
 
 #---
-ps303 = CA.ComponentArray(
+ps303 = ComponentArray(
     k1=30.0,
     km1=1.0,
     k2=10.0,
     ET=1.0
 )
-u0 = CA.ComponentArray(
+u0 = ComponentArray(
     S=5.0,
     ES=0.0,
     P=0.0
@@ -68,8 +68,8 @@ function model303mm!(du, u, p, t)
     nothing
 end
 
-ps303mm = CA.ComponentArray(ps303; S0=5.0)
-prob303mm = ODEProblem(model303mm!, CA.ComponentArray(P=0.0), tend, ps303mm)
+ps303mm = ComponentArray(ps303; S0=5.0)
+prob303mm = ODEProblem(model303mm!, ComponentArray(P=0.0), tend, ps303mm)
 
 #---
 @time sol303mm = solve(prob303mm, Tsit5())

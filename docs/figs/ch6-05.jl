@@ -3,7 +3,7 @@
 
 Model of G-protein signalling pathway
 ===#
-using ComponentArrays: ComponentArray as CA
+using ComponentArrays: ComponentArray
 using SimpleUnPack
 using OrdinaryDiffEq
 using DiffEqCallbacks
@@ -28,7 +28,7 @@ function model605!(D, u, p, t)
 end
 
 #---
-ps605 = CA(
+ps605 = ComponentArray(
     kRL = 2e6,
     kRLm = 0.01,
     kGa = 1e-5,
@@ -39,7 +39,7 @@ ps605 = CA(
     L = 0.0
 )
 
-u0605 = CA(
+u0605 = ComponentArray(
     RL = 0.0,
     Ga = 0.0,
     Gd = 0.0,
@@ -54,10 +54,10 @@ cbs = CallbackSet(event_L1, event_L2)
 
 # ## Fig 6.5 A
 tend = 1200.0
-prob605 = ODEProblem(model605!, u0605, (0.0, tend), ps605)
+prob605 = ODEProblem(model605!, u0605, tend, ps605)
 
 #---
-@time sol = solve(prob605, TRBDF2(), callback=cbs)
+@time sol = solve(prob605, KenCarp47(), callback=cbs)
 
 #---
 fig = Figure()
@@ -70,10 +70,10 @@ fig
 # ## Fig 6.5 B
 lrange = range(0, 20 * 1e-9, 101)
 
-prob_func = (prob, i, repeat) -> remake(prob, p=CA(ps605; L=lrange[i]))
+prob_func = (prob, i, repeat) -> remake(prob, p=ComponentArray(ps605; L=lrange[i]))
 prob605b = SteadyStateProblem(model605!, u0605, ps605)
 trajectories = length(lrange)
-alg = DynamicSS(TRBDF2())
+alg = DynamicSS(KenCarp47())
 eprob = EnsembleProblem(prob605b; prob_func)
 @time sim = solve(eprob, alg; trajectories);
 

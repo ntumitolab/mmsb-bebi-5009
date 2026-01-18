@@ -17,5 +17,6 @@ ax = Axis(fig[1, 1],
 )
 lines!(ax, 2.2..8.0, f, label="Curve")
 lines!(ax, 2.7..5.3, x -> -3 / (4 - 2)^2 * (x - 4) + f(4), label="Tangent line")
+limits!(ax, 2, 6, 0, 5)
 axislegend(ax)
 fig

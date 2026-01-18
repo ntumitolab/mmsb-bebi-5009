@@ -3,7 +3,7 @@
 
 ## Gillespie Algorithm
 ===#
-using Plots
+using CairoMakie
 using DataInterpolations: LinearInterpolation
 using StatsBase: Weights, sample
 using Statistics: mean

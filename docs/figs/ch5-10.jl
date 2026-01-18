@@ -3,15 +3,15 @@
 
 Methionine model
 ===#
+using ComponentArrays: ComponentArray
 using OrdinaryDiffEq
-using ComponentArrays: ComponentArray as CArray
 using SimpleUnPack
 using CairoMakie
 
 #---
-hil(x, k=one(x)) = x / (x + k)
-hil(x, k, n) = hil(x^n, k^n)
-function model510!(D, u, p, t)
+function model510(u, p, t)
+    hil(x, k=one(x)) = x / (x + k)
+    hil(x, k, n) = hil(x^n, k^n)
     @unpack K_AHC, Adenosine, v_MATI_max, Met, K_MATI_m, K_MATI_i,
             v_MATIII_max, K_MATIII_m2, v_GNMT_max, K_GNMT_m, K_GNMT_i,
             v_MET_max, A_over_K_MET_m2, alpha_d = p
@@ -29,13 +29,19 @@ function model510!(D, u, p, t)
 
     dAdoMet = (v_MATI + v_MATIII) - (v_GNMT + v_MET)
     dAdoHcy = (v_GNMT + v_MET - v_D) * hil(Adenosine, K_AHC)
-    D.AdoMet = dAdoMet
-    D.AdoHcy = dAdoHcy
-    return (; dAdoMet, dAdoHcy, v_MATI, v_MATIII, v_GNMT, v_MET, v_D, Hcy)
+
+    return (; dAdoMet, dAdoHcy)
+end
+
+function model510!(D, u, p, t)
+    res = model510(u, p, t)
+    D.AdoMet = res.dAdoMet
+    D.AdoHcy = res.dAdoHcy
+    return nothing
 end
 
 #---
-ps510 = CArray(
+ps510 = ComponentArray(
     K_AHC = 0.1,
     Adenosine = 1.0,
     v_MATI_max = 561.0,
@@ -52,7 +58,7 @@ ps510 = CArray(
     alpha_d = 1333.0
 )
 
-ics510 = CArray(
+ics510 = ComponentArray(
     AdoMet = 10.0,
     AdoHcy = 10.0
 )
@@ -60,9 +66,7 @@ ics510 = CArray(
 # ## Figure 5.10
 tend = 5.0
 prob510 = ODEProblem(model510!, ics510, (0.0, tend), ps510)
-
-#---
-@time sol510 = solve(prob510, TRBDF2())
+@time sol510 = solve(prob510, KenCarp47())
 
 #---
 fig = Figure()
@@ -80,11 +84,11 @@ fig
 xx = range(0, 1200, 101)
 yy = range(0, 6, 101)
 
-∂A1 = [model510!(CArray(AdoMet=0.0, AdoHcy=0.0), CArray(AdoMet=x, AdoHcy=y), ps510, nothing)[1] for x in xx, y in yy]
-∂B1 = [model510!(CArray(AdoMet=0.0, AdoHcy=0.0), CArray(AdoMet=x, AdoHcy=y), ps510, nothing)[2] for x in xx, y in yy]
+∂A1 = [model510(ComponentArray(AdoMet=x, AdoHcy=y), ps510, nothing)[1] for x in xx, y in yy]
+∂B1 = [model510(ComponentArray(AdoMet=x, AdoHcy=y), ps510, nothing)[2] for x in xx, y in yy]
 ∂F1 = function (x, y)
-    du = CArray(AdoMet=0.0, AdoHcy=0.0)
-    u = CArray(AdoMet=x, AdoHcy=y)
+    du = ComponentArray(AdoMet=0.0, AdoHcy=0.0)
+    u = ComponentArray(AdoMet=x, AdoHcy=y)
     model510!(du, u, ps510, nothing)
     return Point2d(du.AdoMet, du.AdoHcy)
 end
@@ -110,11 +114,11 @@ prob511b = remake(prob510, p=ps511b)
 xx = range(0, 1200, 101)
 yy = range(0, 6, 101)
 
-∂A2 = [model510!(CArray(AdoMet=0.0, AdoHcy=0.0), CArray(AdoMet=x, AdoHcy=y), ps511b, nothing)[1] for x in xx, y in yy]
-∂B2 = [model510!(CArray(AdoMet=0.0, AdoHcy=0.0), CArray(AdoMet=x, AdoHcy=y), ps511b, nothing)[2] for x in xx, y in yy]
+∂A2 = [model510(ComponentArray(AdoMet=x, AdoHcy=y), ps511b, nothing)[1] for x in xx, y in yy]
+∂B2 = [model510(ComponentArray(AdoMet=x, AdoHcy=y), ps511b, nothing)[2] for x in xx, y in yy]
 ∂F2 = function (x, y)
-    du = CArray(AdoMet=0.0, AdoHcy=0.0)
-    u = CArray(AdoMet=x, AdoHcy=y)
+    du = ComponentArray(AdoMet=0.0, AdoHcy=0.0)
+    u = ComponentArray(AdoMet=x, AdoHcy=y)
     model510!(du, u, ps511b, nothing)
     return Point2d(du.AdoMet, du.AdoHcy)
 end

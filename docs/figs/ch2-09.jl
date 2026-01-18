@@ -4,7 +4,7 @@
 Metabolic network simulation
 ===#
 using OrdinaryDiffEq
-import ComponentArrays as CA
+using ComponentArrays: ComponentArray
 using SimpleUnPack
 using CairoMakie
 
@@ -25,14 +25,14 @@ function model209!(du, u, p, t)
 end
 
 # Setup problem
-ps = CA.ComponentArray(
+ps = ComponentArray(
     k1=3.0,
     k2=2.0,
     k3=2.5,
     k4=3.0,
     k5=4.0
 )
-u0 = CA.ComponentArray(
+u0 = ComponentArray(
     A=0.0,
     B=0.0,
     C=0.0,

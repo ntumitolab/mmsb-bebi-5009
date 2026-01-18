@@ -1,10 +1,9 @@
 # # Fig 7.21
 # repressilator model
 using OrdinaryDiffEq
-using ComponentArrays
+using ComponentArrays: ComponentArray
 using SimpleUnPack
-using Plots
-Plots.default(linewidth=2)
+using CairoMakie
 
 #---
 function model721!(D, u, p, t)
@@ -35,13 +34,21 @@ u0721 = ComponentArray(
     C = 0.5
 )
 
-tspan = (0.0, 800.0)
+tspan = (0.0, 400.0)
 
 prob721 = ODEProblem(model721!, u0721, tspan, ps721)
 
 #---
-@time sol721 = solve(prob721, Tsit5())
+@time sol721 = solve(prob721, KenCarp47())
 #---
-plot(t -> sol721(t).A, 0, tspan[2], labels="A")
-plot!(t -> sol721(t).B, 0, tspan[2], labels="B")
-plot!(t -> sol721(t).C, 0, tspan[2], xlabel="Time", ylabel="Concentration", title="Fig 7.21", labels="C")
+fig = Figure()
+ax = Axis(fig[1, 1],
+    xlabel = "Time",
+    ylabel = "Concentration",
+    title = "Fig 7.21"
+)
+lines!(ax, 0..400, t-> sol721(t).A, label = "A")
+lines!(ax, 0..400, t-> sol721(t).B, label = "B")
+lines!(ax, 0..400, t-> sol721(t).C, label = "C")
+axislegend(ax, position = :lt)
+fig

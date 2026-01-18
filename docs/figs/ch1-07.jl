@@ -5,7 +5,7 @@ For Figures 1.7, 7.13, 7.14, 7.15.
 ===#
 using OrdinaryDiffEq
 using DiffEqCallbacks
-import ComponentArrays as CA
+using ComponentArrays: ComponentArray
 using SimpleUnPack
 using CairoMakie
 
@@ -22,8 +22,8 @@ end
 
 # Setup the problem
 tend = 50.0
-ps = CA.ComponentArray(a1=3.0, a2=2.5, β=4.0, γ=4.0, i1=0.0, i2=0.0)
-u0 = CA.ComponentArray(s1=0.075, s2=2.5)
+ps = ComponentArray(a1=3.0, a2=2.5, β=4.0, γ=4.0, i1=0.0, i2=0.0)
+u0 = ComponentArray(s1=0.075, s2=2.5)
 prob = ODEProblem(collins!, u0, (0.0, tend), ps)
 
 # Callbacks and solve the problem
@@ -50,5 +50,4 @@ ax = Axis(
 lines!(ax, 0 .. tend, t -> sol(t).s1, label="s1")
 lines!(ax, 0 .. tend, t -> sol(t).s2, label="s2")
 axislegend(ax, position=:rt)
-
 fig

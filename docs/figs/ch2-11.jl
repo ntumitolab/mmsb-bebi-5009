@@ -4,7 +4,7 @@
 Model reduction of ODE metabolic networks.
 ===#
 using OrdinaryDiffEq
-import ComponentArrays as CA
+using ComponentArrays: ComponentArray
 using SimpleUnPack
 using CairoMakie
 
@@ -21,14 +21,14 @@ function model211!(du, u, p, t)
 end
 
 #---
-ps211 = CA.ComponentArray(
+ps211 = ComponentArray(
     k0=0.0,
     k1=9.0,
     km1=12.0,
     k2=2.0
 )
 
-u0 = CA.ComponentArray(
+u0 = ComponentArray(
     A=0.0,
     B=10.0
 )
@@ -69,7 +69,7 @@ end
 
 #---
 tend = 3.0
-u0212 = CA.ComponentArray(C=sum(u0))
+u0212 = ComponentArray(C=sum(u0))
 prob212 = ODEProblem(model212!, u0212, tend, ps211)
 
 #---
@@ -98,13 +98,12 @@ Rapid equilibrium (take 2)
 When another set of parameters is not suitable for rapid equilibrium assumption.
 ===#
 
-ps213 = CA.ComponentArray(k0=9.0, k1=20.0, km1=12.0, k2=2.0)
-u0 = CA.ComponentArray(A=8.0, B=4.0)
+ps213 = ComponentArray(k0=9.0, k1=20.0, km1=12.0, k2=2.0)
+u0 = ComponentArray(A=8.0, B=4.0)
 tend = 3.0
 
 @time sol213full = solve(ODEProblem(model211!, u0, tend, ps213), Tsit5())
-@time sol213re = solve(ODEProblem(model212!, CA.ComponentArray(C=sum(u0)), tend, ps213), Tsit5())
-
+@time sol213re = solve(ODEProblem(model212!, ComponentArray(C=sum(u0)), tend, ps213), Tsit5())
 #---
 fig = Figure()
 ax = Axis(
@@ -136,7 +135,7 @@ function model214!(du, u, p, t)
 end
 
 ps214 = ps213
-u0214 = CA.ComponentArray(B=_u0214(sum(u0), ps214))
+u0214 = ComponentArray(B=_u0214(sum(u0), ps214))
 
 # Solve QSSA model
 @time sol214 = solve(ODEProblem(model214!, u0214, tend, ps214), Tsit5())

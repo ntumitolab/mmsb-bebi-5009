@@ -2,7 +2,7 @@
 # Fig 6.3
 Two component pathway
 ===#
-using ComponentArrays: ComponentArray as CArray
+using ComponentArrays: ComponentArray
 using SimpleUnPack
 using OrdinaryDiffEq
 using DiffEqCallbacks
@@ -24,7 +24,7 @@ function model603!(D, u, p, t)
 end
 
 #---
-ps603 = CArray(
+ps603 = ComponentArray(
     k1=5.0,
     km1=1.0,
     k2=6.0,
@@ -34,7 +34,7 @@ ps603 = CArray(
     Ptot=8.0
 )
 
-u0603 = CArray(
+u0603 = ComponentArray(
     RL=0.0,
     Ps=0.0
 )
@@ -47,9 +47,9 @@ event_L2 = PresetTimeCallback([3.0], affect_L2!)
 cbs = CallbackSet(event_L1, event_L2)
 
 # ## Fig. 6.3 A
-tspan = (0., 10.)
-prob603a = ODEProblem(model603!, u0603, tspan, ps603)
-@time sol603a = solve(prob603a, TRBDF2(), callback=cbs)
+tend = 10.0
+prob603a = ODEProblem(model603!, u0603, tend, ps603)
+@time sol603a = solve(prob603a, KenCarp47(), callback=cbs)
 
 #---
 fig = Figure()
@@ -66,7 +66,7 @@ lrange = 0:0.01:1
 prob_func = (prob, i, repeat) -> remake(prob, p=CArray(ps603; L=lrange[i]))
 prob603b = SteadyStateProblem(model603!, u0603, ps603)
 trajectories = length(lrange)
-alg = DynamicSS(TRBDF2())
+alg = DynamicSS(KenCarp47())
 eprob = EnsembleProblem(prob603b; prob_func)
 @time sim = solve(eprob, alg; trajectories);
 

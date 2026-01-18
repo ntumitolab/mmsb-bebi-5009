@@ -7,7 +7,7 @@ See also [BifurcationKit.jl](https://github.com/bifurcationkit/BifurcationKit.jl
 ===#
 using OrdinaryDiffEq
 using SteadyStateDiffEq
-using ComponentArrays: ComponentArray as CArray
+using ComponentArrays: ComponentArray
 using SimpleUnPack
 using CairoMakie
 
@@ -21,7 +21,7 @@ function model418!(D, u, p, t)
 end
 
 #---
-ps418 = CArray(
+ps418 = ComponentArray(
     k1 = 0.0,
     k2 = 5.0,
     k3 = 5.0,
@@ -29,7 +29,7 @@ ps418 = CArray(
     k5 = 2.0,
     n = 4.0
 )
-u0418 = CArray(
+u0418 = ComponentArray(
     A = 0.0,
     B = 0.0
 )
@@ -37,7 +37,7 @@ u0418 = CArray(
 prob = SteadyStateProblem(model418!, u0418, ps418)
 
 function ainf(k1val)
-    sol = solve(remake(prob, p=CArray(ps418; k1=k1val)))
+    sol = solve(remake(prob, p=ComponentArray(ps418; k1=k1val)))
     return sol.u[1]
 end
 
