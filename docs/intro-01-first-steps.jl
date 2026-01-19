@@ -179,7 +179,6 @@ exp(1e-12) - 1, expm1(1e-12)
 ## Strings
 
 - [Think Julia ch8](https://benlauwens.github.io/ThinkJulia.jl/latest/book.html#chap08)
-- [Introduction_to_Julia_tutorials](https://nbviewer.jupyter.org/github/xorJane/Introduction_to_Julia_tutorials/blob/master/02.Strings.ipynb)
 
 A `string` is a sequence of characters.
 
