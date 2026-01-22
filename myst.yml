@@ -10,6 +10,7 @@ project:
   settings:
     output_matplotlib_strings: remove
   github: https://github.com/ntumitolab/mmsb-bebi-5009
+  edit_url: null
   # bibliography:
   #   - docs/references.bib
   # To autogenerate a Table of Contents, run "jupyter book init --write-toc"
