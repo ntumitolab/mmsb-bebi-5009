@@ -14,13 +14,13 @@ function model725!(D, u, p, t; feedback=true)
     @unpack A, I, Rstar, Aout = u
     R0 = RT - 2Rstar
     v0 = k0 * ifelse(feedback, I, 15.0)
-    v1 = k1*A^2 * R0^2
+    v1 = k1 * A^2 * R0^2
     v2 = k2 * Rstar
     va = n * (A - Aout)
     D.A = v0 - 2v1 + 2v2 - va
     D.I = a0 + a * hil(Rstar, KM) - b * I
     D.Rstar = v1 - v2
-    D.Aout =  popsize * va - diff * Aout
+    D.Aout = popsize * va - diff * Aout
     nothing
 end
 
@@ -64,16 +64,16 @@ eprob_nofeed = EnsembleProblem(prob725_nofeed; prob_func)
 @time sim_nofeed = solve(eprob_nofeed, alg; trajectories);
 
 #---
-luxI = map(s->s.u.I, sim)
-luxI_nofeed = map(s->s.u.I, sim_nofeed)
+luxI = map(s -> s.u.I, sim)
+luxI_nofeed = map(s -> s.u.I, sim_nofeed)
 
 fig = Figure()
 ax = Axis(fig[1, 1],
-    xlabel = "Population Size",
-    ylabel = "LuxI Concentration (μM)",
-    title = "Fig 7.25"
+    xlabel="Population Size",
+    ylabel="LuxI Concentration (μM)",
+    title="Fig 7.25"
 )
-lines!(ax, npops, luxI, label = "Original model")
-lines!(ax, npops, luxI_nofeed, label = "Without Feedback")
-axislegend(ax, position = :rb)
+lines!(ax, npops, luxI, label="Original model")
+lines!(ax, npops, luxI_nofeed, label="Without Feedback")
+axislegend(ax, position=:rb)
 fig
