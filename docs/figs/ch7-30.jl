@@ -1,4 +1,4 @@
-# # Figure 7.30
+# # Fig. 7.30
 # model of synthetic band detector system
 using OrdinaryDiffEq
 using SteadyStateDiffEq
