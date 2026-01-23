@@ -1,18 +1,3 @@
 {
-    "cSpell.words": [
-        "idxs",
-        "Kutta",
-        "linecolor",
-        "linestyle",
-        "Makie",
-        "matplotlib",
-        "mtkbuild",
-        "numpy",
-        "randexp",
-        "Runge",
-        "savefig",
-        "setdefaults",
-        "tspan",
-        "xlabel"
-    ],
+    "julia.executablePath": "julia +lts",
 }
