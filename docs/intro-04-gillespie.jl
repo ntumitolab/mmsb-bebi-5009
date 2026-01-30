@@ -8,7 +8,6 @@ using DataInterpolations: LinearInterpolation
 using StatsBase: Weights, sample
 using Statistics: mean
 using Random
-using DisplayAs: PNG    ## For faster rendering
 Random.seed!(2024)
 
 #===
