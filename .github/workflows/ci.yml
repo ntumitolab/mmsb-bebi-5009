@@ -12,13 +12,14 @@ concurrency:
   cancel-in-progress: true
 
 env:
+  LITERATE_PROC: '6'
   JULIA_CI: 'true'
   JULIA_CONDAPKG_BACKEND: 'Null'
   JULIA_CONDAPKG_OFFLINE: 'true'
   # JULIA_CPU_TARGET: 'generic;icelake-server,clone_all;znver3,clone_all'
   JULIA_NUM_THREADS: '2'
+  OMP_NUM_THREADS: '1'
   NBCACHE: '.cache'
-  LITERATE_PROC: '6'
   PY_VER: '3.14'
 
 jobs:
@@ -71,10 +72,13 @@ jobs:
           ${{ runner.os }}-julia-${{ steps.julia-version.outputs.value }}
     - name: Install Julia packages
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' && (runner.environment == 'self-hosted' || steps.cache-julia.outputs.cache-hit != 'true') }}
-      shell: julia --color=yes --project=@. {0}
+      shell: julia --color=yes {0}
       run: |
         using Pkg, Dates
+        Pkg.add(["JSON", "Literate", "MarkdownTables", "SHA", "Tables"])
+        Pkg.activate(".")
         Pkg.instantiate()
+        Pkg.resolve()
         Pkg.precompile()
         if ENV["RUNNER_ENVIRONMENT"] == "github-hosted"
             Pkg.gc(;collect_delay=Day(0))
@@ -106,8 +110,9 @@ jobs:
       with:
         path: './_build/html'
 
+  # Deployment job
   deploy:
-    name: Deploy to GitHub pages
+    name: Deploy to GitHub pages and Notebook branch
     needs: CI
     if: ${{ github.ref == 'refs/heads/main' }}
     # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
