@@ -2,8 +2,8 @@ name: Auto update Julia manifest dependencies
 
 on:
   workflow_dispatch:
-  # schedule:
-  #   - cron: '0 0 * * 0' # Every week
+  schedule:
+    - cron: '0 0 * * 0' # Every week
   push:
     branches:
       - main
@@ -29,7 +29,7 @@ jobs:
       - name: Setup Julia
         uses: julia-actions/setup-julia@v2
         with:
-          version: '1.10'
+          version: '1'
           arch: ${{ runner.arch }}
       - name: Update Julia dependencies
         env:
