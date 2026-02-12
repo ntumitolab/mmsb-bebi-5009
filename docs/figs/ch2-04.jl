@@ -3,7 +3,6 @@
 Exponential decay
 ===#
 using Plots
-Plots.pythonplot()
 
 #---
 pl1 = plot(xlabel="Time", ylabel="Concentration", title="Fig 2.4\nExponential Decay")

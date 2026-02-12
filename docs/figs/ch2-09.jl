@@ -7,7 +7,6 @@ using OrdinaryDiffEq
 using ModelingToolkit
 using ModelingToolkit: t_nounits as t, D_nounits as D
 using Plots
-Plots.pythonplot()
 
 #---
 function prob209(; tend = 10.0)

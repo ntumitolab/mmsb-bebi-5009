@@ -4,11 +4,13 @@
 Michaelis-Menten kinetics
 ===#
 using OrdinaryDiffEq
-using ComponentArrays: ComponentArray
-using SimpleUnPack
-using CairoMakie
+using ModelingToolkit
+using ModelingToolkit: t_nounits as t, D_nounits as D
+using Plots
 
 # Enzyme kinetics full model
+
+
 _e303(u, p, t) = p.ET - u.ES
 function model303!(du, u, p, t)
     @unpack k1, km1, k2 = p

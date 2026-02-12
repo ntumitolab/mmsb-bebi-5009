@@ -8,7 +8,7 @@ using DiffEqCallbacks
 using ModelingToolkit
 using ModelingToolkit: t_nounits as t, D_nounits as D
 using Plots
-Plots.pythonplot()
+
 #---
 function prob107(; tend = 50.0)
     hil(x, k) = x / (x + k)
