@@ -7,86 +7,51 @@ using OrdinaryDiffEq
 using ModelingToolkit
 using ModelingToolkit: t_nounits as t, D_nounits as D
 using Plots
+Plots.gr(framestyle = :box)
 
 # Enzyme kinetics full model
+function model303(; tend = 1.0)
+    @parameters k1=30 km1=1 k2=10 ET=1
+    @variables S(t)=5.0 ES(t)=0.0 P(t)=0.0 E(t)
 
-
-_e303(u, p, t) = p.ET - u.ES
-function model303!(du, u, p, t)
-    @unpack k1, km1, k2 = p
-    @unpack S, ES, P = u
-    E = _e303(u, p, t)
     v1 = k1 * S * E - km1 * ES
     v2 = k2 * ES
-    du.S = -v1
-    du.ES = v1 - v2
-    du.P = v2
-    nothing
+
+    eqs = [
+        E ~ ET - ES
+        D(S) ~ -v1
+        D(ES) ~ v1 - v2
+        D(P) ~ v2
+    ]
+    @mtkcompile sys = ODESystem(eqs, t)
+    return ODEProblem(sys, [], tend)
 end
+@time prob = model303()
 
 #---
-ps303 = ComponentArray(
-    k1=30.0,
-    km1=1.0,
-    k2=10.0,
-    ET=1.0
-)
-u0 = ComponentArray(
-    S=5.0,
-    ES=0.0,
-    P=0.0
-)
-tend = 1.0
-prob303 = ODEProblem(model303!, u0, tend, ps303)
+@time sol = solve(prob, Tsit5())
 
 #---
-@time sol = solve(prob303, Tsit5())
-
-#---
-fig303 = Figure()
-ax303 = Axis(
-    fig303[1, 1],
-    xlabel="Time",
-    ylabel="Concentration",
-    title="Fig. 3.03 (Full model)"
-)
-lines!(ax303, 0 .. tend, t -> sol(t).S, label="S")
-lines!(ax303, 0 .. tend, t -> sol(t).ES, label="ES")
-lines!(ax303, 0 .. tend, t -> sol(t).P, label="P")
-lines!(ax303, 0 .. tend, t -> _e303(sol(t), ps303, t), label="E")
-axislegend(ax303, position=:rt)
-
-fig303
+@unpack S, ES, P, E = prob.f.sys
+plot(sol, idxs=[S, ES, E, P], xlabel="Time", ylabel="Concentration", title="Fig. 3.03")
 
 # ## QSSA of ES complex
-_s303mm(u, p, t) = p.S0 - u.P
-function model303mm!(du, u, p, t)
-    @unpack k1, km1, k2, ET = p
-    @unpack P = u
-    S = _s303mm(u, p, t)
-    ES = (k1 * S * ET) / (km1 + k2 + k1 * S)
-    v2 = k2 * ES
-    du.P = v2
-    nothing
+function model303mm(s0=5; tend=1.0)
+    @parameters k1=30 km1=1 k2=10 ET=1 S0=s0
+    @variables P(t)=0.0 S(t)
+    eqs = [
+        S ~ S0 - P
+        D(P) ~ (k2 * k1 * S * ET) / (km1 + k2 + k1 * S)
+    ]
+    @mtkcompile sys = ODESystem(eqs, t)
+    return ODEProblem(sys, [], tend)
 end
 
-ps303mm = ComponentArray(ps303; S0=5.0)
-prob303mm = ODEProblem(model303mm!, ComponentArray(P=0.0), tend, ps303mm)
+@time prob303mm = model303mm()
 
 #---
 @time sol303mm = solve(prob303mm, Tsit5())
 
 #---
-fig303mm = Figure()
-ax303mm = Axis(
-    fig303mm[1, 1],
-    xlabel="Time",
-    ylabel="Concentration",
-    title="Fig. 3.03 (QSSA)"
-)
-lines!(ax303mm, 0 .. tend, t -> sol(t).S, label="S (full)", linestyle=:dash)
-lines!(ax303mm, 0 .. tend, t -> sol(t).P, label="P (full)", linestyle=:dash)
-lines!(ax303mm, 0 .. tend, t -> _s303mm(sol303mm(t), ps303mm, t), label="S (MM)")
-lines!(ax303mm, 0 .. tend, t -> sol303mm(t).P, label="P (MM)")
-axislegend(ax303mm, position=:rc)
-fig303mm
+plot(sol, idxs=[S, P], xlabel="Time", ylabel="Concentration", title="Fig. 3.03 (QSSA)", label=["S (full)" "P (full)"], linestyle=:dash)
+plot!(sol303mm, idxs=[S, P], label=["S (QSSA)" "P (QSSA)"], legend=:right)

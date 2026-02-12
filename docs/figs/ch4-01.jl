@@ -4,136 +4,92 @@
 Steady states and phase plots in an asymmetric network.
 ===#
 using OrdinaryDiffEq
-using ComponentArrays: ComponentArray
-using SimpleUnPack
-using CairoMakie
+using ModelingToolkit
+using ModelingToolkit: t_nounits as t, D_nounits as D
+using Plots
+Plots.gr(framestyle = :box)
+import PythonPlot as plt
 
-# The model for figure 4.1, 4.2, and 4.3.
-_dA401(A, B, p, t) = p.k1 / (1 + B^p.n) - (p.k3 + p.k5) * A
-_dB401(A, B, p, t) = p.k2 + p.k5 * A - p.k4 * B
-
-function model401!(D, u, p, t)
-    @unpack A, B = u
-    D.A = _dA401(A, B, p, t)
-    D.B = _dB401(A, B, p, t)
-    return nothing
+#---
+function model401(; tend = 1.5)
+    @parameters k1=20 k2=5 k3=5 k4=5 k5=2 n=4
+    @variables A(t)=0.0 B(t)=0.0
+    eqs = [
+        D(A) ~ k1 / (1 + B^n) - (k3 + k5) * A
+        D(B) ~ k2 + k5 * A - k4 * B
+    ]
+    @mtkcompile sys = ODESystem(eqs, t)
+    return ODEProblem(sys, [], tend)
 end
 
 # ## Fig 4.2 A
-tend = 1.5
-ps402a = ComponentArray(
-    k1 = 20.0,
-    k2 = 5.0,
-    k3 = 5.0,
-    k4 = 5.0,
-    k5 = 2.0,
-    n = 4.0
-)
-ics402a = ComponentArray(
-    A = 0.0,
-    B = 0.0
-)
-prob401 = ODEProblem(model401!, ics402a, tend, ps402a)
+@time prob402a = model401()
+
+@unpack A, B = prob402a.f.sys
 
 u0s = [
-    ComponentArray(
-        A = a,
-        B = b
-    ) for (a, b) in [
-    [0.0, 0.0],
-    [0.5, 0.6],
-    [0.17, 1.1],
-    [0.25, 1.9],
-    [1.85, 1.7]]
+    [A => 0.0, B => 0.0],
+    [A => 0.5, B => 0.6],
+    [A => 0.17, B => 1.1],
+    [A => 0.25, B => 1.9],
+    [A => 1.85, B => 1.7]
 ]
 
 #---
 @time sols = map(u0s) do u0
-    solve(remake(prob401, u0=u0), Tsit5())
+    solve(remake(prob402a, u0=u0), Tsit5())
 end
 
 #---
-fig = Figure()
-ax = Axis(fig[1, 1],
-    xlabel = "Time",
-    ylabel = "Concentration",
-    title = "Fig. 4.2 A\nTime series"
-)
-lines!(ax, 0..tend, t-> sols[1](t).A, label = "A")
-lines!(ax, 0..tend, t-> sols[1](t).B, label = "B")
-axislegend(ax, position = :rt)
+plot(sols[1], xlabel="Time", ylabel="Concentration", title="Fig. 4.2 A")
 fig
 
 # ## Fig. 4.2 B (Phase plot)
-fig = Figure(size = (600, 600))
-ax = Axis(fig[1, 1],
-    xlabel = "[A]",
-    ylabel = "[B]",
-    title = "Fig. 4.2 B\nPhase plot",
-    aspect = 1,
-)
-let ts = 0:0.01:tend
-    aa = [sols[1](t).A for t in ts]
-    bb = [sols[1](t).B for t in ts]
-    lines!(ax, aa, bb)
-end
-limits!(ax, 0.0, 2.0, 0.0, 2.0)
-fig
+plot(sols[1], idxs=(A, B), xlabel="[A]", ylabel="[B]", title="Fig. 4.2 B", aspect_ratio=1, size=(600, 600), xlims=(0, 2), ylims=(0, 2), legend=nothing)
+
 
 # ## Fig. 4.3 A (Multiple time series)
-fig = Figure()
-ax = Axis(fig[1, 1],
-    xlabel = "Time",
-    ylabel = "Concentration",
-    title = "Fig. 4.3A\nMultiple time series"
-)
+pl43 = plot(xlabel = "Time", ylabel = "Concentration", title = "Fig. 4.3 A")
+
 for sol in sols
-    lines!(ax, 0..tend, t-> sol(t).A, alpha=0.7)
-    lines!(ax, 0..tend, t-> sol(t).B, alpha=0.7)
+    plot!(pl43, sol, alpha=0.7, label=nothing)
 end
-fig
+
+pl43
 
 # ## Fig. 4.3 B (Phase plot)
-fig = Figure(size=(600, 600))
-ax = Axis(fig[1, 1],
-    xlabel = "[A]",
-    ylabel = "[B]",
-    title = "Fig. 4.3 B\nPhase plot",
-    aspect = 1,
-)
+pl43B = plot(xlabel="[A]", ylabel="[B]", title = "Fig. 4.3 B", aspect_ratio=1, size=(600, 600), xlims=(0, 2), ylims=(0, 2), legend=nothing)
+
 for sol in sols
-    ts = 0:0.01:tend
-    aa = [sol(t).A for t in ts]
-    bb = [sol(t).B for t in ts]
-    lines!(ax, aa, bb)
-end
-limits!(ax, 0.0, 2.0, 0.0, 2.0)
-fig
-
-# Let's sketch vector fields in phase plots
-∂F44 = function (x, y)
-    da = _dA401(x, y, ps402a, nothing)
-    db = _dB401(x, y, ps402a, nothing)
-    Point2d(da, db)
+    plot!(pl43B, sol, idxs=(A, B), label=nothing)
 end
 
-fig = Figure(size=(600, 600))
-ax = Axis(fig[1, 1],
-    xlabel = "[A]",
-    ylabel = "[B]",
-    title = "Fig. 4.4 A\nPhase plot with vector field",
-    aspect = 1,
-)
+pl43B
+# ## Fig. 4.4 A
+# Vector fields in phase plots
+∂F44 = prob402a.f
+ps402a = prob402a.p
+xx = collect(0:0.1:2)
+yy = collect(0:0.1:2)
+## X and Y velocities are reversed for streamplot in matplotlib
+U = [∂F44([x, y], ps402a, nothing)[2] for x in xx, y in yy]
+V = [∂F44([x, y], ps402a, nothing)[1] for x in xx, y in yy]
 
-streamplot!(ax, ∂F44, 0..2, 0..2)
+plt.figure(figsize=(6, 6))
+plt.quiver(xx, yy, U, V, hypot.(U, V))
 for sol in sols
-    ts = 0:0.01:tend
-    aa = [sol(t).A for t in ts]
-    bb = [sol(t).B for t in ts]
-    lines!(ax, aa, bb, color=:black)
+    ts = 0:0.01:1.5
+    aa = sol(ts, idxs=A)
+    bb = sol(ts, idxs=B)
+    plt.plot(aa, bb, color="black")
 end
-limits!(ax, 0.0, 2.0, 0.0, 2.0)
-fig
+plt.xlabel("[A]")
+plt.ylabel("[B]")
+plt.title("Fig. 4.4 A\nVector field in phase plot")
+plt.xlim(0, 2)
+plt.ylim(0, 2)
+plt.gcf()
+
 
 # ## Figure 4.5A
 fig = Figure(size=(600, 600))
