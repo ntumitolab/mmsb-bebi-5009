@@ -2,21 +2,14 @@
 # Fig 2.04
 Exponential decay
 ===#
-using CairoMakie
+using Plots
+Plots.pythonplot()
 
 #---
-fig = Figure()
-ax = Axis(
-    fig[1, 1],
-    xlabel="Time",
-    ylabel="Concentration",
-    title="Fig 2.4\nExponential Decay"
-)
+pl1 = plot(xlabel="Time", ylabel="Concentration", title="Fig 2.4\nExponential Decay")
 
 for k in 1:3
-    lines!(ax, 0 .. 5, t -> 3 * exp(-k * t), label="exp(-$(k)t)")
+    plot!(pl1, t -> 3 * exp(-k * t), 0, 5, label="exp(-$(k)t)")
 end
 
-axislegend(ax, position=:rt)
-
-fig
+pl1
