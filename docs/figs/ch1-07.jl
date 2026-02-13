@@ -31,4 +31,4 @@ end
 @time sol = solve(prob, Tsit5(); tstops=10:10:40)
 
 #---
-plot(sol, xlabel="Time", ylabel="Concentration", title="Fig. 1.7\nCollins Toggle Switch")
+plot(sol, xlabel="Time", ylabel="Concentration", title="Fig. 1.7")
