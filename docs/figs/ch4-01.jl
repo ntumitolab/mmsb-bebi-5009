@@ -66,75 +66,56 @@ end
 pl43B
 # ## Fig. 4.4 A
 # Vector fields in phase plots
-function plot_gradient(prob, xsym, ysym; maxlength=1, xmin=0, ymin=0, xmax=2, ymax=2, xstep=0.1, ystep=0.1, t = nothing, aspect_ratio=1, size=(600, 600), kwargs...)
+# Get gradient over an xy grid
+function get_gradient(prob, xsym, ysym; t = nothing, xrange=range(0, 2, 21), yrange=range(0, 2, 21))
     swap_or_not(x, y; xidx=1) = xidx == 1 ? [x, y] : [y, x]
-
     ∂F = prob.f
     ps = prob.p
     sys = prob.f.sys
     xidx = ModelingToolkit.variable_index(sys, xsym)
     yidx = ModelingToolkit.variable_index(sys, ysym)
-    ## Raw vector field
-    xx = [x for y in ymin:ystep:ymax, x in xmin:xstep:xmax]
-    yy = [y for y in ymin:ystep:ymax, x in xmin:xstep:xmax]
+    xx = [x for y in yrange, x in xrange]
+    yy = [y for y in yrange, x in xrange]
     dx = map((x, y) -> ∂F(swap_or_not(x, y; xidx), ps, t)[xidx], xx, yy)
     dy = map((x, y) -> ∂F(swap_or_not(x, y; xidx), ps, t)[yidx], xx, yy)
-    ## Normalize vector field
-    maxnorm = maximum(hypot.(dx, dy))
-    @. dx = dx / maxnorm * maxlength
-    @. dy = dy / maxnorm * maxlength
-    quiver(xx, yy, quiver=(dx, dy); aspect_ratio=aspect_ratio, size=size, xlims=(xmin, xmax), ylims=(ymin, ymax), kwargs...)
+    return (; xx, yy, dx, dy)
 end
 
-pl44a = plot_gradient(prob402a, s1, s2; maxlength=0.1, color=:lightblue)
+xrange = range(0, 2, 21)
+yrange = range(0, 2, 21)
+@unpack xx, yy, dx, dy = get_gradient(prob402a, s1, s2; t = nothing, xrange, yrange)
+
+## Normalize vector field
+maxnorm = maximum(hypot.(dx, dy))
+maxlength=0.1
+dxnorm = @. dx / maxnorm * maxlength
+dynorm = @. dy / maxnorm * maxlength
+
+pl44a = quiver(xx, yy, quiver=(dxnorm, dynorm); aspect_ratio=1, size=(600, 600), xlims=(0, 2), ylims=(0, 2), color=:gray)
 
 for sol in sols
-    plot!(pl44a, sol, idxs=(s1, s2), color=:black, label=nothing)
+    plot!(pl44a, sol, idxs=(s1, s2), label=nothing)
 end
 
 plot!(pl44a, title="Fig. 4.4 A", xlabel="[S1]", ylabel="[S2]")
 
 
 # ## Figure 4.5A
-fig = Figure(size=(600, 600))
-ax = Axis(fig[1, 1],
-    xlabel = "[A]",
-    ylabel = "[B]",
-    title = "Fig. 4.5 A\nPhase plot with nullclines",
-    aspect = 1,
-)
-
-## Phase plots
+# Phase plot with nullcline
+pl45a = contour(xrange, yrange, dx, levels=[0], cbar=false, aspect_ratio=1, size=(600, 600), color=:black)
+contour!(pl45a, xrange, yrange, dy, levels=[0], cbar=false, line=(:dash, :black))
+plot!(pl45a, [], [], line=(:black, :solid), label="A nullcline")
+plot!(pl45a, [], [], line=(:black, :dash), label="B nullcline")
 for sol in sols
-    ts = 0:0.01:tend
-    aa = [sol(t).A for t in ts]
-    bb = [sol(t).B for t in ts]
-    lines!(ax, aa, bb, color=:black)
+    plot!(pl45a, sol, idxs=(s1, s2), label=nothing)
 end
+plot!(pl45a, title="Fig. 4.5 A\nPhase plot with nullclines", xlabel="[S1]", ylabel="[S2]", xlims=(0, 2), ylims=(0, 2), legend=:bottomright)
 
-## nullclines
-xs = 0:0.01:2
-ys = 0:0.01:2
-zA44 = [_dA401(x, y, ps402a, nothing) for x in xs, y in ys]
-zB44 = [_dB401(x, y, ps402a, nothing) for x in xs, y in ys]
-contour!(ax, xs, ys, zA44, levels=[0], color=:black, linestyle=:solid, linewidth=2, label="A nullcline")
-contour!(ax, xs, ys, zB44, levels=[0], color=:black, linestyle=:dash, linewidth=2, label="B nullcline")
-limits!(ax, 0.0, 2.0, 0.0, 2.0)
-axislegend(ax, position = :rb)
-fig
 
 # ## Figure 4.5 B
-# Vector field
-fig = Figure(size=(600, 600))
-ax = Axis(fig[1, 1],
-    xlabel = "[A]",
-    ylabel = "[B]",
-    title = "Fig. 4.5 B\nVector field with nullclines",
-    aspect = 1,
-)
-## Nullclines
-contour!(ax, xs, ys, zA44, levels=[0], color=:black, linestyle=:solid, linewidth=2, label="A nullcline")
-contour!(ax, xs, ys, zB44, levels=[0], color=:black, linestyle=:dash, linewidth=2, label="B nullcline")
-streamplot!(ax, ∂F44, 0..2, 0..2)
-limits!(ax, 0.0, 2.0, 0.0, 2.0)
-fig
+# Vector field with nullclines
+pl45b = quiver(xx, yy, quiver=(dxnorm, dynorm); aspect_ratio=1, size=(600, 600), xlims=(0, 2), ylims=(0, 2), color=:gray)
+contour!(pl45b, xrange, yrange, dx, levels=[0], cbar=false, color=:black)
+contour!(pl45b, xrange, yrange, dy, levels=[0], cbar=false, line=(:dash, :black))
+plot!(pl45b, [], [], line=(:black, :solid), label="A nullcline")
+plot!(pl45b, [], [], line=(:black, :dash), label="B nullcline")
