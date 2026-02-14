@@ -9,37 +9,36 @@ using DiffEqCallbacks
 using SimpleUnPack
 using CairoMakie
 
-# Convenience functions
-hil(x, k) = x / (x + k)
-hil(x, k, n) = hil(x^n, k^n)
-exprel(x) = x / expm1(x)
-_mα(u, p, t) = exprel(-0.10 * (u.v + 35))
-_mβ(u, p, t) = 4.0 * exp(-(u.v + 60) / 18.0)
-_hα(u, p, t) = 0.07 * exp(-(u.v + 60) / 20)
-_hβ(u, p, t) = 1 / (exp(-(u.v + 30) / 10) + 1)
-_nα(u, p, t) = 0.1 * exprel(-0.1 * (u.v + 50))
-_nβ(u, p, t) = 0.125 * exp(-(u.v + 60) / 80)
-_iNa(u, p, t) = p.G_N_BAR * (u.v - p.E_N) * (u.m^3) * u.h
-_iK(u, p, t) = p.G_K_BAR * (u.v - p.E_K) * (u.n^4)
-_iLeak(u, p, t) = p.G_LEAK * (u.v - p.E_LEAK)
-
 # HH Neuron model
-function hh_neuron!(du, u, p, t)
+function hh_neuron(u, p, t)
+    exprel(x) = x / expm1(x)
     @unpack E_N, E_K, E_LEAK, G_N_BAR, G_K_BAR, G_LEAK, C_M, iStim = p
     @unpack v, m, h, n = u
-    mα = _mα(u, p, t)
-    mβ = _mβ(u, p, t)
-    hα = _hα(u, p, t)
-    hβ = _hβ(u, p, t)
-    nα = _nα(u, p, t)
-    nβ = _nβ(u, p, t)
-    iNa = _iNa(u, p, t)
-    iK = _iK(u, p, t)
-    iLeak = _iLeak(u, p, t)
-    du.v = -(iNa + iK + iLeak + iStim) / C_M
-    du.m = -(mα + mβ) * m + mα
-    du.h = -(hα + hβ) * h + hα
-    du.n = -(nα + nβ) * n + nα
+    ma = exprel(-0.10 * (v + 35))
+    mb = 4.0 * exp(-(v + 60) / 18.0)
+    ha = 0.07 * exp(-(v + 60) / 20)
+    hb = 1 / (exp(-(v + 30) / 10) + 1)
+    na = 0.1 * exprel(-0.1 * (v + 50))
+    nb = 0.125 * exp(-(v + 60) / 80)
+    iNa = G_N_BAR * (v - E_N) * (m^3) * h
+    iK = G_K_BAR * (v - E_K) * (n^4)
+    iLeak = G_LEAK * (v - E_LEAK)
+    return (;
+        dv = -(iNa + iK + iLeak + iStim) / C_M,
+        dm = -(ma + mb) * m + ma,
+        dh = -(ha + hb) * h + ha,
+        dn = -(na + nb) * n + na,
+        ma, mb, ha, hb, na, nb, iNa, iK, iLeak
+    )
+end
+
+# Inplace version of the HH neuron model
+function hh_neuron!(du, u, p, t)
+    @unpack dv, dm, dh, dn = hh_neuron(u, p, t)
+    du.v = dv
+    du.m = dm
+    du.h = dh
+    du.n = dn
     nothing
 end
 
@@ -63,30 +62,22 @@ u0 = ComponentArray(
 )
 
 tend = 100.0
-
 prob = ODEProblem(hh_neuron!, u0, tend, ps)
 
 # Callbacks for external current and solve the problem
-affect_stim_on1!(integrator) = integrator.p.iStim = -6.6
-affect_stim_off1!(integrator) = integrator.p.iStim = 0.0
-affect_stim_on2!(integrator) = integrator.p.iStim = -6.9
-affect_stim_off2!(integrator) = integrator.p.iStim = 0.0
-cb_stim_on1 = PresetTimeCallback(20.0, affect_stim_on1!)
-cb_stim_off1 = PresetTimeCallback(21.0, affect_stim_off1!)
-cb_stim_on2 = PresetTimeCallback(60.0, affect_stim_on2!)
-cb_stim_off2 = PresetTimeCallback(61.0, affect_stim_off2!)
-cbs = CallbackSet(cb_stim_on1, cb_stim_off1, cb_stim_on2, cb_stim_off2)
-@time sol = solve(prob, TRBDF2(), callback=cbs)
+cbs = let
+    affect_stim_on1!(integrator) = integrator.p.iStim = -6.6
+    affect_stim_off1!(integrator) = integrator.p.iStim = 0.0
+    affect_stim_on2!(integrator) = integrator.p.iStim = -6.9
+    affect_stim_off2!(integrator) = integrator.p.iStim = 0.0
+    cb_stim_on1 = PresetTimeCallback(20.0, affect_stim_on1!)
+    cb_stim_off1 = PresetTimeCallback(21.0, affect_stim_off1!)
+    cb_stim_on2 = PresetTimeCallback(60.0, affect_stim_on2!)
+    cb_stim_off2 = PresetTimeCallback(61.0, affect_stim_off2!)
+    cbs = CallbackSet(cb_stim_on1, cb_stim_off1, cb_stim_on2, cb_stim_off2)
+end
+
+@time sol = solve(prob, Tsit5(), callback=cbs)
 
 # Visualization
-fig = Figure()
-ax = Axis(
-    fig[1, 1],
-    xlabel="Time (ms)",
-    ylabel="Membrane potential (mV)",
-    title="Fig 1.9\nHodgkin-Huxley Neuron"
-)
-lines!(ax, 0 .. tend, t -> sol(t).v, label="v")
-axislegend(ax, position=:rt)
-
-fig
+fig, ax, sp = lines(0 .. tend, t -> sol(t).v, axis=(title="Fig 1.9\nHodgkin-Huxley Neuron", xlabel="Time (ms)", ylabel="Membrane potential (mV)"))
