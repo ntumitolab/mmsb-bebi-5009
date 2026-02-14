@@ -3,7 +3,7 @@
 Exponential decay
 ===#
 using Plots
-
+Plots.gr(framestyle = :box, linewidth=1.5)
 #---
 pl1 = plot(xlabel="Time", ylabel="Concentration", title="Fig 2.4\nExponential Decay")
 

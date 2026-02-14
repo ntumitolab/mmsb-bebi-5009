@@ -8,6 +8,7 @@ using DiffEqCallbacks
 using ModelingToolkit
 using ModelingToolkit: t_nounits as t, D_nounits as D
 using Plots
+Plots.gr(framestyle = :box, linewidth=1.5)
 
 #---
 function prob107(; tend = 50.0)

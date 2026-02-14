@@ -7,7 +7,7 @@ using OrdinaryDiffEq
 using ModelingToolkit
 using ModelingToolkit: t_nounits as t, D_nounits as D
 using Plots
-
+Plots.gr(framestyle = :box, linewidth=1.5)
 #---
 function prob209(; tend = 10.0)
     @parameters k1=3.0 k2=2.0 k3=2.5 k4=3.0 k5=4.0

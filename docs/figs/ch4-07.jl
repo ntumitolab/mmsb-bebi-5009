@@ -33,7 +33,6 @@ pl47_1 = plot(sol1, xlabel="Time", ylabel="Concentration", title= "Fig 4.7A")
 pl47_2 = plot(sol2, xlabel="Time", ylabel="Concentration")
 plot(pl47_1, pl47_2, layout=(2, 1))
 
-
 # ## Fig 4.7 B
 # Vector field with nullclines
 function get_gradient(prob, xsym, ysym; t = nothing, xrange=range(0, 2, 21), yrange=range(0, 2, 21))
@@ -70,11 +69,8 @@ plot!(pl47b, [], [], line=(:black, :dash), label="B nullcline")
 plot!(pl47b, title="Fig 4.7 B", xlabel="[A]", ylabel="[B]", legend=:topright)
 pl47b
 
-#===
-## Fig 4.8
-
-Symmetric parameter set
-===#
+# ## Fig 4.8
+# Symmetric parameter set
 @unpack k1, k2, k3, k4, n1, n2 = prob407.f.sys
 prob408 = remake(prob407, p=[k1=>20, k2=>20, k3=>5, k4=>5, n1=>4, n2=>4])
 
@@ -86,76 +82,55 @@ pl48_2 = plot(sol2, xlabel="Time", ylabel="Concentration")
 plot(pl48_1, pl48_2, layout=(2, 1))
 
 #---
+@unpack xx, yy, dx, dy = get_gradient(prob408, A, B; t = nothing, xrange=range(0, 5, 21), yrange=range(0, 5, 21))
+## Normalize vector field
+maxnorm = maximum(hypot.(dx, dy))
+maxlength=0.5
+dxnorm = @. dx / maxnorm * maxlength
+dynorm = @. dy / maxnorm * maxlength
+
+pl48b = quiver(xx, yy, quiver=(dxnorm, dynorm); aspect_ratio=1, size=(600, 600), xlims=(0, 5), ylims=(0, 5), color=:gray)
+
+## Finer resolution for nullclines
+xrange = range(0, 5, 51)
+yrange = range(0, 5, 51)
+@unpack xx, yy, dx, dy = get_gradient(prob408, A, B; t = nothing, xrange, yrange)
+contour!(pl48b, xrange, yrange, dx, levels=[0], cbar=false, line=(:black))
+contour!(pl48b, xrange, yrange, dy, levels=[0], cbar=false, line=(:dash, :black))
+plot!(pl48b, [], [], line=(:black, :solid), label="A nullcline")
+plot!(pl48b, [], [], line=(:black, :dash), label="B nullcline")
+plot!(pl48b, title="Fig 4.8 B", xlabel="[A]", ylabel="[B]", legend=:topright)
+pl48b
+
+# ## Fig 4.8 C
+# Around the unstable steady-state
+@unpack xx, yy, dx, dy = get_gradient(prob408, A, B; t = nothing, xrange=range(1.0, 1.5, 21), yrange=range(1.0, 1.5, 21))
+## Normalize vector field
+maxnorm = maximum(hypot.(dx, dy))
+maxlength=0.05
+dxnorm = @. dx / maxnorm * maxlength
+dynorm = @. dy / maxnorm * maxlength
+pl48c = quiver(xx, yy, quiver=(dxnorm, dynorm); aspect_ratio=1, size=(600, 600), xlims=(1, 1.5), ylims=(1, 1.5), color=:gray)
+
+contour!(pl48c, range(1.0, 1.5, 21), range(1.0, 1.5, 21), dx, levels=[0], cbar=false, line=(:black))
+contour!(pl48c, range(1.0, 1.5, 21), range(1.0, 1.5, 21), dy, levels=[0], cbar=false, line=(:dash, :black))
+plot!(pl48c, [], [], line=(:black, :solid), label="A nullcline")
+plot!(pl48c, [], [], line=(:black, :dash), label="B nullcline")
+plot!(pl48c, title="Fig 4.8 C", xlabel="[A]", ylabel="[B]", legend=:topright)
+pl48c
 
 
-∂F48 = function (x, y)
-    da = _dA407(x, y, ps408, nothing)
-    db = _dB407(x, y, ps408, nothing)
-    return Point2d(da, db)
-end
-zA48 = [_dA407(x, y, ps408, nothing) for x in xs, y in ys]
-zB48 = [_dB407(x, y, ps408, nothing) for x in xs, y in ys]
-
-#---
-fig = Figure(size=(600, 600))
-ax = Axis(fig[1, 1],
-    xlabel = "[A]",
-    ylabel = "[B]",
-    title = "Fig 4.8 B\nVector field with nullclines",
-    aspect = 1,
-)
-
-streamplot!(ax, ∂F48, 0..5, 0..5)
-contour!(ax, xs, ys, zA48, levels=[0], color=:black, label="A nullcline", linewidth=2, linestyle=:solid)
-contour!(ax, xs, ys, zB48, levels=[0], color=:black, label="B nullcline", linewidth=2, linestyle=:dash)
-limits!(ax, 0.0, 5.0, 0.0, 5.0)
-axislegend(ax, position = :rc)
-fig
-
-#===
-## Fig 4.8 C
-
-Around the unstable steady-state
-===#
-fig = Figure(size=(600, 600))
-ax = Axis(fig[1, 1],
-    xlabel = "[A]",
-    ylabel = "[B]",
-    title = "Fig 4.8 C\nClose-up of vector field with nullclines",
-    aspect = 1,
-)
-
-xs = 1.0:0.005:1.5
-ys = 1.0:0.005:1.5
-zA48c = [_dA407(x, y, ps408, nothing) for x in xs, y in ys]
-zB48c = [_dB407(x, y, ps408, nothing) for x in xs, y in ys]
-
-streamplot!(ax, ∂F48, 1.0..1.5, 1.0..1.5)
-contour!(ax, xs, ys, zA48c, levels=[0], color=:black, label="A nullcline", linewidth=2, linestyle=:solid)
-contour!(ax, xs, ys, zB48c, levels=[0], color=:black, label="B nullcline", linewidth=2, linestyle=:dash)
-limits!(ax, 1.0, 1.5, 1.0, 1.5)
-axislegend(ax, position = :rc)
-fig
-
-# Another way to draw nullclines is to find the analytical solutions for dA (or dB) is zero. And then sketch the nullclines in a parameteric plot.
+# ## Nullclines vs parameters
+# Another way to draw nullclines is to find the analytical solutions when dA (or dB) is zero. And then sketch the nullclines in a parameteric plot.
 nca47(b, p) = p.k1 / p.k3 / (1 + b^p.n1)
 ncb47(a, p) = p.k2 / p.k4 / (1 + a^p.n2)
 
-fig = Figure(size = (800, 800))
-for (i, k1) in enumerate((8.0, 16.0, 20.0, 35.0))
+axs = map((8.0, 16.0, 20.0, 35.0)) do k1
     ps = (k1=k1, k2=20., k3=5., k4=5., n1=4., n2=4.)
-    ax = Axis(fig[div(i-1,2)+1, mod(i-1,2)+1],
-        xlabel = "[A]",
-        ylabel = "[B]",
-        title = "K1 = $k1",
-        aspect = 1,
-    )
-    ts = 0:0.01:7
-    aa = nca47.(ts, Ref(ps))
-    bb = ncb47.(ts, Ref(ps))
-    lines!(ax, ts, aa, color=:red, label="Nullcline A")
-    lines!(ax, bb, ts, color=:blue, label="Nullcline B")
-    limits!(ax, 0, 7, 0, 7)
-    axislegend(ax, position = :rc)
+    pl = plot(t->nca47(t, ps), identity, 0, 7, color=:red, label="Nullcline A")
+    plot!(pl, identity, t->ncb47(t, ps), 0, 7, color=:blue, label="Nullcline B")
+    plot!(pl, title="K1 = $k1", xlabel="[A]", ylabel="[B]", xlims=(0, 7), ylims=(0, 7))
+    pl
 end
-fig
+
+plot(axs..., layout=(2, 2), size=(800, 800))

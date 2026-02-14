@@ -7,7 +7,7 @@ using OrdinaryDiffEq
 using ModelingToolkit
 using ModelingToolkit: t_nounits as t, D_nounits as D
 using Plots
-Plots.gr(framestyle = :box)
+Plots.gr(framestyle = :box, linewidth=1.5)
 
 # Enzyme kinetics full model
 function model303(; tend = 1.0)
