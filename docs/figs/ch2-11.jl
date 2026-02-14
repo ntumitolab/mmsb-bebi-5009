@@ -21,18 +21,8 @@ function model211!(du, u, p, t)
 end
 
 #---
-ps211 = ComponentArray(
-    k0=0.0,
-    k1=9.0,
-    km1=12.0,
-    k2=2.0
-)
-
-u0 = ComponentArray(
-    A=0.0,
-    B=10.0
-)
-
+ps211 = ComponentArray(k0=0.0, k1=9.0, km1=12.0, k2=2.0)
+u0 = ComponentArray(A=0.0, B=10.0)
 tend = 3.0
 prob211 = ODEProblem(model211!, u0, tend, ps211)
 
@@ -40,36 +30,30 @@ prob211 = ODEProblem(model211!, u0, tend, ps211)
 @time sol211 = solve(prob211, Tsit5())
 
 # Fig 2.11
-fig = Figure()
-ax = Axis(
-    fig[1, 1],
-    xlabel="Time",
-    ylabel="Concentration",
-    title="Fig. 2.11\nFull model"
-)
-lines!(ax, 0 .. tend, t -> sol211(t).A, label="A")
-lines!(ax, 0 .. tend, t -> sol211(t).B, label="B")
+ts = range(0, tend, length=100)
+us = Array(sol211(ts))
+fig, ax, sp = series(ts, us, labels=["A", "B"], axis=(xlabel="Time", ylabel="Concentration", title="Fig 2.11\nFull model"))
 axislegend(ax, position=:rt)
 fig
 
 # ## Figure 2.12
 # Rapid equilibrium assumption
-_a212(u, p, t) = u.C * p.km1 / (p.km1 + p.k1)
-_b212(u, p, t) = u.C * p.k1 / (p.km1 + p.k1)
-function model212!(du, u, p, t)
-    @unpack k0, k2 = p
+function model212(u, p, t)
+    @unpack k0, k1, km1, k2 = p
     @unpack C = u
-    A = _a212(u, p, t)
-    B = C - A
-    v0 = k0
-    v2 = k2 * B
-    du.C = v0 - v2
+    A = C * km1 / (km1 + k1)
+    B = C * k1 / (km1 + k1)
+    return (; A, B, dC = k0 - k2 * B)
+end
+function model212!(du, u, p, t)
+    @unpack dC = model212(u, p, t)
+    du.C = dC
     nothing
 end
 
 #---
 tend = 3.0
-u0212 = ComponentArray(C=sum(u0))
+u0212 = ComponentArray(C=10.0)
 prob212 = ODEProblem(model212!, u0212, tend, ps211)
 
 #---

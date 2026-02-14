@@ -1,8 +1,5 @@
-#===
-# Fig 2.09
-
-Metabolic network simulation
-===#
+# # Fig 2.09
+# Metabolic network simulation
 using OrdinaryDiffEq
 using ComponentArrays: ComponentArray
 using SimpleUnPack
@@ -25,19 +22,8 @@ function model209!(du, u, p, t)
 end
 
 # Setup problem
-ps = ComponentArray(
-    k1=3.0,
-    k2=2.0,
-    k3=2.5,
-    k4=3.0,
-    k5=4.0
-)
-u0 = ComponentArray(
-    A=0.0,
-    B=0.0,
-    C=0.0,
-    D=0.0
-)
+ps = ComponentArray(k1=3.0, k2=2.0, k3=2.5, k4=3.0, k5=4.0)
+u0 = ComponentArray(A=0.0, B=0.0, C=0.0, D=0.0)
 tend = 10.0
 prob = ODEProblem(model209!, u0, tend, ps)
 
@@ -45,17 +31,8 @@ prob = ODEProblem(model209!, u0, tend, ps)
 @time sol = solve(prob, Tsit5())
 
 # Visualize the results
-fig = Figure()
-ax = Axis(
-    fig[1, 1],
-    xlabel="Time",
-    ylabel="Concentration",
-    title="Fig 2.9\nMetabolic Network Simulation"
-)
-lines!(ax, 0 .. tend, t -> sol(t).A, label="A")
-lines!(ax, 0 .. tend, t -> sol(t).B, label="B")
-lines!(ax, 0 .. tend, t -> sol(t).C, label="C")
-lines!(ax, 0 .. tend, t -> sol(t).D, label="D")
+ts = range(0, tend, length=100)
+us = Array(sol(ts))
+fig, ax, sp = series(ts, us, labels=["A", "B", "C", "D"], axis=(title="Fig 2.9\nMetabolic Network Simulation", xlabel="Time", ylabel="Concentration"))
 axislegend(ax, position=:rb)
-
 fig
