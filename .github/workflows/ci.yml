@@ -12,13 +12,13 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  LITERATE_PROC: '4'
+  LITERATE_PROC: '2'
   JULIA_CI: 'true'
   JULIA_CONDAPKG_BACKEND: 'Null'
   JULIA_CONDAPKG_OFFLINE: 'true'
   JULIA_CPU_TARGET: 'generic;icelake-server,clone_all;znver3,clone_all'
-  JULIA_NUM_THREADS: '1'
-  # OPENBLAS_NUM_THREADS: '1'
+  JULIA_NUM_THREADS: '2'
+  OPENBLAS_NUM_THREADS: '1'
   NBCACHE: '.cache'
   PY_VER: '3.14'
 
