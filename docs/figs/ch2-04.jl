@@ -1,7 +1,5 @@
-#===
-# Fig 2.04
-Exponential decay
-===#
+# # Fig 2.04
+# Exponential decay
 using CairoMakie
 
 #---

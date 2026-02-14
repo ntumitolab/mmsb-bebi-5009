@@ -69,18 +69,14 @@ ax = Axis(
 
 lines!(ax, 0 .. tend, t -> sol211(t).A, label="A (full solution)", linestyle=:dash)
 lines!(ax, 0 .. tend, t -> sol211(t).B, label="B (full solution)", linestyle=:dash)
-lines!(ax, 0 .. tend, t -> _a212(sol212(t), ps211, t), label="A (rapid equilibrium)")
-lines!(ax, 0 .. tend, t -> _b212(sol212(t), ps211, t), label="B (rapid equilibrium)")
+lines!(ax, 0 .. tend, t -> model212(sol212(t), ps211, t).A, label="A (rapid equilibrium)")
+lines!(ax, 0 .. tend, t -> model212(sol212(t), ps211, t).B, label="B (rapid equilibrium)")
 axislegend(ax, position=:rt)
 fig
 
-#===
-## Figure 2.13
-
-Rapid equilibrium (take 2)
-
-When another set of parameters is not suitable for rapid equilibrium assumption.
-===#
+# ## Figure 2.13
+# Rapid equilibrium (take 2)
+# When another set of parameters is not suitable for rapid equilibrium assumption.
 
 ps213 = ComponentArray(k0=9.0, k1=20.0, km1=12.0, k2=2.0)
 u0 = ComponentArray(A=8.0, B=4.0)
@@ -98,16 +94,13 @@ ax = Axis(
 )
 lines!(ax, 0 .. tend, t -> sol213full(t).A, label="A (full solution)", linestyle=:dash)
 lines!(ax, 0 .. tend, t -> sol213full(t).B, label="B (full solution)", linestyle=:dash)
-lines!(ax, 0 .. tend, t -> _a212(sol213re(t), ps213, t), label="A (rapid equilibrium)")
-lines!(ax, 0 .. tend, t -> _b212(sol213re(t), ps213, t), label="B (rapid equilibrium)")
+lines!(ax, 0 .. tend, t -> model212(sol213re(t), ps213, t).A, label="A (rapid equilibrium)")
+lines!(ax, 0 .. tend, t -> model212(sol213re(t), ps213, t).B, label="B (rapid equilibrium)")
 axislegend(ax, position=:rt)
 fig
 
-#===
-## Figure 2.14 : QSSA
-
-Quasi-steady state assumption on species A
-===#
+# ## Figure 2.14 : QSSA
+# Quasi-steady state assumption on species A
 _a214(u, p, t) = (p.k0 + p.km1 * u.B) / p.k1
 _u0214(u0, p) = (p.k1 * u0 - p.k0) / (p.k1 + p.km1)
 function model214!(du, u, p, t)

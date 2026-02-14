@@ -23,7 +23,7 @@ ps = ComponentArray(a1=3.0, a2=2.5, β=4.0, γ=4.0, i1=0.0, i2=0.0)
 u0 = ComponentArray(s1=0.075, s2=2.5)
 prob = ODEProblem(collins!, u0, (0.0, tend), ps)
 
-#--- Callbacks and solve the problem
+# Callbacks and solve the problem
 cbs = let
     affect_i2_on!(integrator) = integrator.p.i2 = 10.0
     affect_i2_off!(integrator) = integrator.p.i2 = 0.0
@@ -38,7 +38,7 @@ end
 
 @time sol = solve(prob, Tsit5(), callback=cbs)
 
-#--- Visualization
+# Visualization
 ts = 0:0.1:tend
 data = Array(sol(ts; idxs=[1, 2]))
 fig, ax, sp = series(ts, data; labels=["s1", "s2"], axis=(title="Fig. 1.7", xlabel="Time", ylabel="Concentration"))
