@@ -1,9 +1,7 @@
-#===
-# Fig 4.11
-
-Surface plots
-===#
-using CairoMakie
+# # Fig 4.11
+# Surface plots
+using Plots
+Plots.gr(framestyle = :box, linewidth=1.5)
 
 #---
 z1(x, y) = x^2 + 0.5y^2
@@ -15,13 +13,8 @@ zz1 = [z1(x, y) for x in x1, y in y1]
 zz2 = [z2(x, y) for x in x2, y in y2];
 
 #---
-fig = Figure(resolution = (800, 600))
-ax1 = Axis3(fig[1, 1], title="Single-well potential")
-surface!(ax1, x1, y1, zz1, colormap = :viridis)
-ax2 = Axis(fig[2, 1], title="Single-well potential (contour)")
-contourf!(ax2, x1, y1, zz1, colormap = :viridis)
-ax3 = Axis3(fig[1, 2], title="Double-well potential")
-surface!(ax3, x2, y2, zz2, colormap = :viridis)
-ax4 = Axis(fig[2, 2], title="Double-well potential (contour)")
-contourf!(ax4, x2, y2, zz2, colormap = :viridis)
-fig
+pl1 = surface(x1, y1, zz1, title="Single-well potential", cbar=false)
+pl2 = contourf(x1, y1, zz1, title="Single-well potential (contour)", cbar=false)
+pl3 = surface(x2, y2, zz2, title="Double-well potential", cbar=false)
+pl4 = contourf(x2, y2, zz2, title="Double-well potential (contour)", cbar=false)
+plot(pl1, pl2, pl3, pl4, layout=(2, 2), size=(800, 800))

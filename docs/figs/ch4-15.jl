@@ -2,141 +2,106 @@
 # Oscillatory networks.
 # ## Figure 4.15 (A)
 using OrdinaryDiffEq
-using ComponentArrays: ComponentArray
-using SimpleUnPack
-using CairoMakie
-
-# The model
-_dA415(A, B, p, t) = p.k0 - p.k1 * A * (1 + B^p.n)
-_dB415(A, B, p, t) = p.k1 * A * (1 + B^p.n) - p.k2 * B
-function model415!(D, u, p, t)
-    @unpack A, B = u
-    D.A = _dA415(A, B, p, t)
-    D.B = _dB415(A, B, p, t)
-    nothing
+using ModelingToolkit
+using ModelingToolkit: t_nounits as t, D_nounits as D
+using Plots
+Plots.gr(framestyle = :box, linewidth=1.5)
+#---
+function model415(; tend=8.0)
+    @parameters k0=8.0 k1=1.0 k2=5.0 n=2.0
+    @variables A(t)=1.5 B(t)=1.0
+    vAB = k1 * A * (1 + B^n)
+    eqs = [
+        D(A) ~ k0 - vAB
+        D(B) ~ vAB - k2 * B
+    ]
+    @mtkcompile sys = ODESystem(eqs, t)
+    return ODEProblem(sys, [], tend)
 end
+@time prob415 = model415()
 
 #---
-ps415 = ComponentArray(
-    k0 = 8.0,
-    k1 = 1.0,
-    k2 = 5.0,
-    n = 2.0
-)
-u0415 = ComponentArray(
-    A = 1.5,
-    B = 1.0
-)
-
-tend = 8.0
-prob415 = ODEProblem(model415!, u0415, (0.0, tend), ps415)
-
-#---
+@unpack A, B = prob415.f.sys
 u0s = [
-    ComponentArray(A=1.5, B=1.0),
-    ComponentArray(A=0.0, B=1.0),
-    ComponentArray(A=0.0, B=3.0),
-    ComponentArray(A=2.0, B=0.0),
+    [A=>1.5, B=>1.0],
+    [A=>0.0, B=>1.0],
+    [A=>0.0, B=>3.0],
+    [A=>2.0, B=>0.0],
 ]
 
 @time sols = map(u0s) do u0
     solve(remake(prob415, u0=u0), Tsit5())
 end
 
-fig = Figure()
-ax = Axis(fig[1, 1],
-    xlabel = "Time",
-    ylabel = "Concentration",
-    title = "Fig. 4.15 A\nTime series"
-)
-lines!(ax, 0..tend, t-> sols[1](t).A, label = "A")
-lines!(ax, 0..tend, t-> sols[1](t).B, label = "B")
-axislegend(ax, position = :rt)
-fig
+plot(sols[1], xlabel="Time", ylabel="Concentration", title="Fig. 4.15 A")
 
 # ## Fig 4.15 (B)
-∂F415  = function (x, y)
-    da = _dA415(x, y, ps415, nothing)
-    db = _dB415(x, y, ps415, nothing)
-    return Point2d(da, db)
+# Vector field with nullclines
+function get_gradient(prob, xsym, ysym; t = nothing, xrange=range(0, 2, 21), yrange=range(0, 2, 21))
+    swap_or_not(x, y; xidx=1) = xidx == 1 ? [x, y] : [y, x]
+    ∂F = prob.f
+    ps = prob.p
+    sys = prob.f.sys
+    xidx = ModelingToolkit.variable_index(sys, xsym)
+    yidx = ModelingToolkit.variable_index(sys, ysym)
+    xx = [x for y in yrange, x in xrange]
+    yy = [y for y in yrange, x in xrange]
+    dx = map((x, y) -> ∂F(swap_or_not(x, y; xidx), ps, t)[xidx], xx, yy)
+    dy = map((x, y) -> ∂F(swap_or_not(x, y; xidx), ps, t)[yidx], xx, yy)
+    return (; xx, yy, dx, dy)
 end
 
-## Grid points
-xx = 0:0.01:4
-yy = 0:0.01:4
-ts = 0:0.05:tend
-∂A415 = [_dA415(x, y, ps415, nothing) for x in xx, y in yy]
-∂B415 = [_dB415(x, y, ps415, nothing) for x in xx, y in yy]
+@unpack xx, yy, dx, dy = get_gradient(prob415, A, B; t = nothing, xrange=range(0, 4, 21), yrange=range(0, 4, 21))
 
-fig = Figure(size=(600, 600))
-ax = Axis(fig[1, 1],
-    xlabel = "[A]",
-    ylabel = "[B]",
-    title = "Fig. 4.15 B\nPhase plot",
-    aspect = 1,
-)
-streamplot!(ax, ∂F415, xx, yy)
+## Normalize vector field
+maxnorm = maximum(hypot.(dx, dy))
+maxlength=0.7
+dxnorm = @. dx / maxnorm * maxlength
+dynorm = @. dy / maxnorm * maxlength
 
-for sol in sols
-    aa = [sol(t).A for t in ts]
-    bb = [sol(t).B for t in ts]
-    lines!(ax, aa, bb, color=:tomato)
-end
-limits!(ax, 0.0, 4.0, 0.0, 4.0)
-contour!(ax, xx, yy, ∂A415, levels=[0], color=:black, linestyle=:solid, linewidth=2, label="A nullcline")
-contour!(ax, xx, yy, ∂B415, levels=[0], color=:black, linestyle=:dash, linewidth=2, label="B nullcline")
-axislegend(ax, position = :rb)
-fig
+pl415b = quiver(xx, yy, quiver=(dxnorm, dynorm); aspect_ratio=1, size=(600, 600), xlims=(0, 4), ylims=(0, 4), color=:gray)
+
+## Finer resolution for nullclines
+xrange = range(0, 4, 51)
+yrange = range(0, 4, 51)
+@unpack xx, yy, dx, dy = get_gradient(prob415, A, B; t = nothing, xrange, yrange)
+
+contour!(pl415b, xrange, yrange, dx, levels=[0], cbar=false, line=(:black))
+contour!(pl415b, xrange, yrange, dy, levels=[0], cbar=false, line=(:dash, :black))
+plot!(pl415b, [], [], line=(:black, :solid), label="A nullcline")
+plot!(pl415b, [], [], line=(:black, :dash), label="B nullcline")
+plot!(pl415b, title="Fig 4.15 B", xlabel="[A]", ylabel="[B]", legend=:topright)
+pl415b
 
 #===
 ## Fig 4.16 A
 
 Oscillatory parameter set
 ===#
-ps416 = ComponentArray(
-    k0 = 8.0,
-    k1 = 1.0,
-    k2 = 5.0,
-    n = 2.5
-)
-
-tend = 100.0
+@unpack n = prob415.f.sys
+prob416 = remake(prob415, p=[n=>2.5])
 u0s = [
-    ComponentArray(A=1.5, B=1.0),
-    ComponentArray(A=0.0, B=1.0),
-    ComponentArray(A=0.0, B=3.0),
-    ComponentArray(A=2.0, B=0.0),
+    [A=>1.5, B=>1.0],
+    [A=>0.0, B=>1.0],
+    [A=>0.0, B=>3.0],
+    [A=>2.0, B=>0.0],
 ]
-
-prob416 = ODEProblem(model415!, u0415, tend, ps416)
 
 @time sols = map(u0s) do u0
     solve(remake(prob416, u0=u0), Tsit5())
 end
 
-fig = Figure()
-ax = Axis(fig[1, 1],
-    xlabel = "Time",
-    ylabel = "Concentration",
-    title = "Fig. 4.16 A\nTime series"
-)
-lines!(ax, 0..8, t-> sols[1](t).A, label = "A")
-lines!(ax, 0..8, t-> sols[1](t).B, label = "B")
-axislegend(ax, position = :rt)
-fig
+plot(sols[1], xlabel="Time", ylabel="Concentration", title="Fig. 4.16 A")
 
 # ## Fig 4.16 b
-∂F416 = function (x, y)
-    da = _dA415(x, y, ps416, nothing)
-    db = _dB415(x, y, ps416, nothing)
-    return Point2d(da, db)
-end
+@unpack xx, yy, dx, dy = get_gradient(prob416, A, B; t = nothing, xrange=range(0, 4, 21), yrange=range(0, 4, 21))
 
-xx = 0:0.01:4
-yy = 0:0.01:4
-
-∂A416 = [_dA415(x, y, ps416, nothing) for x in xx, y in yy]
-∂B416 = [_dB415(x, y, ps416, nothing) for x in xx, y in yy];
+## Normalize vector field
+maxnorm = maximum(hypot.(dx, dy))
+maxlength=0.7
+dxnorm = @. dx / maxnorm * maxlength
+dynorm = @. dy / maxnorm * maxlength
+pl416b = quiver(xx, yy, quiver=(dxnorm, dynorm); aspect_ratio=1, size=(600, 600), xlims=(0, 4), ylims=(0, 4), color=:gray)
 
 fig = Figure(size=(600, 600))
 ax = Axis(fig[1, 1],
