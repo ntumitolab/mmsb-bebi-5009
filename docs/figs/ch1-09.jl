@@ -4,43 +4,89 @@
 Hodgkin-Huxley model
 ===#
 using OrdinaryDiffEq
-using ModelingToolkit
-using ModelingToolkit: t_nounits as t, D_nounits as D
-using Plots
-Plots.gr(framestyle = :box, linewidth=1.5)
-#---
-function prob109(; tend = 100.0)
-    ## Convenience functions
-    hil(x, k) = x / (x + k)
-    hil(x, k, n) = hil(x^n, k^n)
-    exprel(x) = x / expm1(x)
-    @parameters E_N=55 E_K=-72 E_LEAK=-49 G_N_BAR=120 G_K_BAR=36 G_LEAK=0.30 C_M=1
-    @variables v(t)=-59.8977 m(t)=0.0536 h(t)=0.5925 n(t)=0.3192
-    @variables mα(t) mβ(t) hα(t) hβ(t) nα(t) nβ(t) iNa(t) iK(t) iLeak(t) iStim(t)
-    eqs = [
-        mα ~ exprel(-0.10 * (v + 35))
-        mβ ~ 4.0 * exp(-(v + 60) / 18)
-        hα ~ 0.07 * exp(-(v + 60) / 20)
-        hβ ~ 1 / (exp(-(v + 30) / 10) + 1)
-        nα ~ 0.1 * exprel(-0.1 * (v + 50))
-        nβ ~ 0.125 * exp(-(v + 60) / 80)
-        iNa ~ G_N_BAR * (v - E_N) * (m^3) * h
-        iK ~ G_K_BAR * (v - E_K) * (n^4)
-        iLeak ~ G_LEAK * (v - E_LEAK)
-        iStim ~ -6.6 * (20 < t) * (t < 21) - 8.0 * (60 < t) * (t < 61)
-        D(v) ~ -(iNa + iK + iLeak + iStim) / C_M
-        D(m) ~ -(mα + mβ) * m + mα
-        D(h) ~ -(hα + hβ) * h + hα
-        D(n) ~ -(nα + nβ) * n + nα
-    ]
-    @mtkcompile sys = ODESystem(eqs, t)
-    return ODEProblem(sys, [], tend)
+using ComponentArrays: ComponentArray
+using DiffEqCallbacks
+using SimpleUnPack
+using CairoMakie
+
+# Convenience functions
+hil(x, k) = x / (x + k)
+hil(x, k, n) = hil(x^n, k^n)
+exprel(x) = x / expm1(x)
+_mα(u, p, t) = exprel(-0.10 * (u.v + 35))
+_mβ(u, p, t) = 4.0 * exp(-(u.v + 60) / 18.0)
+_hα(u, p, t) = 0.07 * exp(-(u.v + 60) / 20)
+_hβ(u, p, t) = 1 / (exp(-(u.v + 30) / 10) + 1)
+_nα(u, p, t) = 0.1 * exprel(-0.1 * (u.v + 50))
+_nβ(u, p, t) = 0.125 * exp(-(u.v + 60) / 80)
+_iNa(u, p, t) = p.G_N_BAR * (u.v - p.E_N) * (u.m^3) * u.h
+_iK(u, p, t) = p.G_K_BAR * (u.v - p.E_K) * (u.n^4)
+_iLeak(u, p, t) = p.G_LEAK * (u.v - p.E_LEAK)
+
+# HH Neuron model
+function hh_neuron!(du, u, p, t)
+    @unpack E_N, E_K, E_LEAK, G_N_BAR, G_K_BAR, G_LEAK, C_M, iStim = p
+    @unpack v, m, h, n = u
+    mα = _mα(u, p, t)
+    mβ = _mβ(u, p, t)
+    hα = _hα(u, p, t)
+    hβ = _hβ(u, p, t)
+    nα = _nα(u, p, t)
+    nβ = _nβ(u, p, t)
+    iNa = _iNa(u, p, t)
+    iK = _iK(u, p, t)
+    iLeak = _iLeak(u, p, t)
+    du.v = -(iNa + iK + iLeak + iStim) / C_M
+    du.m = -(mα + mβ) * m + mα
+    du.h = -(hα + hβ) * h + hα
+    du.n = -(nα + nβ) * n + nα
+    nothing
 end
 
-@time prob = prob109()
+# Problem definition
+ps = ComponentArray(
+    E_N=55.0,       ## Reversal potential of Na (mV)
+    E_K=-72.0,      ## Reversal potential of K (mV)
+    E_LEAK=-49.0,   ## Reversal potential of leaky channels (mV)
+    G_N_BAR=120.0,  ## Max. Na channel conductance (mS/cm^2)
+    G_K_BAR=36.0,   ## Max. K channel conductance (mS/cm^2)
+    G_LEAK=0.30,    ## Max. leak channel conductance (mS/cm^2)
+    C_M=1.0,        ## membrane capacitance (uF/cm^2))
+    iStim=0.0       ## stimulation current
+)
 
-#---
-@time sol = solve(prob, KenCarp47(), tstops=[20, 21, 60, 61])
+u0 = ComponentArray(
+    v=-59.8977,
+    m=0.0536,
+    h=0.5925,
+    n=0.3192,
+)
+
+tend = 100.0
+
+prob = ODEProblem(hh_neuron!, u0, tend, ps)
+
+# Callbacks for external current and solve the problem
+affect_stim_on1!(integrator) = integrator.p.iStim = -6.6
+affect_stim_off1!(integrator) = integrator.p.iStim = 0.0
+affect_stim_on2!(integrator) = integrator.p.iStim = -6.9
+affect_stim_off2!(integrator) = integrator.p.iStim = 0.0
+cb_stim_on1 = PresetTimeCallback(20.0, affect_stim_on1!)
+cb_stim_off1 = PresetTimeCallback(21.0, affect_stim_off1!)
+cb_stim_on2 = PresetTimeCallback(60.0, affect_stim_on2!)
+cb_stim_off2 = PresetTimeCallback(61.0, affect_stim_off2!)
+cbs = CallbackSet(cb_stim_on1, cb_stim_off1, cb_stim_on2, cb_stim_off2)
+@time sol = solve(prob, TRBDF2(), callback=cbs)
 
 # Visualization
-plot(sol, idxs= prob.f.sys.v, xlabel="Time", ylabel="Voltage (mV)", title="Fig. 1.9\nHodgkin-Huxley Model")
+fig = Figure()
+ax = Axis(
+    fig[1, 1],
+    xlabel="Time (ms)",
+    ylabel="Membrane potential (mV)",
+    title="Fig 1.9\nHodgkin-Huxley Neuron"
+)
+lines!(ax, 0 .. tend, t -> sol(t).v, label="v")
+axislegend(ax, position=:rt)
+
+fig
