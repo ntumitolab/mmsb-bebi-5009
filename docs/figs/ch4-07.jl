@@ -6,34 +6,24 @@ using SimpleUnPack
 using CairoMakie
 
 # Model
-_dA407(A, B, p, t) = p.k1 / (1 + B^p.n1) - p.k3 * A
-_dB407(A, B, p, t) = p.k2 / (1 + A^p.n2) - p.k4 * B
-function model407!(D, u, p, t)
+function model407(u, p, t)
     @unpack A, B = u
-    D.A = _dA407(A, B, p, t)
-    D.B = _dB407(A, B, p, t)
+    @unpack k1, k2, k3, k4, n1, n2 = p
+    dA = k1 / (1 + B^n1) - k3 * A
+    dB = k2 / (1 + A^n2) - k4 * B
+    return (; dA, dB)
+end
+function model407!(D, u, p, t)
+    @unpack dA, dB = model407(u, p, t)
+    D.A = dA
+    D.B = dB
     nothing
 end
 
-#===
-## Fig 4.7 A
-
-Asymmetric parameter set
-===#
-ps407 = ComponentArray(
-    k1 = 20.0,
-    k2 = 20.0,
-    k3 = 5.0,
-    k4 = 5.0,
-    n1 = 4.0,
-    n2 = 1.0
-)
-
-ics407 = ComponentArray(
-    A = 3.0,
-    B = 1.0
-)
-
+# ## Fig 4.7 A
+# Asymmetric parameter set
+ps407 = ComponentArray(k1 = 20.0,k2 = 20.0,k3 = 5.0,k4 = 5.0, n1 = 4.0, n2 = 1.0)
+ics407 = ComponentArray( A = 3.0, B = 1.0)
 tend = 4.0
 prob407 = ODEProblem(model407!, ics407, (0.0, tend), ps407)
 #---
@@ -53,15 +43,9 @@ fig
 # ## Fig 4.7 B
 # Vector field with nullclines
 ∂F47 = function (x, y)
-    da = _dA407(x, y, ps407, nothing)
-    db = _dB407(x, y, ps407, nothing)
-    return Point2d(da, db)
+    @unpack dA, dB = model407((; A=x, B=y), ps407, nothing)
+    return Point2d(dA, dB)
 end
-
-xs = 0:0.01:5
-ys = 0:0.01:5
-zA47 = [_dA407(x, y, ps407, nothing) for x in xs, y in ys]
-zB47 = [_dB407(x, y, ps407, nothing) for x in xs, y in ys]
 
 fig = Figure(size=(600, 600))
 ax = Axis(fig[1, 1],
@@ -72,8 +56,12 @@ ax = Axis(fig[1, 1],
 )
 
 ## Nullclines
-contour!(ax, xs, ys, zA47, levels=[0], color=:black, label="A nullcline", linewidth=2, linestyle=:solid)
-contour!(ax, xs, ys, zB47, levels=[0], color=:black, label="B nullcline", linewidth=2, linestyle=:dash)
+let xrange = 0:0.01:5, yrange = 0:0.01:5
+    zA47 = [model407((; A=x, B=y), ps407, nothing).dA for x in xrange, y in yrange]
+    zB47 = [model407((; A=x, B=y), ps407, nothing).dB for x in xrange, y in yrange]
+    contour!(ax, xrange, yrange, zA47, levels=[0], color=:black, label="A nullcline", linewidth=2, linestyle=:solid)
+    contour!(ax, xrange, yrange, zB47, levels=[0], color=:black, label="B nullcline", linewidth=2, linestyle=:dash)
+end
 
 ## Vector field
 streamplot!(ax, ∂F47, 0..5, 0..5)
@@ -81,25 +69,10 @@ limits!(ax, 0.0, 5.0, 0.0, 5.0)
 axislegend(ax, position = :rc)
 fig
 
-#===
-## Fig 4.8
-
-Symmetric parameter set
-===#
-ps408 = ComponentArray(
-    k1 = 20.0,
-    k2 = 20.0,
-    k3 = 5.0,
-    k4 = 5.0,
-    n1 = 4.0,
-    n2 = 4.0
-)
-
-ics408 = ComponentArray(
-    A = 3.0,
-    B = 1.0
-)
-
+# ## Fig 4.8
+# Symmetric parameter set
+ps408 = ComponentArray(k1 = 20.0, k2 = 20.0, k3 = 5.0, k4 = 5.0, n1 = 4.0, n2 = 4.0)
+ics408 = ComponentArray(A = 3.0, B = 1.0)
 tend = 4.0
 prob408 = ODEProblem(model407!, ics408, (0.0, tend), ps408)
 
@@ -119,12 +92,9 @@ fig
 
 #---
 ∂F48 = function (x, y)
-    da = _dA407(x, y, ps408, nothing)
-    db = _dB407(x, y, ps408, nothing)
-    return Point2d(da, db)
+    @unpack dA, dB = model407((; A=x, B=y), ps408, nothing)
+    return Point2d(dA, dB)
 end
-zA48 = [_dA407(x, y, ps408, nothing) for x in xs, y in ys]
-zB48 = [_dB407(x, y, ps408, nothing) for x in xs, y in ys]
 
 #---
 fig = Figure(size=(600, 600))
@@ -135,18 +105,19 @@ ax = Axis(fig[1, 1],
     aspect = 1,
 )
 
+let xs = 0.0:0.01:5.0, ys = 0.0:0.01:5.0
+    zA48 = [model407((; A=x, B=y), ps408, nothing).dA for x in xs, y in ys]
+    zB48 = [model407((; A=x, B=y), ps408, nothing).dB for x in xs, y in ys]
+    contour!(ax, xs, ys, zA48, levels=[0], color=:black, label="A nullcline", linewidth=2, linestyle=:solid)
+    contour!(ax, xs, ys, zB48, levels=[0], color=:black, label="B nullcline", linewidth=2, linestyle=:dash)
+end
 streamplot!(ax, ∂F48, 0..5, 0..5)
-contour!(ax, xs, ys, zA48, levels=[0], color=:black, label="A nullcline", linewidth=2, linestyle=:solid)
-contour!(ax, xs, ys, zB48, levels=[0], color=:black, label="B nullcline", linewidth=2, linestyle=:dash)
 limits!(ax, 0.0, 5.0, 0.0, 5.0)
 axislegend(ax, position = :rc)
 fig
 
-#===
-## Fig 4.8 C
-
-Around the unstable steady-state
-===#
+# ## Fig 4.8 C
+# Around the unstable steady-state
 fig = Figure(size=(600, 600))
 ax = Axis(fig[1, 1],
     xlabel = "[A]",
@@ -155,14 +126,13 @@ ax = Axis(fig[1, 1],
     aspect = 1,
 )
 
-xs = 1.0:0.005:1.5
-ys = 1.0:0.005:1.5
-zA48c = [_dA407(x, y, ps408, nothing) for x in xs, y in ys]
-zB48c = [_dB407(x, y, ps408, nothing) for x in xs, y in ys]
-
+let xs = 1.0:0.005:1.5, ys = 1.0:0.005:1.5
+    zA48 = [model407((; A=x, B=y), ps408, nothing).dA for x in xs, y in ys]
+    zB48 = [model407((; A=x, B=y), ps408, nothing).dB for x in xs, y in ys]
+    contour!(ax, xs, ys, zA48, levels=[0], color=:black, label="A nullcline", linewidth=2, linestyle=:solid)
+    contour!(ax, xs, ys, zB48, levels=[0], color=:black, label="B nullcline", linewidth=2, linestyle=:dash)
+end
 streamplot!(ax, ∂F48, 1.0..1.5, 1.0..1.5)
-contour!(ax, xs, ys, zA48c, levels=[0], color=:black, label="A nullcline", linewidth=2, linestyle=:solid)
-contour!(ax, xs, ys, zB48c, levels=[0], color=:black, label="B nullcline", linewidth=2, linestyle=:dash)
 limits!(ax, 1.0, 1.5, 1.0, 1.5)
 axislegend(ax, position = :rc)
 fig
@@ -183,8 +153,8 @@ for (i, k1) in enumerate((8.0, 16.0, 20.0, 35.0))
     ts = 0:0.01:7
     aa = nca47.(ts, Ref(ps))
     bb = ncb47.(ts, Ref(ps))
-    lines!(ax, ts, aa, color=:red, label="Nullcline A")
-    lines!(ax, bb, ts, color=:blue, label="Nullcline B")
+    lines!(ax, aa, ts, color=:red, label="Nullcline A")
+    lines!(ax, ts, bb, color=:blue, label="Nullcline B")
     limits!(ax, 0, 7, 0, 7)
     axislegend(ax, position = :rc)
 end
