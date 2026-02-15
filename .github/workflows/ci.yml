@@ -60,7 +60,6 @@ jobs:
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' }}
       with:
         version: ${{ steps.julia-version.outputs.value }}
-        arch: ${{ runner.arch }}
     - name: Restore Julia packages
       uses: actions/cache/restore@v5
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' && runner.environment == 'github-hosted'}}
