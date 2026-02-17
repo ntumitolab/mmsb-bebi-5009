@@ -1,8 +1,5 @@
-#===
-# Fig 5.10, 5.11
-
-Methionine model
-===#
+# # Fig 5.10, 5.11
+# Methionine model
 using ComponentArrays: ComponentArray
 using OrdinaryDiffEq
 using SimpleUnPack
@@ -58,10 +55,7 @@ ps510 = ComponentArray(
     alpha_d = 1333.0
 )
 
-ics510 = ComponentArray(
-    AdoMet = 10.0,
-    AdoHcy = 10.0
-)
+ics510 = ComponentArray(AdoMet = 10.0, AdoHcy = 10.0)
 
 # ## Figure 5.10
 tend = 5.0
@@ -83,9 +77,8 @@ fig
 # ## Figure 5.11 A
 xx = range(0, 1200, 101)
 yy = range(0, 6, 101)
-
-∂A1 = [model510(ComponentArray(AdoMet=x, AdoHcy=y), ps510, nothing)[1] for x in xx, y in yy]
-∂B1 = [model510(ComponentArray(AdoMet=x, AdoHcy=y), ps510, nothing)[2] for x in xx, y in yy]
+∂A1 = [model510((;AdoMet=x, AdoHcy=y), ps510, nothing)[1] for x in xx, y in yy]
+∂B1 = [model510((;AdoMet=x, AdoHcy=y), ps510, nothing)[2] for x in xx, y in yy]
 ∂F1 = function (x, y)
     da, db = model510((; AdoMet = x, AdoHcy = y), ps510, nothing)
     return Point2d(da, db)

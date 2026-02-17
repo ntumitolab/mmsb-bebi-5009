@@ -1,8 +1,5 @@
-#===
-# Fig 4.22
-
-Tangent line.
-===#
+# # Fig 4.22
+# Tangent line.
 using CairoMakie
 
 # The curve
