@@ -74,6 +74,7 @@ jobs:
       shell: julia --color=yes --project=@. {0}
       run: |
         using Pkg, Dates
+        Pkg.Registry.update()
         Pkg.instantiate()
         Pkg.resolve()
         Pkg.precompile()
