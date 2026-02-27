@@ -12,19 +12,19 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  LITERATE_PROC: '2'
+  LITERATE_PROC: '6'
   JULIA_CI: 'true'
   JULIA_CONDAPKG_BACKEND: 'Null'
   JULIA_CONDAPKG_OFFLINE: 'true'
   JULIA_CPU_TARGET: 'generic;znver3,clone_all'
-  JULIA_NUM_THREADS: '2,0'
+  JULIA_NUM_THREADS: '2'
   OPENBLAS_NUM_THREADS: '1'
   NBCACHE: '.cache'
   PY_VER: '3.14'
 
 jobs:
-  CI:
-    runs-on: ubuntu-latest
+  execute:
+    runs-on: self-hosted
     steps:
     - name: Checkout repository
       uses: actions/checkout@v6
@@ -60,6 +60,7 @@ jobs:
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' }}
       with:
         version: ${{ steps.julia-version.outputs.value }}
+        arch: ${{ runner.arch }}
     - name: Restore Julia packages
       uses: actions/cache/restore@v5
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' && runner.environment == 'github-hosted'}}
@@ -78,9 +79,12 @@ jobs:
         Pkg.instantiate()
         Pkg.resolve()
         Pkg.precompile()
+        Pkg.activate()
+        Pkg.add(["JSON", "Literate", "MarkdownTables", "SHA", "Tables"])
         if ENV["RUNNER_ENVIRONMENT"] == "github-hosted"
             Pkg.gc(;collect_delay=Day(0))
         end
+        using Literate
     - name: Save Julia packages
       uses: actions/cache/save@v5
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' && runner.environment == 'github-hosted' && steps.cache-julia.outputs.cache-hit != 'true' }}
@@ -90,6 +94,23 @@ jobs:
     - name: Run notebooks
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' }}
       run: julia --project=@. --color=yes -p ${{ env.LITERATE_PROC }} .github/ci.jl
+    - name: Upload Notebook
+      uses: actions/upload-artifact@v6
+      with:
+        name: notebooks
+        path: ${{ env.NBCACHE }}
+        include-hidden-files: true
+  render:
+    needs: execute
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v6
+    - name: Download notebooks
+      uses: actions/download-artifact@v7
+      with:
+        name: notebooks
+        path: ${{ env.NBCACHE }}/
     - name: Copy back built notebooks
       run: cp --verbose -rf ${{ env.NBCACHE }}/docs/* docs/
     - name: Setup NodeJS
@@ -107,11 +128,24 @@ jobs:
       uses: actions/upload-pages-artifact@v4
       with:
         path: './_build/html'
-
+  # CI conclusion for GitHub status check
+  CI:
+    needs: render
+    if: always()
+    runs-on: ubuntu-slim
+    steps:
+      - run: |
+          if [[ ${{ needs.render.result }} == "success" ]]; then
+            echo "Tests passed"
+            exit 0
+          else
+            echo "Tests failed"
+            exit 1
+          fi
   # Deployment job
   deploy:
     name: Deploy to GitHub pages and Notebook branch
-    needs: CI
+    needs: render
     if: ${{ github.ref == 'refs/heads/main' }}
     # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
     permissions:
