@@ -1163,9 +1163,9 @@ version = "1.12.0"
 
 [[deps.JumpProcesses]]
 deps = ["ArrayInterface", "DataStructures", "DiffEqBase", "DiffEqCallbacks", "DocStringExtensions", "FunctionWrappers", "Graphs", "LinearAlgebra", "PoissonRandom", "Random", "RecursiveArrayTools", "Reexport", "SciMLBase", "StaticArrays", "SymbolicIndexingInterface"]
-git-tree-sha1 = "5f36c8535941dfed422c376c347ce774ad2f6b03"
+git-tree-sha1 = "310fc6ddd46db8946f988b142fc2821f2f6456ff"
 uuid = "ccbc3e58-028d-4f4c-8cd5-9ae44345cda5"
-version = "9.23.0"
+version = "9.23.1"
 
     [deps.JumpProcesses.extensions]
     JumpProcessesKernelAbstractionsExt = ["Adapt", "KernelAbstractions"]
@@ -1320,9 +1320,9 @@ version = "1.12.0"
 
 [[deps.LinearSolve]]
 deps = ["ArrayInterface", "ChainRulesCore", "ConcreteStructs", "DocStringExtensions", "EnumX", "GPUArraysCore", "InteractiveUtils", "Krylov", "Libdl", "LinearAlgebra", "MKL_jll", "Markdown", "OpenBLAS_jll", "PrecompileTools", "Preferences", "RecursiveArrayTools", "Reexport", "SciMLBase", "SciMLLogging", "SciMLOperators", "Setfield", "StaticArraysCore"]
-git-tree-sha1 = "37c3e62180f3f325425f5e75dfd4ce34104f2c09"
+git-tree-sha1 = "1e487940a06ed9562de685e5f336633cdc14e011"
 uuid = "7ed4a6bd-45f5-4d41-b270-4a48e9bafcae"
-version = "3.61.0"
+version = "3.62.0"
 
     [deps.LinearSolve.extensions]
     LinearSolveAMDGPUExt = "AMDGPU"
@@ -1695,9 +1695,9 @@ version = "1.22.0"
 
 [[deps.OrdinaryDiffEqCore]]
 deps = ["ADTypes", "Accessors", "Adapt", "ArrayInterface", "ConcreteStructs", "DataStructures", "DiffEqBase", "DocStringExtensions", "EnumX", "EnzymeCore", "FastBroadcast", "FastClosures", "FastPower", "FillArrays", "FunctionWrappersWrappers", "InteractiveUtils", "LinearAlgebra", "Logging", "MacroTools", "MuladdMacro", "Polyester", "PrecompileTools", "Preferences", "Random", "RecursiveArrayTools", "Reexport", "SciMLBase", "SciMLLogging", "SciMLOperators", "SciMLStructures", "Static", "StaticArrayInterface", "StaticArraysCore", "SymbolicIndexingInterface", "TruncatedStacktraces"]
-git-tree-sha1 = "b836cbe4aa71643d6c7e98c92e9a5738937d7139"
+git-tree-sha1 = "4d1140f9f18dbcb2632b60b72fb56350ffcc567e"
 uuid = "bbf590c4-e513-4bbe-9b18-05decba2e5d8"
-version = "3.11.0"
+version = "3.12.0"
 
     [deps.OrdinaryDiffEqCore.extensions]
     OrdinaryDiffEqCoreMooncakeExt = "Mooncake"
