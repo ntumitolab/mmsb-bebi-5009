@@ -93,7 +93,7 @@ jobs:
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' }}
       run: julia --project=@. --color=yes -p ${{ env.LITERATE_PROC }} .github/ci.jl
     - name: Upload Notebook
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: notebooks
         path: ${{ env.NBCACHE }}
@@ -105,7 +105,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v6
     - name: Download notebooks
-      uses: actions/download-artifact@v7
+      uses: actions/download-artifact@v8
       with:
         name: notebooks
         path: ${{ env.NBCACHE }}/
