@@ -16,19 +16,19 @@ project:
   # To autogenerate a Table of Contents, run "jupyter book init --write-toc"
   # https://mystmd.org/guide/table-of-contents
   toc:
-    - file: docs/index.md
+    - file: index.md
     - title: Introduction
       children:
-        - file: docs/intro-00-start.md
-        - pattern: docs/intro-*.ipynb
+        - file: intro-00-start.md
+        - pattern: "intro-*.ipynb"
     - title: Homework
       children:
-        - file: docs/hw-00.md
-        - file: docs/hw-01.ipynb
+        - file: hw-00.md
+        - file: hw-01.ipynb
     - title: Textbook figures
       children:
-        - pattern: docs/figs/*.ipynb
-    - file: docs/runtime.ipynb
+        - pattern: figs/*.ipynb
+    - file: runtime.ipynb
 
 site:
   template: book-theme
