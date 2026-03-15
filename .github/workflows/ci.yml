@@ -14,12 +14,10 @@ concurrency:
 env:
   LITERATE_PROC: '2'
   JULIA_CI: 'true'
-  JULIA_CONDAPKG_BACKEND: 'Null'
-  JULIA_CONDAPKG_OFFLINE: 'true'
+  JULIA_CONDAPKG_ENV: '@mpl'
   JULIA_NUM_THREADS: '2'
   OPENBLAS_NUM_THREADS: '1'
   NBCACHE: '.cache'
-  PY_VER: '3.14'
 
 jobs:
   CI:
@@ -27,18 +25,11 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v6
-    - name: Setup Python
-      uses: actions/setup-python@v6
-      id: setup-python
-      with:
-        python-version: ${{ env.PY_VER }}
-    - name: Install the latest version of uv
-      uses: astral-sh/setup-uv@v7
-    - name: Install Python dependencies
-      run: uv pip install --system -r requirements.txt
     - name: Read Julia version
       id: julia-version
-      run: python -c 'import tomllib; from pathlib import Path; print("value=", tomllib.loads(Path("Manifest.toml").read_text())["julia_version"], sep="")' >> "$GITHUB_OUTPUT"
+      uses: julia-actions/julia-version@main
+      with:
+        versions: manifest
     - name: Get hashes
       id: hash
       run: |
@@ -58,16 +49,16 @@ jobs:
       uses: julia-actions/setup-julia@v2
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' }}
       with:
-        version: ${{ steps.julia-version.outputs.value }}
+        version: ${{ steps.julia-version.outputs.resolved }}
     - name: Restore Julia packages
       uses: actions/cache/restore@v5
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' && runner.environment == 'github-hosted'}}
       id: cache-julia
       with:
         path: ~/.julia
-        key: ${{ runner.os }}-julia-${{ steps.julia-version.outputs.value }}-${{ steps.hash.outputs.value }}
+        key: ${{ runner.os }}-julia-${{ steps.julia-version.outputs.resolved }}-${{ steps.hash.outputs.resolved }}
         restore-keys: |
-          ${{ runner.os }}-julia-${{ steps.julia-version.outputs.value }}
+          ${{ runner.os }}-julia-${{ steps.julia-version.outputs.resolved }}
     - name: Install Julia packages
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' && (runner.environment == 'self-hosted' || steps.cache-julia.outputs.cache-hit != 'true') }}
       shell: julia --color=yes --project=@. {0}
@@ -91,6 +82,8 @@ jobs:
         key: ${{ steps.cache-julia.outputs.cache-primary-key }}
     - name: Run notebooks
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' }}
+      env:
+        JULIA_CONDAPKG_OFFLINE: 'true'
       run: julia --project=@. --color=yes -p ${{ env.LITERATE_PROC }} .github/ci.jl
     - name: Copy back built notebooks
       run: cp --verbose -rf ${{ env.NBCACHE }}/docs/* docs/
