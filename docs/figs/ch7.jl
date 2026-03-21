@@ -6,6 +6,59 @@ using SteadyStateDiffEq
 using Catalyst
 using Plots
 
+# Model with feedback
+@time "Build system" rn725 = @reaction_network begin
+    @combinatoric_ratelaws false
+    k0 * I, 0 --> A
+    (k1, k2), 2A + 2R0 <--> Rstar
+    n * (A - Aout), A => 0
+    (a0 + mm(Rstar, a, KM), b), 0 <--> I
+    popsize * n * (A - Aout), 0 --> Aout
+    diffAout, Aout --> 0
+end
+
+# Model without feedback
+@time "Build system" rn725_no_feedback = @reaction_network begin
+    @combinatoric_ratelaws false
+    15k0, 0 --> A
+    (k1, k2), 2A + 2R0 <--> Rstar
+    n * (A - Aout), A => 0
+    (a0 + mm(Rstar, a, KM), b), 0 <--> I
+    popsize * n * (A - Aout), 0 --> Aout
+    diffAout, Aout --> 0
+end
+
+up725 = Dict(
+    :k0=>0.0008, # /min
+    :k1=>0.5, # /muM^3 /min
+    :k2=>0.02, # /min
+    :n=>0.6,
+    :a=>10, # muM/min
+    :b=>0.07, # /min
+    :a0=>0.05, # muM/min
+    :KM=>0.01, # muM
+    :R0=>0.5, # muM
+    :diffAout=>1000,
+    :popsize=>1000,
+    :A=>0.0,
+    :I=>0.0,
+    :Rstar=>0.0,
+    :Aout=>0.0,
+)
+
+@time "Build problem" prob725 = SteadyStateProblem(rn725, up725)
+@time "Build problem" prob725_no_feedback = SteadyStateProblem(rn725_no_feedback, up725)
+
+# npops = 1:50:5000
+# trajectories = length(npops)
+# alg = DynamicSS(KenCarp47())
+# prob_func = (prob, i, repeat) -> remake(prob, p=[:popsize=>npops[i]])
+# eprob = EnsembleProblem(prob725; prob_func)
+# eprob_nofeed = EnsembleProblem(prob725_no_feedback; prob_func)
+# @time sim = solve(eprob, alg; trajectories);
+# @time sim_nofeed = solve(eprob_nofeed, alg; trajectories);
+
+
 
 # ## Fig 7.28
 # model of synthetic pulse generating system
