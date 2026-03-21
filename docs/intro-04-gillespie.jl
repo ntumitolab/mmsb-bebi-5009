@@ -3,7 +3,7 @@
 
 ## Gillespie Algorithm
 ===#
-using CairoMakie
+using Plots
 using DataInterpolations: LinearInterpolation
 using StatsBase: Weights, sample
 using Statistics: mean
@@ -66,16 +66,13 @@ tend = 10.0
 @time solfirst = ssa_alg(model, u0, tend, parameters, stoich; method=:first)
 
 # Plot the solution from the direct method
-fig, ax, sp = series(soldirect.t, soldirect.u', labels=["A", "B"]; axis=(;  xlabel="time", ylabel="# of molecules", title="SSA (direct method)"))
-axislegend(ax)
-fig
+plot(soldirect.t, soldirect.u, labels=["A" "B"], xlabel="time", ylabel="# of molecules", title="SSA (direct method)")
 
 # Plot the solution by the first reaction method
-fig, ax, sp = series(solfirst.t, solfirst.u', labels=["A", "B"]; axis=(;  xlabel="time", ylabel="# of molecules", title="SSA (first reaction method)"))
-axislegend(ax)
-fig
+plot(solfirst.t, solfirst.u, labels=["A" "B"], xlabel="time", ylabel="# of molecules", title="SSA (first reaction method)")
 
-# Running 50 simulations
+# Running 50 simulations serially
+# TODO: parallelize this loop using `Threads.@threads` or `Distributed` for better performance
 @time sols = map(1:50) do _
     ssa_alg(model, u0, tend, parameters, stoich; method=:direct)
 end;
@@ -88,17 +85,10 @@ a_avg(t) = mean(i-> i(t), a_interp)
 b_avg(t) = mean(i-> i(t), b_interp)
 
 # Plot the solution
-fig = Figure()
-ax = Axis(fig[1, 1],
-    xlabel = "Time",
-    ylabel = "# of molecules",
-    title = "SSA (first method) ensemble"
-)
+plot(ts, a_avg.(ts), label="Average [A]", line=(:black, :solid))
+plot!(ts, b_avg.(ts), label="Average [B]", line=(:black, :dash))
 for sol in sols
-    lines!(ax, sol.t, sol.u[:, 1], color = (:blue, 0.05))
-    lines!(ax, sol.t, sol.u[:, 2], color = (:red, 0.05))
+    plot!(sol.t, sol.u[:, 1], line = (:blue, 0.05), label=false)
+    plot!(sol.t, sol.u[:, 2], line = (:red, 0.05), label=false)
 end
-lines!(ax, ts, a_avg.(ts), color = :black, linewidth = 3, linestyle = :solid, label = "Average [A]")
-lines!(ax, ts, b_avg.(ts), color = :black, linewidth = 3, linestyle = :dash, label = "Average [B]")
-axislegend(ax, position = :rt)
-fig
+plot!(xlabel="time", ylabel="# of molecules", title="SSA (first method) ensemble")
