@@ -64,7 +64,7 @@ tspan = (-50.0, 200.0)
 @time "Build problem" prob719 = ODEProblem(rn719, up719, tspan)
 @time "Solve problem" sol719 = solve(prob719, KenCarp47())
 @unpack M, P0, P1, P2, PN = rn719
-totalP =
+totalP = P0 + P1 + P2 + PN
 plot(sol719, idxs=[M, PN, totalP], labels=["M" "Nuclear PER" "Total PER"], xlabel="Time", ylabel="Concentration", title="Fig 7.19 (A)")
 
 
