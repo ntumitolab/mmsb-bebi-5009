@@ -80,21 +80,18 @@ u0 = 0.0
 
 # Solve the problem
 sol01 = mysolve(model, u0, tspan, p, dt=0.1, method=euler)
-sol1 = mysolve(model, u0, tspan, p, dt=1.0, method=euler)
+sol05 = mysolve(model, u0, tspan, p, dt=0.5, method=euler)
 
 # Analytical solution
 analytical(t) = 1 - exp(-t)
 
 # Visualization
-using CairoMakie
+using Plots
 
-fig = Figure()
-ax = Axis(fig[1, 1])
-lines!(ax, sol01.t, vec(sol01.u), label="Euler (dt=0.1)")
-lines!(ax, sol1.t, vec(sol1.u), label = "Euler (dt=1)")
-lines!(ax, tspan[begin]..tspan[end], t -> analytical(t), label = "Analytical solution", linestyle=:dash)
-axislegend(ax, position = :rc)
-fig
+plot(sol05.t, vec(sol05.u), label="Euler (dt=0.5)")
+plot!(sol01.t, vec(sol01.u), label="Euler (dt=0.1)")
+plot!(analytical, tspan[begin], tspan[end], label = "Analytical solution", linestyle=:dash, legend=:bottomright)
+
 #===
 ## Part 3: The RK4 method
 

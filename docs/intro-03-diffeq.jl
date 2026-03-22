@@ -32,7 +32,7 @@ $$
 
 ===#
 using OrdinaryDiffEq
-using CairoMakie
+using Plots
 
 # The model function is the 3-argument out-of-place form, `f(u, p, t)`.
 decay(u, p, t) = p * u
@@ -50,19 +50,11 @@ sol(1.0)
 # Time points
 sol.t
 
-# Solutions at corresponding time points
+# Solutions at `sol.t`
 sol.u
 
 # Visualize the solution
-fig = Figure()
-ax = Axis(fig[1, 1],
-    xlabel = "Time",
-    ylabel = "Concentration",
-    title = "Exponential Decay"
-)
-lines!(ax, sol, label = "C(t)")
-axislegend(ax, position = :rt)
-fig
+plot(sol, title="Exponential Decay", xlabel="Time", ylabel="Concentration")
 
 #===
 ### Three variables: The SIR model
@@ -90,7 +82,7 @@ $$
 
 ===#
 using OrdinaryDiffEq
-using CairoMakie
+using Plots
 
 # SIR model (in-place form can save array allocations and thus faster)
 function sir!(du, u, p, t)
@@ -112,13 +104,8 @@ prob = ODEProblem(sir!, u0, tspan, p)
 sol = solve(prob)
 
 # Visualize the solution
-fig = Figure()
-ax = Axis(fig[1, 1])
-lines!(ax, 0..20, t-> sol(t)[1], label="S")
-lines!(ax, 0..20, t-> sol(t)[2], label="I")
-lines!(ax, 0..20, t-> sol(t)[3], label="R")
-axislegend(ax, position = :rc)
-fig
+plot(sol, title="SIR model", xlabel="Time", ylabel="Fraction of population", labels=["S" "I" "R"])
+
 
 # ## Saving simulation results
 using DataFrames
