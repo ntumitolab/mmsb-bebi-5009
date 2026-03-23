@@ -1,15 +1,153 @@
 # # Chapter 7
+function get_gradient(prob, xsym, ysym, xrange, yrange; t = nothing, normalize=0.9)
+    ## The order of state variables (unknowns) in the ODE system is not guaranteed. So we may need to swap the order of x and y when calling ∂F.
+    swap_or_not(x, y; xidx=1) = xidx == 1 ? [x, y] : [y, x]
+    ∂F = prob.f
+    ps = prob.p
+    sys = prob.f.sys
+    xidx = ModelingToolkit.variable_index(sys, xsym)
+    yidx = ModelingToolkit.variable_index(sys, ysym)
+    xx = [x for y in yrange, x in xrange]
+    yy = [y for y in yrange, x in xrange]
+    dx = map((x, y) -> ∂F(swap_or_not(x, y; xidx), ps, t)[xidx], xx, yy)
+    dy = map((x, y) -> ∂F(swap_or_not(x, y; xidx), ps, t)[yidx], xx, yy)
+    if normalize > 0
+        maxnormx = maximum(dx)
+        maxnormy = maximum(dy)
+        dx .*= normalize / maxnormx * step(xrange)
+        dy .*= normalize / maxnormy * step(yrange)
+    end
+    return (; xx, yy, dx, dy)
+end
+
 # ## Fig 7.7
 # model of lac operon in E. coli
 using OrdinaryDiffEq
 using SteadyStateDiffEq
+using DiffEqCallbacks
 using Catalyst
 using Plots
 Plots.gr(linewidth=1.5)
+
 @time "Build system" rn707 = @reaction_network begin
     (a1 / (1 + RToverK1 * (K2 / (K2 + L))^4), δM), 0 <--> M
     (c1 * M, δY), 0 <--> Y
+    mm(Le, kL * Y, KML), 0 --> L
+    δL, L --> 0
+    (Y/4) * mm(L, 2kg, KMg), L => 0
 end
+
+up707 = Dict(
+    :δM => 0.48,
+    :δY => 0.03,
+    :δL => 0.02,
+    :a1 => 0.29,
+    :K2 => 2.92e6,
+    :RToverK1 => 213.2,
+    :c1 => 18.8,
+    :kL => 6e4,
+    :KML => 680.0,
+    :kg => 3.6e3,
+    :KMg => 7e5,
+    :Le => 0.0,
+    :M => 0.01,
+    :Y => 0.1,
+    :L => 0.0,
+)
+
+@unpack Le = rn707
+cbs = let
+    event_le1 = PresetTimeCallback([500.0], (integrator) -> integrator.ps[Le] = 50)
+    event_le2 = PresetTimeCallback([1000.0], (integrator) -> integrator.ps[Le] = 100)
+    event_le3 = PresetTimeCallback([1500.0], (integrator) -> integrator.ps[Le] = 150)
+    event_le4 = PresetTimeCallback([2000.0], (integrator) -> integrator.ps[Le] = 0)
+    CallbackSet(event_le1, event_le2, event_le3, event_le4)
+end
+
+# ### Fig 7.07 (A)
+tend = 2500.0
+@time "Build problem" prob707a = ODEProblem(rn707, up707, tend)
+@time "Solve problem" sol = solve(prob707a, KenCarp47(), callback=cbs)
+
+plot(sol, idxs=[:Y], labels="β-galactosidase monomer", title="Fig 7.07 (A)", xlabel="Time (min)", ylabel="Concentration")
+plot!(t -> 50 * (500<=t<1000) + 100 * (1000<=t<1500) + 150 * (1500<=t<2000), 0, tend, linestyle=:dash, label="External lactose")
+
+# ### Fig 7.07 (B)
+# Comparing the original model and the modified model
+@time "Build system" rn707b = @reaction_network begin
+    (a1 / (1 + RToverK1 * (K2 / (K2 + L))^4), δM), 0 <--> M
+    (c1 * M, δY), 0 <--> Y
+    Enz * mm(Le, 4kL, KML), 0 --> L
+    δL, L --> 0
+    Enz * mm(L, 2kg, KMg), L => 0
+end
+
+up707b = merge(up707, Dict(:Enz => 40.0))
+prob707a = SteadyStateProblem(rn707, up707)
+prob707b = SteadyStateProblem(rn707b, up707b)
+lerange = 0:100
+prob_func = (prob, i, repeat) -> remake(prob, p=[:Le => lerange[i]])
+output_func=(sol, i) -> (sol[:Y] / 4, false)
+alg = DynamicSS(KenCarp47())
+
+eprob = EnsembleProblem(prob707a; prob_func, output_func)
+eprob_mod = EnsembleProblem(prob707b; prob_func, output_func)
+@time sim = solve(eprob, alg; trajectories=length(lerange))
+@time sim_mod = solve(eprob_mod, alg; trajectories=length(lerange))
+
+plot(lerange, [sim.u sim_mod.u], labels=["Original model" "Modified model"], title="Fig 7.07 (B)", xlabel="External lactose concentration", ylabel="β-galactosidase tetramer concentration")
+
+# ## Fig 7.11
+# Model of phage lambda decision switch
+using ModelingToolkit
+using ModelingToolkit: t_nounits as t, D_nounits as D
+using OrdinaryDiffEq
+using Plots
+using DisplayAs: PNG
+
+function build_sys711(; name=:model711, simplify=true)
+    @parameters K1=1 K2=0.1 K3=5 K4=0.5 delta_r=0.02 delta_c=0.02 a=5 b=50
+    @variables r(t)=0 c(t)=0 rd(t) cd(t)
+    rd = r / 2
+    cd = c / 2
+    f1 = K1 * rd^2
+    f2 = K2 * rd
+    f3 = K3 * cd
+    f4 = K4 * cd
+    den = 1 + f1 * (1 + f2) + f3 * (1 + f4)
+    Dr = a * (1 + 10 * f1) / den - delta_r * r
+    Dc = b * (1 + f3) / den - delta_c * c
+    eqs = [
+        D(r) ~ Dr,
+        D(c) ~ Dc
+    ]
+    sys = ODESystem(eqs, t; name)
+    return simplify ? mtkcompile(sys) : sys
+end
+
+@time "Build system" sys711 = build_sys711()
+@time "Build problem" prob711 = ODEProblem(sys711, [], (0.0, 6000.0))
+xrange = range(0, 250, 101)
+yrange = range(0, 250, 101)
+
+@unpack r, c, delta_r = sys711
+(; xx, yy, dx, dy) = get_gradient(prob711, r, c, xrange, yrange; normalize=10)
+quiver(xx[1:5:end, 1:5:end], yy[1:5:end, 1:5:end], quiver=(dx[1:5:end, 1:5:end], dy[1:5:end, 1:5:end]); aspect_ratio=1, size=(600, 600), xlims=(0, 250), ylims=(0, 250), color=:gray)
+contour!(xrange, yrange, dx, levels=[0], line=(:black, :solid), colorbar=false) |> PNG
+plot!([], [],  line=(:black, :solid), label="R nullcline")
+contour!(xrange, yrange, dy, levels=[0],  line=(:black, :dash), colorbar=false) |> PNG
+plot!([], [], line=(:black, :dash), label="C nullcline")
+plot!(xlabel="[cI] (nM)", ylabel="[cro] (nM)", title="Fig. 7.11 (A)", legend=:topright)
+
+# ### Fig 7.11 (B)
+prob711b = remake(prob711, p=[delta_r => 0.2])
+(; xx, yy, dx, dy) = get_gradient(prob711b, r, c, xrange, yrange; normalize=10)
+quiver(xx[1:5:end, 1:5:end], yy[1:5:end, 1:5:end], quiver=(dx[1:5:end, 1:5:end], dy[1:5:end, 1:5:end]); aspect_ratio=1, size=(600, 600), xlims=(0, 250), ylims=(0, 250), color=:gray)
+contour!(xrange, yrange, dx, levels=[0], line=(:black, :solid), colorbar=false) |> PNG
+plot!([], [],  line=(:black, :solid), label="R nullcline")
+contour!(xrange, yrange, dy, levels=[0],  line=(:black, :dash), colorbar=false) |> PNG
+plot!([], [], line=(:black, :dash), label="C nullcline")
+plot!(xlabel="[cI] (nM)", ylabel="[cro] (nM)", title="Fig. 7.11 (B)", legend=:topright)
 
 
 # ## Fig 7.17
@@ -103,6 +241,43 @@ tend = 300.0
 
 plot(sol721, idxs=[:A, :B, :C], xlabel="Time", ylabel="Concentration", title="Fig 7.21", legend=:left)
 
+# ## Fig 7.23
+# Hasty synthetic oscillator model
+v0_723(x, y, alpha, sigma) = (1 + x^2 + alpha * sigma * x^4) / ((1 + x^2 + sigma * x^4) * (1 + y^4))
+
+@time "Build system" rn723 = @reaction_network begin
+    v0_723(x, y, alpha, sigma), 0 --> x
+    ay * v0_723(x, y, alpha, sigma), 0 --> y
+    gammax, x --> 0
+    gammay, y --> 0
+end
+
+up723 = Dict(
+    :alpha => 11.0,
+    :sigma => 2.0,
+    :gammax => 0.2,
+    :gammay => 0.012,
+    :ay => 0.2,
+    :x => 0.3963,
+    :y => 2.3346,
+)
+
+tend = 300.0
+@time "Build problem" prob723 = ODEProblem(rn723, up723, (0.0, tend))
+@time "Solve problem" sol723 = solve(prob723, KenCarp47())
+plot(sol723, idxs=[:x, :y], xlabel="Time", ylabel="Concentration", title="Fig 7.23 (A)", legend=:right)
+
+# Vector field
+xrange = range(0, 1.5, 51)
+yrange = range(0, 3, 51)
+@unpack x, y = rn723
+(; xx, yy, dx, dy) = get_gradient(prob723, x, y, xrange, yrange; t=0.0)
+contour(xrange, yrange, dx, levels=[0], line=(:black, :solid), colorbar=false) |> PNG
+plot!([], [], line=(:black, :solid), label="x nullcline")
+contour!(xrange, yrange, dy, levels=[0], line=(:black, :dash), colorbar=false) |> PNG
+plot!([], [], line=(:black, :dash), label="y nullcline")
+plot!(sol723, idxs=(x, y), label="Trajectory")
+plot!(xlabel="x", ylabel="y", title="Fig 7.23 (B)", legend=:bottomright, size=(600, 600))
 
 # ## Fig 7.25
 # model of quorum sensing mechanism of Vibrio fischeri

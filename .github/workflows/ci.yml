@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  LITERATE_PROC: '2'
+  LITERATE_PROC: '6'
   JULIA_CI: 'true'
   PY_VER: '3.14'
   JULIA_CONDAPKG_BACKEND: 'Null'
@@ -22,7 +22,7 @@ env:
 
 jobs:
   CI:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
     - name: Checkout repository
       uses: actions/checkout@v6
