@@ -1,6 +1,8 @@
 # # Chapter 4
 using OrdinaryDiffEq
 using Catalyst
+using ModelingToolkit
+using ModelingToolkit: t_nounits as t, D_nounits as D
 using DisplayAs: PNG
 using Plots
 Plots.gr(linewidth=1.5)
