@@ -77,15 +77,8 @@ quiver(vec(x2d), vec(y2d), quiver=(vec(vx2d), vec(vy2d))
 quiver(x2d, y2d, quiver=∇f)
 ```
 
-### `PythonPlot.jl`:
-
-```julia
-using PythonPlot as plt
-plt.quiver(X2d, Y2d, U2d, V2d)
-```
-
-See also: [matplotlib: quiver plot](https://matplotlib.org/stable/gallery/images_contours_and_fields/quiver_demo.html#sphx-glr-gallery-images-contours-and-fields-quiver-demo-py)
 ===#
+
 using Plots
 
 # ∇ = `\nabla <TAB>`
@@ -99,7 +92,33 @@ xx = [x for y in r, x in r]
 yy = [y for y in r, x in r]
 
 # Vector fields
-quiver(xx, yy, quiver=∇f, aspect_ratio=:equal, line=(:black), arrow=(:closed))
+quiver(xx, yy, quiver=∇f, aspect_ratio=:equal, line=(:black), arrow=(:closed), xlims=(-1.2, 1.2), ylims=(-1.2, 1.2))
+
+#===
+### `PythonPlot.jl`:
+
+```julia
+using PythonPlot as plt
+plt.streamplot(X2d, Y2d, U2d, V2d)
+```
+
+See also: [matplotlib: streamplot](https://matplotlib.org/stable/gallery/images_contours_and_fields/plot_streamplot.html)
+===#
+
+import PythonPlot as plt
+
+xrange = range(-3, 3, length=31)
+yrange = range(-3, 3, length=31)
+xx = xrange'
+yy = yrange
+
+uu = @. -1 - xx^2 + yy
+vv = @. 1 + xx - yy^2
+speed = hypot.(uu, vv)
+
+plt.figure(figsize=(6,6))
+plt.streamplot(xx, yy, uu, vv)
+
 
 #===
 ## Save figure

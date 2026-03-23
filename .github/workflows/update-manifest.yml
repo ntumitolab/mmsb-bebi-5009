@@ -29,7 +29,7 @@ jobs:
       - name: Setup Julia
         uses: julia-actions/setup-julia@v2
         with:
-          version: '1.10'
+          version: '1'
           arch: ${{ runner.arch }}
       - name: Update Julia dependencies
         env:
