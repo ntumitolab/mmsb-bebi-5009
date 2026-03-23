@@ -29,8 +29,6 @@ function get_gradient(prob, xsym, ysym, xrange, yrange; t = nothing, normalize=0
 end
 
 # Steady states and phase plots in an asymmetric network.
-
-
 @time "Build system" rn402 = @reaction_network begin
     k1 / (1 + B^n), 0 --> A
     k2, 0 --> B
@@ -144,3 +142,63 @@ contour!(xrange, yrange, dy, levels=[0], line=(:black, :dash), colorbar=false) |
 plot!([], [], line=(:black, :dash), label="B nullcline", legend=:bottomright)
 quiver!(xx[1:10:end, 1:10:end], yy[1:10:end, 1:10:end], quiver=(dx[1:10:end, 1:10:end], dy[1:10:end, 1:10:end]), color=:gray)
 plot!(title="Fig 4.7 B", aspect_ratio=1, size=(600, 600), xlims=(0, 5), ylims=(0, 5), xlabel="[A]", ylabel="[B]", legend=:bottomright)
+
+# ## Fig 4.8
+# Symmetric parameter set
+prob408 = remake(prob407, p=[:k1 => 20.0, :k2 => 20.0, :k3 => 5.0, :k4 => 5.0, :n1 => 4.0, :n2 => 4.0], u0=[:A => 3.0, :B => 1.0], tspan=(0.0, 4.0))
+@time sol1 = solve(prob408, Tsit5())
+@time sol2 = solve(remake(prob408, u0=[:A => 1.0, :B => 3.0]), Tsit5())
+pl1 = plot(sol1, xlabel="Time", ylabel="Concentration", title="Fig 4.8A (1)")
+pl2 = plot(sol2, xlabel="Time", ylabel="Concentration", title="Fig 4.8A (2)")
+plot(pl1, pl2, layout=(2, 1))
+
+# Nullclines and vector field
+@unpack A, B = prob408.f.sys
+xrange = 0:0.01:5
+yrange = 0:0.01:5
+(; xx, yy, dx, dy) = get_gradient(prob408, A, B, xrange, yrange)
+contour(xrange, yrange, dx, levels=[0], line=(:black, :solid), colorbar=false) |> PNG
+plot!([], [],  line=(:black, :solid), label="A nullcline")
+contour!(xrange, yrange, dy, levels=[0], line=(:black, :dash), colorbar=false) |> PNG
+plot!([], [], line=(:black, :dash), label="B nullcline", legend=:bottomright)
+quiver!(xx[1:10:end, 1:10:end], yy[1:10:end, 1:10:end], quiver=(dx[1:10:end, 1:10:end], dy[1:10:end, 1:10:end]), color=:gray)
+plot!(title="Fig 4.8 B", aspect_ratio=1, size=(600, 600), xlims=(0, 5), ylims=(0, 5), xlabel="[A]", ylabel="[B]", legend=:bottomright)
+
+# ## Fig 4.8 C
+# Around the unstable steady-state
+xrange = range(1.0, 1.5, length=21)
+yrange = range(1.0, 1.5, length=21)
+(; xx, yy, dx, dy) = get_gradient(prob408, A, B, xrange, yrange)
+contour(xrange, yrange, dx, levels=[0], line=(:black, :solid), colorbar=false) |> PNG
+plot!([], [],  line=(:black, :solid), label="A nullcline")
+contour!(xrange, yrange, dy, levels=[0], line=(:black, :dash), colorbar=false) |> PNG
+plot!([], [], line=(:black, :dash), label="B nullcline", legend=:bottomright)
+quiver!(xx, yy, quiver=(dx, dy), color=:gray)
+plot!(title="Fig 4.8 C", aspect_ratio=1, size=(600, 600), xlims=(1.0, 1.5), ylims=(1.0, 1.5), xlabel="[A]", ylabel="[B]", legend=:bottomright)
+
+# Another way to draw nullclines is to find the analytical solutions for dA (or dB) is zero. And then sketch the nullclines in a parameteric plot.
+nca47(b, p) = p.k1 / p.k3 / (1 + b^p.n1)
+ncb47(a, p) = p.k2 / p.k4 / (1 + a^p.n2)
+
+pls = map((8.0, 16.0, 20.0, 35.0)) do k1
+    ps = (k1=k1, k2=20., k3=5., k4=5., n1=4., n2=4.)
+    pl = plot(t->nca47(t, ps), identity, 0, 7, color=:red, label="Nullcline A")
+    plot!(pl, identity, t->ncb47(t, ps), 0, 7, color=:blue, label="Nullcline B")
+    plot!(xlims=(0, 7), ylims=(0, 7), aspect_ratio=1, title="k1 = $k1", xlabel="[A]", ylabel="[B]", legend=:right)
+end
+
+plot(pls..., layout=(2, 2), size=(800, 800))
+
+# ## Fig 4.11
+# Surface plots
+using Plots
+z1(x, y) = x^2 + 0.5y^2
+z2(x, y) = (.2x^2-1)^2 + y^2
+x1 = y1 = range(-1.0, 1.0, 41)
+x2 = range(-2.75, 2.75, 41)
+y2 = range(-0.75, 0.75, 41)
+p1 = surface(x1, y1, z1, title="Single-well potential")
+p2 = contourf(x1, y1, z1)
+p3 = surface(x2, y2, z2, title="Double-well potential")
+p4 = contourf(x2, y2, z2)
+plot(p1, p2, p3, p4, size=(800, 600))
