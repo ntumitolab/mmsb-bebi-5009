@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  LITERATE_PROC: '6'
+  LITERATE_PROC: '2'
   JULIA_CI: 'true'
   PY_VER: '3.14'
   JULIA_CONDAPKG_BACKEND: 'Null'
@@ -22,7 +22,7 @@ env:
 
 jobs:
   CI:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
       uses: actions/checkout@v6
@@ -30,12 +30,11 @@ jobs:
       uses: actions/setup-python@v6
       with:
         python-version: ${{ env.PY_VER }}
-        cache: 'pip'
+    - name: Install the latest version of uv
+      uses: astral-sh/setup-uv@v7
     - name: Read Julia version
       id: julia-version
-      uses: julia-actions/julia-version@main
-      with:
-        versions: manifest
+      run: python -c 'import tomllib; from pathlib import Path; print("resolved=", tomllib.loads(Path("Manifest.toml").read_text())["julia_version"], sep="")' >> "$GITHUB_OUTPUT"
     - name: Get hashes
       id: hash
       run: |
@@ -85,7 +84,7 @@ jobs:
     - name: Run notebooks
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' }}
       run: |
-        pip install -r requirements.txt
+        uv pip install --system -r requirements.txt
         julia --project=@. --color=yes -p ${{ env.LITERATE_PROC }} .github/ci.jl
     - name: Copy back built notebooks
       run: cp --verbose -rf ${{ env.NBCACHE }}/docs/* docs/
