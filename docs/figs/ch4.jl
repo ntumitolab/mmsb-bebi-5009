@@ -7,7 +7,7 @@ using DisplayAs: PNG
 using Plots
 Plots.gr(linewidth=1.5)
 
-function get_gradient(prob, xsym, ysym, xrange, yrange; t = nothing, normalize=0.9)
+function get_gradient(prob, xsym, ysym, xrange, yrange; t = nothing, normalize=true, xscale = step(xrange), yscale = step(yrange))
     ## The order of state variables (unknowns) in the ODE system is not guaranteed. So we may need to swap the order of x and y when calling ∂F.
     swap_or_not(x, y; xidx=1) = xidx == 1 ? [x, y] : [y, x]
     ∂F = prob.f
@@ -19,11 +19,17 @@ function get_gradient(prob, xsym, ysym, xrange, yrange; t = nothing, normalize=0
     yy = [y for y in yrange, x in xrange]
     dx = map((x, y) -> ∂F(swap_or_not(x, y; xidx), ps, t)[xidx], xx, yy)
     dy = map((x, y) -> ∂F(swap_or_not(x, y; xidx), ps, t)[yidx], xx, yy)
-    if normalize > 0
-        maxnormx = maximum(dx)
-        maxnormy = maximum(dy)
-        dx .*= normalize / maxnormx * step(xrange)
-        dy .*= normalize / maxnormy * step(yrange)
+    if normalize
+        maxdx = maximum(abs, dx)
+        maxdy = maximum(abs, dy)
+        for i in eachindex(dx)
+            x = dx[i]
+            dx[i] = sqrt(abs(x) / maxdx) * sign(x) * xscale
+        end
+        for i in eachindex(dy)
+            y = dy[i]
+            dy[i] = sqrt(abs(y) / maxdy) * sign(y) * yscale
+        end
     end
     return (; xx, yy, dx, dy)
 end
@@ -42,7 +48,7 @@ up402 = Dict(:k1 => 20.0, :k2 => 5.0, :k3 => 5.0, :k4 => 5.0, :k5 => 2.0, :n => 
 
 # ## Fig 4.2 A
 tend = 1.5
-prob402 = ODEProblem(rn402, up402, tend)
+@time "Build problem" prob402 = ODEProblem(rn402, up402, tend)
 u0s = [
     [0.0, 0.0],
     [0.5, 0.6],
@@ -53,7 +59,7 @@ u0s = [
 
 #---
 @time sols = map(u0s) do u0
-    solve(remake(prob402, u0=u0), Tsit5())
+    solve(remake(prob402, u0=u0), TRBDF2())
 end
 plot(sols[1], xlabel="Time", ylabel="Concentration", title="Fig. 4.2 A")
 
@@ -89,6 +95,9 @@ pl
 
 # ## Figure 4.5A
 ## nullclines
+xrange = 0:0.01:2
+yrange = 0:0.01:2
+(; xx, yy, dx, dy) = get_gradient(prob402, A, B, xrange, yrange; normalize=false)
 contour(xrange, yrange, dx, levels=[0], line=(:black, :solid), colorbar=false)
 plot!([], [],  line=(:black, :solid), label="A nullcline")
 contour!(xrange, yrange, dy, levels=[0], line=(:black, :dash), colorbar=false)
@@ -104,11 +113,14 @@ plot!(title="Fig. 4.5 A", aspect_ratio=1, size=(600, 600), xlims=(0, 2), ylims=(
 
 # ## Figure 4.5 B
 # Vector field with nullclines
-quiver(xx, yy, quiver=(dx, dy), xlabel="[A]", ylabel="[B]", title="Fig. 4.5 B", aspect_ratio=1, size=(600, 600), xlims=(0, 2), ylims=(0, 2), color=:gray)
-contour!(xrange, yrange, dx, levels=[0], line=(:black, :solid), colorbar=false)
+contour(xrange, yrange, dx, levels=[0], line=(:black, :solid), colorbar=false)
 plot!([], [],  line=(:black, :solid), label="A nullcline")
 contour!(xrange, yrange, dy, levels=[0], line=(:black, :dash), colorbar=false)
 plot!([], [], line=(:black, :dash), label="B nullcline", legend=:bottomright)
+xrange = 0:0.1:2
+yrange = 0:0.1:2
+(; xx, yy, dx, dy) = get_gradient(prob402, A, B, xrange, yrange)
+quiver!(xx, yy, quiver=(dx, dy), xlabel="[A]", ylabel="[B]", title="Fig. 4.5 B", aspect_ratio=1, size=(600, 600), xlims=(0, 2), ylims=(0, 2), color=:gray)
 
 # ## Fig 4.7 A
 # Symmetric (bistable) biological networks.
@@ -123,8 +135,8 @@ up407 = Dict(:k1 => 20.0, :k2 => 20.0, :k3 => 5.0, :k4 => 5.0, :n1 => 4.0, :n2 =
 
 tend = 4.0
 @time "Build problem" prob407 = ODEProblem(rn407, up407, (0.0, tend))
-@time sol1 = solve(prob407, Tsit5())
-@time sol2 = solve(remake(prob407, u0=[:A => 1.0, :B => 3.0]), Tsit5())
+@time sol1 = solve(prob407, TRBDF2())
+@time sol2 = solve(remake(prob407, u0=[:A => 1.0, :B => 3.0]), TRBDF2())
 pl1 = plot(sol1, xlabel="Time", ylabel="Concentration", title="Fig 4.7A (1)")
 pl2 = plot(sol2, xlabel="Time", ylabel="Concentration", title="Fig 4.7A (2)")
 plot(pl1, pl2, layout=(2, 1))
@@ -134,20 +146,20 @@ plot(pl1, pl2, layout=(2, 1))
 xrange = 0:0.01:5
 yrange = 0:0.01:5
 @unpack A, B = rn407
-(; xx, yy, dx, dy) = get_gradient(prob407, A, B, xrange, yrange)
+(; xx, yy, dx, dy) = get_gradient(prob407, A, B, xrange, yrange; xscale=0.2, yscale=0.2)
 
 contour(xrange, yrange, dx, levels=[0], line=(:black, :solid), colorbar=false) |> PNG
 plot!([], [],  line=(:black, :solid), label="A nullcline")
 contour!(xrange, yrange, dy, levels=[0], line=(:black, :dash), colorbar=false) |> PNG
 plot!([], [], line=(:black, :dash), label="B nullcline", legend=:bottomright)
-quiver!(xx[1:10:end, 1:10:end], yy[1:10:end, 1:10:end], quiver=(dx[1:10:end, 1:10:end], dy[1:10:end, 1:10:end]), color=:gray)
+quiver!(xx[1:20:end, 1:20:end], yy[1:20:end, 1:20:end], quiver=(dx[1:20:end, 1:20:end], dy[1:20:end, 1:20:end]), color=:gray)
 plot!(title="Fig 4.7 B", aspect_ratio=1, size=(600, 600), xlims=(0, 5), ylims=(0, 5), xlabel="[A]", ylabel="[B]", legend=:bottomright)
 
 # ## Fig 4.8
 # Symmetric parameter set
 prob408 = remake(prob407, p=[:k1 => 20.0, :k2 => 20.0, :k3 => 5.0, :k4 => 5.0, :n1 => 4.0, :n2 => 4.0], u0=[:A => 3.0, :B => 1.0], tspan=(0.0, 4.0))
-@time sol1 = solve(prob408, Tsit5())
-@time sol2 = solve(remake(prob408, u0=[:A => 1.0, :B => 3.0]), Tsit5())
+@time sol1 = solve(prob408, TRBDF2())
+@time sol2 = solve(remake(prob408, u0=[:A => 1.0, :B => 3.0]), TRBDF2())
 pl1 = plot(sol1, xlabel="Time", ylabel="Concentration", title="Fig 4.8A (1)")
 pl2 = plot(sol2, xlabel="Time", ylabel="Concentration", title="Fig 4.8A (2)")
 plot(pl1, pl2, layout=(2, 1))
@@ -156,23 +168,26 @@ plot(pl1, pl2, layout=(2, 1))
 @unpack A, B = prob408.f.sys
 xrange = 0:0.01:5
 yrange = 0:0.01:5
-(; xx, yy, dx, dy) = get_gradient(prob408, A, B, xrange, yrange)
+(; xx, yy, dx, dy) = get_gradient(prob408, A, B, xrange, yrange; xscale=0.2, yscale=0.2)
 contour(xrange, yrange, dx, levels=[0], line=(:black, :solid), colorbar=false) |> PNG
 plot!([], [],  line=(:black, :solid), label="A nullcline")
 contour!(xrange, yrange, dy, levels=[0], line=(:black, :dash), colorbar=false) |> PNG
 plot!([], [], line=(:black, :dash), label="B nullcline", legend=:bottomright)
-quiver!(xx[1:10:end, 1:10:end], yy[1:10:end, 1:10:end], quiver=(dx[1:10:end, 1:10:end], dy[1:10:end, 1:10:end]), color=:gray)
-plot!(title="Fig 4.8 B", aspect_ratio=1, size=(600, 600), xlims=(0, 5), ylims=(0, 5), xlabel="[A]", ylabel="[B]", legend=:bottomright)
+quiver!(xx[1:20:end, 1:20:end], yy[1:20:end, 1:20:end], quiver=(dx[1:20:end, 1:20:end], dy[1:20:end, 1:20:end]), color=:gray)
+plot!(title="Fig 4.8 B", aspect_ratio=1, size=(600, 600), xlims=(0, 5), ylims=(0, 5), xlabel="[A]", ylabel="[B]", legend=:topright)
 
 # ## Fig 4.8 C
 # Around the unstable steady-state
-xrange = range(1.0, 1.5, length=21)
-yrange = range(1.0, 1.5, length=21)
-(; xx, yy, dx, dy) = get_gradient(prob408, A, B, xrange, yrange)
+xrange = 1.0:0.01:1.5
+yrange = 1.0:0.01:1.5
+(; xx, yy, dx, dy) = get_gradient(prob408, A, B, xrange, yrange; normalize=false)
 contour(xrange, yrange, dx, levels=[0], line=(:black, :solid), colorbar=false) |> PNG
 plot!([], [],  line=(:black, :solid), label="A nullcline")
 contour!(xrange, yrange, dy, levels=[0], line=(:black, :dash), colorbar=false) |> PNG
 plot!([], [], line=(:black, :dash), label="B nullcline", legend=:bottomright)
+xrange = 1.0:0.05:1.5
+yrange = 1.0:0.05:1.5
+(; xx, yy, dx, dy) = get_gradient(prob408, A, B, xrange, yrange)
 quiver!(xx, yy, quiver=(dx, dy), color=:gray)
 plot!(title="Fig 4.8 C", aspect_ratio=1, size=(600, 600), xlims=(1.0, 1.5), ylims=(1.0, 1.5), xlabel="[A]", ylabel="[B]", legend=:bottomright)
 
@@ -202,3 +217,62 @@ p2 = contourf(x1, y1, z1)
 p3 = surface(x2, y2, z2, title="Double-well potential")
 p4 = contourf(x2, y2, z2)
 plot(p1, p2, p3, p4, size=(800, 600))
+
+# ## Figure 4.15 (A)
+# Oscillatory networks
+using Catalyst
+using OrdinaryDiffEq
+using Plots
+Plots.gr(linewidth=1.5)
+
+@time "Build system" model415 = @reaction_network begin
+    k0 , 0 --> A
+    k1 * (1 + B^n), A --> B
+    k2, B --> 0
+end
+
+up415 = Dict(:k0 => 8.0, :k1 => 1.0, :k2 => 5.0, :n => 2.0, :A => 1.5, :B => 1.0)
+tend = 8.0
+@time "Build problem" prob415 = ODEProblem(model415, up415, (0.0, tend))
+
+u0s = [
+    [:A=>1.5, :B=>1.0],
+    [:A=>0.0, :B=>1.0],
+    [:A=>0.0, :B=>3.0],
+    [:A=>2.0, :B=>0.0],
+]
+
+@time "Solve problems" sols = map(u0s) do u0
+    solve(remake(prob415, u0=u0), TRBDF2())
+end
+
+plot(sols[1], xlabel="Time", ylabel="Concentration", title="Fig. 4.15 A")
+
+## Figure 4.15 (B)
+# Vector field with nullclines
+xrange = 0:0.4:4
+yrange = 0:0.4:4
+@unpack A, B = model415
+(; xx, yy, dx, dy) = get_gradient(prob415, A, B, xrange, yrange)
+quiver(xx, yy, quiver=(dx, dy), xlabel="[A]", ylabel="[B]", title="Fig. 4.15 B", aspect_ratio=1, size=(600, 600), xlims=(0, 4), ylims=(0, 4), color=:gray, arrow=:closed)
+
+for sol in sols
+    plot!(sol, idxs=(A, B), label=false)
+end
+
+plot!()
+
+xrange = 0:0.1:4
+yrange = 0:0.1:4
+(; xx, yy, dx, dy) = get_gradient(prob415, A, B, xrange, yrange; normalize=false)
+contour!(xrange, yrange, dx, levels=[0], line=(:black, :solid), colorbar=false) |> PNG
+plot!([], [],  line=(:black, :solid), label="A nullcline")
+contour!(xrange, yrange, dy, levels=[0], line=(:black, :dash), colorbar=false) |> PNG
+plot!([], [], line=(:black, :dash), label="B nullcline", legend=:bottomright)
+
+# ## Fig 4.16 A
+# Oscillatory parameter set
+prob416 = remake(prob415, p=[:n=>2.5], tspan=(0.0, 100.0))
+@time "Solve problems" sols = map(u0s) do u0
+    solve(remake(prob416, u0=u0), TRBDF2())
+end

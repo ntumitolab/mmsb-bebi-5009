@@ -1,5 +1,6 @@
 # # Chapter 7
-function get_gradient(prob, xsym, ysym, xrange, yrange; t = nothing, normalize=0.9)
+# Convience function
+function get_gradient(prob, xsym, ysym, xrange, yrange; t = nothing, normalize=true)
     ## The order of state variables (unknowns) in the ODE system is not guaranteed. So we may need to swap the order of x and y when calling ∂F.
     swap_or_not(x, y; xidx=1) = xidx == 1 ? [x, y] : [y, x]
     ∂F = prob.f
@@ -11,11 +12,17 @@ function get_gradient(prob, xsym, ysym, xrange, yrange; t = nothing, normalize=0
     yy = [y for y in yrange, x in xrange]
     dx = map((x, y) -> ∂F(swap_or_not(x, y; xidx), ps, t)[xidx], xx, yy)
     dy = map((x, y) -> ∂F(swap_or_not(x, y; xidx), ps, t)[yidx], xx, yy)
-    if normalize > 0
-        maxnormx = maximum(dx)
-        maxnormy = maximum(dy)
-        dx .*= normalize / maxnormx * step(xrange)
-        dy .*= normalize / maxnormy * step(yrange)
+    if normalize
+        maxdx = maximum(abs, dx)
+        maxdy = maximum(abs, dy)
+        for i in eachindex(dx)
+            x = dx[i]
+            dx[i] = sqrt(abs(x) / maxdx) * sign(x) * step(xrange)
+        end
+        for i in eachindex(dy)
+            y = dy[i]
+            dy[i] = sqrt(abs(y) / maxdy) * sign(y) * step(yrange)
+        end
     end
     return (; xx, yy, dx, dy)
 end
