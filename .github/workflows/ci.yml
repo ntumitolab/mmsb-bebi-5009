@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  LITERATE_PROC: '6'
+  LITERATE_PROC: '2'
   JULIA_CI: 'true'
   JULIA_NUM_THREADS: '2'
   OPENBLAS_NUM_THREADS: '1'
@@ -20,7 +20,7 @@ env:
 
 jobs:
   CI:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
       uses: actions/checkout@v6
