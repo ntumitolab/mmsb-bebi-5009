@@ -29,8 +29,7 @@ jobs:
       - name: Setup Julia
         uses: julia-actions/setup-julia@v2
         with:
-          version: '1'
-          arch: ${{ runner.arch }}
+          version: '1.10'
       - name: Update Julia dependencies
         env:
           JULIA_PKG_PRECOMPILE_AUTO: '0'

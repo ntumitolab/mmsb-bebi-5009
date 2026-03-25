@@ -12,30 +12,24 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  LITERATE_PROC: '2'
+  LITERATE_PROC: '6'
   JULIA_CI: 'true'
-  PY_VER: '3.14'
-  JULIA_CONDAPKG_BACKEND: 'Null'
   JULIA_NUM_THREADS: '2'
   OPENBLAS_NUM_THREADS: '1'
   NBCACHE: '.cache'
 
 jobs:
   CI:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
     - name: Checkout repository
       uses: actions/checkout@v6
-    - name: Setup Python
-      uses: actions/setup-python@v6
-      with:
-        python-version: ${{ env.PY_VER }}
-        cache: 'pip'
     - name: Read Julia version
+      uses: SebRollen/toml-action@v1.2.0
       id: julia-version
-      uses: julia-actions/julia-version@main
       with:
-        versions: manifest
+        file: 'Manifest.toml'
+        field: 'julia_version'
     - name: Get hashes
       id: hash
       run: |
@@ -55,27 +49,19 @@ jobs:
       uses: julia-actions/setup-julia@v2
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' }}
       with:
-        version: ${{ steps.julia-version.outputs.resolved }}
+        version: ${{ steps.julia-version.outputs.value }}
     - name: Restore Julia packages
       uses: actions/cache/restore@v5
-      if: ${{ steps.cache-nb.outputs.cache-hit != 'true' && runner.environment == 'github-hosted'}}
+      if: ${{ steps.cache-nb.outputs.cache-hit != 'true' && runner.environment == 'github-hosted' }}
       id: cache-julia
       with:
         path: ~/.julia
-        key: ${{ runner.os }}-julia-${{ steps.julia-version.outputs.resolved }}-${{ steps.hash.outputs.value }}
+        key: ${{ runner.os }}-julia-${{ steps.julia-version.outputs.value }}-${{ steps.hash.outputs.value }}
         restore-keys: |
-          ${{ runner.os }}-julia-${{ steps.julia-version.outputs.resolved }}-
+          ${{ runner.os }}-julia-${{ steps.julia-version.outputs.value }}-
     - name: Install Julia packages
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' && (runner.environment == 'self-hosted' || steps.cache-julia.outputs.cache-hit != 'true') }}
-      shell: julia --color=yes --project=@. {0}
-      run: |
-        using Pkg, Dates
-        Pkg.Registry.update()
-        Pkg.instantiate()
-        Pkg.precompile()
-        if ENV["RUNNER_ENVIRONMENT"] == "github-hosted"
-            Pkg.gc(;collect_delay=Day(0))
-        end
+      run: julia --color=yes .github/setup.jl
     - name: Save Julia packages
       uses: actions/cache/save@v5
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' && runner.environment == 'github-hosted' && steps.cache-julia.outputs.cache-hit != 'true' }}
@@ -84,9 +70,7 @@ jobs:
         key: ${{ steps.cache-julia.outputs.cache-primary-key }}
     - name: Run notebooks
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' }}
-      run: |
-        pip install -r requirements.txt
-        julia --project=@. --color=yes -p ${{ env.LITERATE_PROC }} .github/ci.jl
+      run: julia --project=@. --color=yes -p ${{ env.LITERATE_PROC }} .github/ci.jl
     - name: Copy back built notebooks
       run: cp --verbose -rf ${{ env.NBCACHE }}/docs/* docs/
     - name: Setup NodeJS
