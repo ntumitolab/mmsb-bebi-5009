@@ -33,7 +33,7 @@ jobs:
         with:
           python-version: ${{ env.PY_VER }}
       - name: Install nbconvert
-        run: pip install  nbconvert
+        run: pip install nbconvert
       - name: Convert ipynb files to markdown
         run: >
           find docs/ -type f -name '*.ipynb' |
