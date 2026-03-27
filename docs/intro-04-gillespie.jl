@@ -1,8 +1,5 @@
-#===
-# Stochastic simulations
-
-## Gillespie Algorithm
-===#
+# # Stochastic simulations
+# ## Gillespie Algorithm
 using Plots
 using DataInterpolations: LinearInterpolation
 using StatsBase: Weights, sample
@@ -10,12 +7,9 @@ using Statistics: mean
 using Random
 Random.seed!(2024)
 
-#===
-## Do-it-yourself
-
-Stochastic chemical reaction: Gillespie Algorithm (direct and first reaction method)
-Adapted from: Chemical and Biomedical Engineering Calculations Using Python Ch.4-3
-===#
+# ## Do-it-yourself
+# Stochastic chemical reaction: Gillespie Algorithm (direct and first reaction method)
+# Adapted from: Chemical and Biomedical Engineering Calculations Using Python Ch.4-3
 function ssa_alg(model, u0::AbstractVector, tend, p, stoich; tstart=zero(tend), method=:direct)
     t = tstart   ## Current time
     ts = [t]     ## Time points
