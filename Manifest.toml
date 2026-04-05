@@ -642,10 +642,10 @@ uuid = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
 version = "1.7.0"
 
 [[deps.DynamicPolynomials]]
-deps = ["Future", "LinearAlgebra", "MultivariatePolynomials", "MutableArithmetics", "Reexport", "Test"]
-git-tree-sha1 = "3f50fa86c968fc1a9e006c07b6bc40ccbb1b704d"
+deps = ["LinearAlgebra", "MultivariatePolynomials", "MutableArithmetics", "Reexport", "StarAlgebras", "Test"]
+git-tree-sha1 = "5bfabc3827dfdd164359bad6800c115a81280c00"
 uuid = "7c1d4256-1411-5781-91ec-d7bc3513ac07"
-version = "0.6.4"
+version = "0.6.6"
 
 [[deps.DynamicQuantities]]
 deps = ["DispatchDoctor", "PrecompileTools", "TestItems", "Tricks"]
@@ -2082,9 +2082,9 @@ version = "0.6.12"
 
 [[deps.RecursiveArrayTools]]
 deps = ["Adapt", "ArrayInterface", "DocStringExtensions", "GPUArraysCore", "LinearAlgebra", "PrecompileTools", "RecipesBase", "StaticArraysCore", "SymbolicIndexingInterface"]
-git-tree-sha1 = "e4fd3369c78666a65ccec25dba28a0b181434ab2"
+git-tree-sha1 = "04f8cef2c128b300342e560ab23bb81fba2506c3"
 uuid = "731186ca-8d62-57ce-b412-fbd966d074cd"
-version = "3.52.0"
+version = "3.53.0"
 
     [deps.RecursiveArrayTools.extensions]
     RecursiveArrayToolsFastBroadcastExt = "FastBroadcast"
@@ -2221,9 +2221,9 @@ version = "1.9.1"
 
 [[deps.SciMLOperators]]
 deps = ["Accessors", "ArrayInterface", "DocStringExtensions", "LinearAlgebra"]
-git-tree-sha1 = "794c760e6aafe9f40dcd7dd30526ea33f0adc8b7"
+git-tree-sha1 = "234869cf9fee9258a95464b7a7065cc7be84db00"
 uuid = "c0aeaf25-5076-4817-a8d5-81caf7dfa961"
-version = "1.15.1"
+version = "1.16.0"
 weakdeps = ["SparseArrays", "StaticArraysCore"]
 
     [deps.SciMLOperators.extensions]
