@@ -8,8 +8,7 @@ using Reexport
 using PrecompileTools: @setup_workload, @compile_workload
 using ModelingToolkit: t_nounits as t, D_nounits as D
 
-@compile_workload begin
-    # Prepare data for `@compile_workload`
+@setup_workload begin
     # Collins toggle switch model
     function collins_sys(; name=:collins)
         @parameters a1=3 a2=2.5 β=4 γ=4
@@ -25,21 +24,24 @@ using ModelingToolkit: t_nounits as t, D_nounits as D
         return ODESystem(eqs, t; name)
     end
 
-    # inside here, put a "toy example" of everything you want to be fast
-    @mtkbuild sys = collins_sys()
-    prob = ODEProblem(sys, [], (0.0, 50.0))
-    sol = solve(prob, TRBDF2(), tstops=[10.0, 20.0, 30.0, 40.0])
-
     # Enzyme kinetics full model
     up303 = Dict(:S => 5.0, :ES => 0.0, :P => 0.0, :E=>1.0, :k1 => 30.0, :km1 => 1.0, :k2 => 10.0)
 
-    rn303 = @reaction_network begin
-        k1, S + E --> ES
-        km1, ES --> S + E
-        k2, ES --> P + E
+    @compile_workload begin
+        # inside here, put a "toy example" of everything you want to be fast
+        @mtkbuild sys = collins_sys()
+        prob = ODEProblem(sys, [], (0.0, 50.0))
+        sol = solve(prob, TRBDF2(), tstops=[10.0, 20.0, 30.0, 40.0])
+
+        rn303 = @reaction_network begin
+            k1, S + E --> ES
+            km1, ES --> S + E
+            k2, ES --> P + E
+        end
+        prob303 = ODEProblem(rn303, up303, (0.0, 1.0); remove_conserved=true)
+        sol303 = solve(prob303, TRBDF2())
     end
-    prob303 = ODEProblem(rn303, up303, (0.0, 1.0); remove_conserved=true)
-    sol303 = solve(prob303, TRBDF2())
+
 end
 
 
