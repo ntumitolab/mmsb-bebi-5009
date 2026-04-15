@@ -1,4 +1,4 @@
-using Startup
+
 using OrdinaryDiffEq
 using Plots
 using Catalyst

@@ -2,7 +2,7 @@
 
 julia_version = "1.12.6"
 manifest_format = "2.0"
-project_hash = "44a4532accb2ce65aad6e76f21db764f6ccd8deb"
+project_hash = "504b659dbd3df49f45d7ece1bf14098d86113253"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "f7304359109c768cf32dc5fa2d371565bb63b68a"
@@ -2376,12 +2376,6 @@ deps = ["LinearAlgebra", "MutableArithmetics", "SparseArrays"]
 git-tree-sha1 = "235b1f9d287bbf34083b3d0829343a7942c0ad1c"
 uuid = "0c0c59c1-dc5f-42e9-9a8b-b5dc384a6cd1"
 version = "0.3.0"
-
-[[deps.Startup]]
-deps = ["Catalyst", "ModelingToolkit", "OrdinaryDiffEq", "PrecompileTools", "Reexport"]
-path = "Startup"
-uuid = "add62068-8fd2-4411-bb49-5a93b5f7fa6d"
-version = "0.1.0"
 
 [[deps.StateSelection]]
 deps = ["BipartiteGraphs", "DocStringExtensions", "FindFirstFunctions", "Graphs", "LinearAlgebra", "OrderedCollections", "Setfield", "SparseArrays"]
