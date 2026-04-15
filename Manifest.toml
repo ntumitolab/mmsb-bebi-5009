@@ -2,7 +2,7 @@
 
 julia_version = "1.12.6"
 manifest_format = "2.0"
-project_hash = "e5d619997d5e805ad0d35bb009edf2e39876d14c"
+project_hash = "d6c486bca5202a0e4a8bf0c2ed7ecfdee5d92aef"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "f7304359109c768cf32dc5fa2d371565bb63b68a"
@@ -608,11 +608,6 @@ weakdeps = ["ChainRulesCore", "EnzymeCore"]
     [deps.DispatchDoctor.extensions]
     DispatchDoctorChainRulesCoreExt = "ChainRulesCore"
     DispatchDoctorEnzymeCoreExt = "EnzymeCore"
-
-[[deps.DisplayAs]]
-git-tree-sha1 = "43c017d5dd3a48d56486055973f443f8a39bb6d9"
-uuid = "0b91fe84-8a4c-11e9-3e1d-67c38462b6d6"
-version = "0.1.6"
 
 [[deps.Distributed]]
 deps = ["Random", "Serialization", "Sockets"]
