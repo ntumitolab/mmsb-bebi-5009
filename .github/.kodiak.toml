@@ -2,8 +2,8 @@
 version = 1
 
 [merge]
-  method                               = "squash"
-  block_on_neutral_required_check_runs = true
+method = "squash"
+block_on_neutral_required_check_runs = true
   [merge.message]
-    title = "pull_request_title"
-    body  = "pull_request_body"
+  title = "pull_request_title"
+  body  = "pull_request_body"
