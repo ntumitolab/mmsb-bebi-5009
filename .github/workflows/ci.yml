@@ -45,7 +45,7 @@ jobs:
     - name: Get environment hash
       id: hash
       run: |
-        echo "value=${{ hashFiles('Project.toml', 'Manifest.toml', 'src/**') }}" >> "$GITHUB_OUTPUT"
+        echo "value=${{ hashFiles('Project.toml', 'Manifest.toml', 'Startup/**') }}" >> "$GITHUB_OUTPUT"
         echo "ver=${{ runner.os }}-julia-${{ steps.julia-version.outputs.value }}" >> "$GITHUB_OUTPUT"
     - name: Cache Julia packages
       uses: actions/cache@v5
