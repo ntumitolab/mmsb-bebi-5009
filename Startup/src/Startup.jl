@@ -2,15 +2,13 @@ module Startup
 
 using PrecompileTools: @recompile_invalidations, @setup_workload, @compile_workload
 
-@recompile_invalidations begin
-    using Catalyst
-    using CSV
-    using DataFrames
-    using ModelingToolkit
-    using OrdinaryDiffEq
-    using SteadyStateDiffEq
-    using Plots
-end
+using Catalyst
+using CSV
+using DataFrames
+using ModelingToolkit
+using OrdinaryDiffEq
+using SteadyStateDiffEq
+using Plots
 
 @setup_workload begin
     function collins_sys(; name=:collins)
