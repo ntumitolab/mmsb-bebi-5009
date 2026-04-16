@@ -41,7 +41,7 @@ jobs:
     - name: Get hashes
       id: hash
       run: |
-        echo "value=${{ hashFiles('Project.toml', 'Manifest.toml', 'Model/**') }}" >> "$GITHUB_OUTPUT"
+        echo "value=${{ hashFiles('Project.toml', 'Manifest.toml', 'Startup/**') }}" >> "$GITHUB_OUTPUT"
         echo "nb=${{ hashFiles('docs/**/*.jl', 'docs/**/*.ipynb') }}" >> "$GITHUB_OUTPUT"
     - name: Cache executed notebooks
       uses: actions/cache@v5
