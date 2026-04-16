@@ -15,7 +15,7 @@ env:
   LITERATE_PROC: '2'
   JULIA_CI: 'true'
   JULIA_NUM_THREADS: '2'
-  JULIA_CPU_TARGET: 'generic;icelake-server,clone_all;znver3,clone_all'
+  # JULIA_CPU_TARGET: 'generic;icelake-server,clone_all;znver3,clone_all'
   JULIA_CONDAPKG_BACKEND: 'Null'
   JULIA_CONDAPKG_OFFLINE: 'true'
   OPENBLAS_NUM_THREADS: '1'
@@ -41,7 +41,7 @@ jobs:
     - name: Get hashes
       id: hash
       run: |
-        echo "value=${{ hashFiles('Project.toml', 'Manifest.toml', 'src/**') }}" >> "$GITHUB_OUTPUT"
+        echo "value=${{ hashFiles('Project.toml', 'Manifest.toml', 'Model/**') }}" >> "$GITHUB_OUTPUT"
         echo "nb=${{ hashFiles('docs/**/*.jl', 'docs/**/*.ipynb') }}" >> "$GITHUB_OUTPUT"
     - name: Cache executed notebooks
       uses: actions/cache@v5
