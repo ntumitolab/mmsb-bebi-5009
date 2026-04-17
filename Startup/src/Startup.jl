@@ -7,13 +7,13 @@ using DataFrames
 using DataInterpolations
 using DiffEqCallbacks
 using ForwardDiff
-using GR
 using JumpProcesses
 using Latexify
 using LaTeXStrings
 using ModelingToolkit
 using OrdinaryDiffEq
 using Plots
+import GR
 using Statistics
 using StatsBase
 using SteadyStateDiffEq
