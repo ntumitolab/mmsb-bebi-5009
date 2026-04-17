@@ -1,14 +1,22 @@
 module Startup
 
-using PrecompileTools: @recompile_invalidations, @setup_workload, @compile_workload
-
+using PrecompileTools: @setup_workload, @compile_workload
 using Catalyst
 using CSV
 using DataFrames
+using DataInterpolations
+using DiffEqCallbacks
+using ForwardDiff
+using GR
+using JumpProcesses
+using Latexify
+using LaTeXStrings
 using ModelingToolkit
 using OrdinaryDiffEq
-using SteadyStateDiffEq
 using Plots
+using Statistics
+using StatsBase
+using SteadyStateDiffEq
 
 @setup_workload begin
     function collins_sys(; name=:collins)
