@@ -60,7 +60,8 @@ jobs:
         include-matrix: 'false'
         cache-name: 'julia-cache'
     - name: Install Julia packages
-      run: julia --color=yes .github/setup.jl
+      shell: julia --color=yes --project=@. {0}
+      run: using Pkg; Pkg.instantiate()
     - name: List notebooks as a JSON array
       id: set-matrix
       run: echo "matrix=$(python -c 'import glob, json; print(json.dumps(glob.glob("**/*.ipynb", root_dir="docs", recursive=True) + glob.glob("**/*.jl", root_dir="docs", recursive=True)))')" >> "$GITHUB_OUTPUT"
@@ -98,8 +99,7 @@ jobs:
           cache-name: 'julia-cache'
       - name: Execute notebook
         if: ${{ steps.nb-cache.outputs.cache-hit != 'true' }}
-        run: |
-          julia --project=@. .github/ci.jl
+        run: julia --project=@. .github/ci.jl
       - name: Convert artifact Name
         id: art
         run: echo "name=$(echo ${{ env.NB }} | sed 's/\//-/g')" >> "$GITHUB_OUTPUT"
