@@ -58,7 +58,7 @@ jobs:
       id: cache-julia
       with:
         include-matrix: 'false'
-        cache-name: 'julia-cache-${{ steps.hash.outputs.value }}'
+        cache-name: 'julia-cache'
     - name: Install Julia packages
       run: julia --color=yes .github/setup.jl
     - name: List notebooks as a JSON array
@@ -95,7 +95,7 @@ jobs:
         id: cache-julia
         with:
           include-matrix: 'false'
-          cache-name: 'julia-cache-${{ needs.setup.outputs.hash }}'
+          cache-name: 'julia-cache'
       - name: Execute notebook
         if: ${{ steps.nb-cache.outputs.cache-hit != 'true' }}
         run: |
