@@ -16,10 +16,13 @@ env:
   JULIA_NUM_THREADS: 'auto'
   JULIA_CPU_TARGET: 'generic;icelake-server,clone_all;znver3,clone_all'
   OPENBLAS_NUM_THREADS: '1'
-  JULIA_CONDAPKG_BACKEND: 'Null'
-  JULIA_CONDAPKG_OFFLINE: 'true'
   NBCACHE: '.cache'
   PY_VER: '3.14'
+
+# needed to allow julia-actions/cache to delete old caches that it has created
+permissions:
+  actions: write
+  contents: read
 
 jobs:
   setup:
@@ -27,7 +30,8 @@ jobs:
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
       hash: ${{ steps.hash.outputs.value }}
-      ver: ${{ steps.julia-version.outputs.value }}
+      ver: ${{ steps.julia-version.outputs.resolved }}
+      cachekey: ${{ steps.cache-julia.outputs.cache-key }}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v6
@@ -36,32 +40,25 @@ jobs:
       id: setup-python
       with:
         python-version: ${{ env.PY_VER }}
-    - name: Install the latest version of uv
-      uses: astral-sh/setup-uv@v7
-    - run: uv pip install --system -r requirements.txt
-    - name: Read Julia version
-      id: julia-version
-      run: python -c 'import tomllib; from pathlib import Path; print("value=", tomllib.loads(Path("Manifest.toml").read_text())["julia_version"], sep="")' >> "$GITHUB_OUTPUT"
     - name: Get environment hash
       id: hash
       run: |
         echo "value=${{ hashFiles('Project.toml', 'Manifest.toml', 'Startup/**') }}" >> "$GITHUB_OUTPUT"
-        echo "ver=${{ runner.os }}-julia-${{ steps.julia-version.outputs.value }}" >> "$GITHUB_OUTPUT"
+    - name: Read Julia version
+      uses: julia-actions/julia-version@main
+      id: julia-version
+      with:
+        versions: manifest
+    - name: Setup Julia
+      uses: julia-actions/setup-julia@v3
+      with:
+        version: ${{ steps.julia-version.outputs.resolved }}
     - name: Cache Julia packages
-      uses: actions/cache@v5
+      uses: julia-actions/cache@v3
       id: cache-julia
       with:
-        path: ~/.julia
-        key: ${{ steps.hash.outputs.ver }}-${{ steps.hash.outputs.value }}
-        restore-keys: |
-          ${{ steps.hash.outputs.ver }}-
-    - name: Setup Julia
-      uses: julia-actions/setup-julia@v2
-      if: ${{ steps.cache-julia.outputs.cache-hit != 'true' }}
-      with:
-        version: ${{ steps.julia-version.outputs.value }}
+          include-matrix: 'false'
     - name: Install Julia packages
-      if: ${{ steps.cache-julia.outputs.cache-hit != 'true' }}
       run: julia --color=yes .github/setup.jl
     - name: List notebooks as a JSON array
       id: set-matrix
@@ -86,28 +83,20 @@ jobs:
         with:
           path: ${{ env.NBCACHE }}
           key: notebook-${{ needs.setup.outputs.hash }}-${{ hashFiles(env.NB) }}
-      - name: Setup Python
-        uses: actions/setup-python@v6
-        id: setup-python
-        with:
-          python-version: ${{ env.PY_VER }}
-      - name: Install the latest version of uv
-        uses: astral-sh/setup-uv@v7
       - name: Setup Julia
         uses: julia-actions/setup-julia@v2
         if: ${{ steps.nb-cache.outputs.cache-hit != 'true' }}
         with:
           version: ${{ needs.setup.outputs.ver }}
-      - name: Restore Julia packages
-        uses: actions/cache/restore@v5
+      - name: Cache Julia packages
+        uses: julia-actions/cache@v3
         if: ${{ steps.nb-cache.outputs.cache-hit != 'true' }}
+        id: cache-julia
         with:
-          path: ~/.julia
-          key: ${{ runner.os }}-julia-${{ needs.setup.outputs.ver }}-${{ needs.setup.outputs.hash }}
+          include-matrix: 'false'
       - name: Execute notebook
         if: ${{ steps.nb-cache.outputs.cache-hit != 'true' }}
         run: |
-          uv pip install --system -r requirements.txt
           julia --project=@. .github/ci.jl
       - name: Convert artifact Name
         id: art

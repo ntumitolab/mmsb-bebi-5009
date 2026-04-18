@@ -2,6 +2,7 @@ module Startup
 
 using PrecompileTools: @recompile_invalidations, @setup_workload, @compile_workload
 using ModelingToolkit
+using Catalyst
 using OrdinaryDiffEq
 using Plots
 
