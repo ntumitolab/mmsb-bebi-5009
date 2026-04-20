@@ -1241,9 +1241,9 @@ version = "2.42.0+0"
 
 [[deps.LineSearch]]
 deps = ["ADTypes", "CommonSolve", "ConcreteStructs", "FastClosures", "LinearAlgebra", "MaybeInplace", "PrecompileTools", "SciMLBase", "SciMLJacobianOperators", "StaticArraysCore"]
-git-tree-sha1 = "69da095e4c24ed3c4a168bb76dc9c620a6d7239c"
+git-tree-sha1 = "25454bc65c3eec4656cbe201c3d9336af49178c7"
 uuid = "87fe0de2-c867-4266-b59a-2f0a94fc965b"
-version = "0.1.7"
+version = "0.1.8"
 weakdeps = ["LineSearches"]
 
     [deps.LineSearch.extensions]
@@ -2363,7 +2363,7 @@ uuid = "0c0c59c1-dc5f-42e9-9a8b-b5dc384a6cd1"
 version = "0.3.0"
 
 [[deps.Startup]]
-deps = ["CSV", "Catalyst", "DataFrames", "ModelingToolkit", "OrdinaryDiffEq", "Plots", "PrecompileTools", "SteadyStateDiffEq"]
+deps = ["CSV", "Catalyst", "DataFrames", "DataInterpolations", "DiffEqCallbacks", "ForwardDiff", "JumpProcesses", "Latexify", "ModelingToolkit", "OrdinaryDiffEq", "Plots", "PrecompileTools", "SteadyStateDiffEq"]
 path = "Startup"
 uuid = "a62b76ab-7d3f-4675-a0a2-3db7dd0a15ab"
 version = "0.1.0"
