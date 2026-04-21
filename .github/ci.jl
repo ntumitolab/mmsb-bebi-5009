@@ -5,7 +5,7 @@ using SHA
 
 @everywhere begin
     ENV["GKSwstype"] = "100"
-    using Literate, JSON
+    using Literate, JSON, Startup
 end
 
 # Post-process Jupyter notebook
