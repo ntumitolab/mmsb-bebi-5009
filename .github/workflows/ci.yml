@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  LITERATE_PROC: '6'
+  LITERATE_PROC: '8'
   JULIA_CI: 'true'
   # JULIA_CPU_TARGET: 'generic;icelake-server,clone_all;znver3,clone_all'
   JULIA_NUM_THREADS: '2'
