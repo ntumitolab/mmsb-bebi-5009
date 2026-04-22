@@ -79,21 +79,21 @@ quiver(x2d, y2d, quiver=∇f)
 
 ===#
 using Plots
-import GR
-GR.setarrowsize(0.5)
+using UniformStreamlines
 
 # ∇ = `\nabla <TAB>`
-function ∇f(x, y; scale=(x^2 + y^2)^0.25 * 3)
-    return [-y, x] ./ scale
-end
+∇fx = (x, y) -> -y
+∇fy = (x, y) -> 1 + x - y^2
 
 # x and y grid points
-r = -1.0:0.2:1.0
-xx = [x for y in r, x in r]
-yy = [y for y in r, x in r]
+xs = LinRange(-2, 2, 200)
+ys = LinRange(-2, 2, 200)
 
-# Vector fields
-quiver(xx, yy, quiver=∇f, aspect_ratio=:equal, line=(:gray), arrow=(:closed), xlims=(-1.2, 1.2), ylims=(-1.2, 1.2))
+# stream object
+str = evenstream(xs, ys, ∇fx, ∇fy)
+
+# Stream plot
+streamlines(str; line_z=colorize(str, :norm), color=:viridis, with_arrows=true, colorbar=false)
 
 #===
 ## Save figure
