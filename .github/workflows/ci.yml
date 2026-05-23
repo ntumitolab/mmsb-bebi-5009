@@ -12,16 +12,16 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  LITERATE_PROC: '2'
+  LITERATE_PROC: '4'
   JULIA_CI: 'true'
   # JULIA_CPU_TARGET: 'generic;icelake-server,clone_all;znver3,clone_all'
-  JULIA_NUM_THREADS: '2'
+  JULIA_NUM_THREADS: '1'
   OPENBLAS_NUM_THREADS: '1'
   NBCACHE: '.cache'
 
 jobs:
   CI:
-    runs-on: self-hosted
+    runs-on: ubuntu-24.04-arm
     permissions:
       actions: write
       contents: read
