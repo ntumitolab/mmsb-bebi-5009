@@ -12,31 +12,42 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  LITERATE_PROC: '2'
+  CACHE_NUM: '1'
+  LITERATE_PROC: '4'
   JULIA_CI: 'true'
   # JULIA_CPU_TARGET: 'generic;icelake-server,clone_all;znver3,clone_all'
-  JULIA_NUM_THREADS: '2'
+  JULIA_NUM_THREADS: '1'
   OPENBLAS_NUM_THREADS: '1'
   NBCACHE: '.cache'
+  PY_VER: '3.14'
+  JULIA_CONDAPKG_OFFLINE: true
+  JULIA_CONDAPKG_BACKEND: 'Null'
 
 jobs:
   CI:
-    runs-on: self-hosted
-    permissions:
-      actions: write
-      contents: read
+    runs-on: ubuntu-24.04-arm
     steps:
     - name: Checkout repository
       uses: actions/checkout@v6
-    - name: Read Julia version
-      uses: julia-actions/julia-version@main
-      id: julia-version
+    - name: Setup uv
+      uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
       with:
-        versions: manifest
-    - name: Get hashes
+        python-version: ${{ env.PY_VER }}
+        activate-environment: true
+    - name: Install Python deps
+      run: uv pip install -r requirements.txt
+    - name: Add python venv to path
+      run: |
+          echo "$GITHUB_WORKSPACE/.venv/bin" >> $GITHUB_PATH
+          echo "VIRTUAL_ENV=$GITHUB_WORKSPACE/.venv" >> $GITHUB_ENV
+    - name: Read Julia version
+      id: julia-version
+      run: python -c 'import tomllib; from pathlib import Path; print("resolved=", tomllib.loads(Path("Manifest.toml").read_text())["julia_version"], sep="")' >> "$GITHUB_OUTPUT"
+    - name: Get environment hashes
       id: hash
       run: |
-        echo "value=${{ hashFiles('Project.toml', 'Manifest.toml', 'Startup/**') }}" >> "$GITHUB_OUTPUT"
+        echo "jl=${{ runner.os }}-${{ runner.arch }}-julia-${{ steps.julia-version.outputs.resolved }}" >> "$GITHUB_OUTPUT"
+        echo "env=${{ env.CACHE_NUM }}-${{ hashFiles('Project.toml', 'Manifest.toml', 'Startup/**') }}" >> "$GITHUB_OUTPUT"
         echo "nb=${{ hashFiles('docs/**/*.jl', 'docs/**/*.ipynb') }}" >> "$GITHUB_OUTPUT"
     - name: Cache executed notebooks
       uses: actions/cache@v5
@@ -45,22 +56,33 @@ jobs:
         path: |
           ${{ env.NBCACHE }}/**/*.ipynb
           ${{ env.NBCACHE }}/**/*.sha
-        key: notebook-${{ steps.hash.outputs.value }}-${{ steps.hash.outputs.nb }}
+        key: notebook-${{ steps.hash.outputs.env }}-${{ steps.hash.outputs.nb }}
         restore-keys: |
-          notebook-${{ steps.hash.outputs.value }}-
+          notebook-${{ steps.hash.outputs.env }}-
     - name: Setup Julia
       uses: julia-actions/setup-julia@v3
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' }}
       with:
         version: ${{ steps.julia-version.outputs.resolved }}
-    - name: Cache Julia packages
-      uses: julia-actions/cache@v3
+    - name: Restore Julia packages
+      uses: actions/cache/restore@v5
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' && runner.environment == 'github-hosted' }}
       id: cache-julia
+      with:
+        path: ~/.julia
+        key: ${{ steps.hash.outputs.jl }}-${{ steps.hash.outputs.env }}
+        restore-keys: |
+          ${{ steps.hash.outputs.jl }}-
     - name: Install Julia packages
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' && (runner.environment == 'self-hosted' || steps.cache-julia.outputs.cache-hit != 'true') }}
       shell: julia --color=yes --project=@. {0}
       run: using Pkg; Pkg.instantiate()
+    - name: Save Julia packages
+      uses: actions/cache/save@v5
+      if: ${{ steps.cache-nb.outputs.cache-hit != 'true' && runner.environment == 'github-hosted' && steps.cache-julia.outputs.cache-hit != 'true' }}
+      with:
+        path: ~/.julia
+        key: ${{ steps.cache-julia.outputs.cache-primary-key }}
     - name: Run notebooks
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' }}
       run: julia --project=@. --color=yes -p ${{ env.LITERATE_PROC }} .github/ci.jl
