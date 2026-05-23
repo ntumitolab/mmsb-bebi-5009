@@ -1,4 +1,4 @@
-name: Auto update Julia manifest dependencies
+name: Update Julia manifest
 
 on:
   workflow_dispatch:
