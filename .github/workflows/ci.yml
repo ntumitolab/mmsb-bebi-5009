@@ -13,10 +13,10 @@ concurrency:
 
 env:
   CACHE_NUM: '1'
-  LITERATE_PROC: '4'
+  LITERATE_PROC: '6'
   JULIA_CI: 'true'
   # JULIA_CPU_TARGET: 'generic;icelake-server,clone_all;znver3,clone_all'
-  JULIA_NUM_THREADS: '1'
+  JULIA_NUM_THREADS: '2'
   OPENBLAS_NUM_THREADS: '1'
   NBCACHE: '.cache'
   PY_VER: '3.14'
@@ -25,7 +25,7 @@ env:
 
 jobs:
   CI:
-    runs-on: ubuntu-24.04-arm
+    runs-on: self-hosted
     steps:
     - name: Checkout repository
       uses: actions/checkout@v6
@@ -47,7 +47,7 @@ jobs:
       id: hash
       run: |
         echo "jl=${{ runner.os }}-${{ runner.arch }}-julia-${{ steps.julia-version.outputs.resolved }}" >> "$GITHUB_OUTPUT"
-        echo "env=${{ env.CACHE_NUM }}-${{ hashFiles('Project.toml', 'Manifest.toml', 'Startup/**') }}" >> "$GITHUB_OUTPUT"
+        echo "env=${{ env.CACHE_NUM }}-${{ hashFiles('Project.toml', 'Manifest.toml', 'Model/**') }}" >> "$GITHUB_OUTPUT"
         echo "nb=${{ hashFiles('docs/**/*.jl', 'docs/**/*.ipynb') }}" >> "$GITHUB_OUTPUT"
     - name: Cache executed notebooks
       uses: actions/cache@v5
