@@ -414,9 +414,9 @@ up730 = Dict(
     (sols, as)
 end;
 
-luxI = map(s -> s[:L], sols)
-CI = map(s -> s[:C], sols)
-GFP = map(s -> s[:G], sols)
+luxI = map(s -> s[:L], sols.u)
+CI = map(s -> s[:C], sols.u)
+GFP = map(s -> s[:G], sols.u)
 plot(as, [luxI, CI, GFP], xscale=:log10, xlabel="AHL concentration (μM)", ylabel="Concentration (μM)", title="Fig. 7.30", label=["LuxI" "cI" "GFP"])
 
 # ## Fig. 7.31
