@@ -317,8 +317,8 @@ eprob_nofeed = EnsembleProblem(prob725_no_feedback; prob_func)
 @time sim = solve(eprob, alg; trajectories);
 @time sim_no_feed = solve(eprob_nofeed, alg; trajectories);
 
-luxI = map(s -> s[I], sim)
-luxI_nofeed = map(s -> s[I], sim_no_feed)
+luxI = map(s -> s[I], sim.u)
+luxI_nofeed = map(s -> s[I], sim_no_feed.u)
 plot(npops, [luxI, luxI_nofeed], xscale=:log10, xlabel="Population size", ylabel="LuxI concentration (μM)", title="Fig. 7.25", label=["With feedback" "Without feedback"], legend=:topleft)
 
 # ## Fig 7.28
