@@ -25,7 +25,7 @@ up = [:k1=>1.0, :Ki1A=>2.0, :K1A=>0.1, :k2=>0.05, :k3=>0.005, :K3F=>0.15, :K3A=>
 
 tend = 1000.0
 prob = ODEProblem(glycolysis, up, (0.0, tend); combinatoric_ratelaw=false)
-@time sol = solve(prob, TRBDF2(); abstol=1e-8, reltol=1e-6)
+@time sol = solve(prob, FBDF(); abstol=1e-8, reltol=1e-6)
 
 p1 = plot(sol, idxs=[:ATP, :ADP, :AMP], xlabel="Time", ylabel="Concentration", linewidth=2, title="Energy states", )
 
