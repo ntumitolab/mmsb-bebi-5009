@@ -19,7 +19,6 @@ env:
   JULIA_NUM_THREADS: '2'
   OPENBLAS_NUM_THREADS: '1'
   NBCACHE: '.cache'
-  PY_VER: '3.14'
 
 jobs:
   CI:
