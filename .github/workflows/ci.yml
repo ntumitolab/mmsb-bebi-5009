@@ -13,19 +13,19 @@ concurrency:
 
 env:
   CACHE_NUM: '1'
-  LITERATE_PROC: '4'
+  LITERATE_PROC: '2'
   JULIA_CI: 'true'
-  # JULIA_CPU_TARGET: 'generic;icelake-server,clone_all;znver3,clone_all'
-  JULIA_NUM_THREADS: '1'
+  JULIA_CPU_TARGET: 'generic;icelake-server,clone_all;znver3,clone_all'
+  JULIA_NUM_THREADS: '2'
   OPENBLAS_NUM_THREADS: '1'
   NBCACHE: '.cache'
 
 jobs:
-  CI:
-    runs-on: ubuntu-24.04-arm
+  execute:
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
     - name: Setup Python
       uses: actions/setup-python@v6
       id: setup-python
@@ -68,38 +68,71 @@ jobs:
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' && (runner.environment == 'self-hosted' || steps.cache-julia.outputs.cache-hit != 'true') }}
       shell: julia --color=yes --project=@. {0}
       run: using Pkg; Pkg.instantiate()
-    - name: Run notebooks
-      if: ${{ steps.cache-nb.outputs.cache-hit != 'true' }}
-      run: julia --project=@. --color=yes -p ${{ env.LITERATE_PROC }} .github/ci.jl
-    - name: Copy back built notebooks
-      run: cp --verbose -rf ${{ env.NBCACHE }}/docs/* docs/
-    - name: Setup NodeJS
-      uses: actions/setup-node@v6
-      with:
-        node-version: 'lts/*'
-    - name: Build website
-      env:
-        BASE_URL: /${{ github.event.repository.name }}
-      working-directory: docs
-      run: |
-        npm install -g "jupyter-book"
-        jupyter-book build --html
-    - name: Upload pages artifact
-      if: ${{ github.ref == 'refs/heads/main' }}
-      uses: actions/upload-pages-artifact@v5
-      with:
-        path: 'docs/_build/html'
     - name: Save Julia package cache
       uses: actions/cache/save@v5
-      if: ${{ always() && steps.cache-nb.outputs.cache-hit != 'true' && runner.environment == 'github-hosted' && steps.cache-julia.outputs.cache-hit != 'true' }}
+      if: ${{ steps.cache-nb.outputs.cache-hit != 'true' && runner.environment == 'github-hosted' && steps.cache-julia.outputs.cache-hit != 'true' }}
       with:
         path: ~/.julia
         key: ${{ steps.cache-julia.outputs.cache-primary-key }}
+    - name: Run notebooks
+      if: ${{ steps.cache-nb.outputs.cache-hit != 'true' }}
+      run: julia --project=@. --color=yes -p ${{ env.LITERATE_PROC }} .github/ci.jl
+    - name: Upload Notebooks
+      uses: actions/upload-artifact@v7
+      with:
+        name: notebooks
+        path: ${{ env.NBCACHE }}
+        include-hidden-files: true
+
+  render:
+    needs: execute
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Download notebooks
+        uses: actions/download-artifact@v8
+        with:
+          path: ${{ env.NBCACHE }}/
+          name: notebooks
+      - name: Copy back built notebooks
+        run: cp --verbose -rf ${{ env.NBCACHE }}/docs/* docs/
+      - name: Setup NodeJS
+        uses: actions/setup-node@v6
+        with:
+          node-version: 'lts/*'
+      - name: Build website
+        env:
+          BASE_URL: /${{ github.event.repository.name }}
+        working-directory: docs
+        run: |
+          npm install -g "jupyter-book"
+          jupyter-book build --html
+      - name: Upload pages artifact
+        if: ${{ github.ref == 'refs/heads/main' }}
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: 'docs/_build/html'
+
+  # CI conclusion for GitHub status check
+  CI:
+    needs: render
+    if: always()
+    runs-on: ubuntu-slim
+    steps:
+      - run: |
+          if [[ ${{ needs.render.result }} == "success" ]]; then
+            echo "Tests passed"
+            exit 0
+          else
+            echo "Tests failed"
+            exit 1
+          fi
 
   # Deployment job
   deploy:
     name: Deploy to GitHub pages and Notebook branch
-    needs: CI
+    needs: render
     if: ${{ github.ref == 'refs/heads/main' }}
     # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
     permissions:
