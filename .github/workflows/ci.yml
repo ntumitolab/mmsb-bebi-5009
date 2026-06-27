@@ -15,7 +15,7 @@ env:
   CACHE_NUM: '1'
   LITERATE_PROC: '2'
   JULIA_CI: 'true'
-  JULIA_CPU_TARGET: 'generic;icelake-server,clone_all;znver3,clone_all'
+  # JULIA_CPU_TARGET: 'generic;icelake-server,clone_all;znver3,clone_all'
   JULIA_NUM_THREADS: '2'
   OPENBLAS_NUM_THREADS: '1'
   NBCACHE: '.cache'
