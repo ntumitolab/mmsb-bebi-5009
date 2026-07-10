@@ -13,18 +13,16 @@ concurrency:
 
 env:
   CACHE_NUM: '1'
-  LITERATE_PROC: '2'
+  LITERATE_PROC: '4'
   JULIA_CI: 'true'
   # JULIA_CPU_TARGET: 'generic;icelake-server,clone_all;znver3,clone_all'
-  JULIA_NUM_THREADS: '2'
+  JULIA_NUM_THREADS: '1'
   OPENBLAS_NUM_THREADS: '1'
   NBCACHE: '.cache'
-  JULIA_CONDAPKG_BACKEND: 'Null'
-  JULIA_CONDAPKG_OFFLINE: true
 
 jobs:
   CI:
-    runs-on: self-hosted
+    runs-on: ubuntu-24.04-arm
     steps:
     - name: Checkout repository
       uses: actions/checkout@v7
@@ -33,10 +31,6 @@ jobs:
       id: setup-python
       with:
         python-version: 3.x
-    - name: Install the latest version of uv
-      uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
-    - name: Install python packages
-      run: uv pip install --system -r requirements.txt
     - name: Read Julia version
       id: julia-version
       run: python -c 'import tomllib; from pathlib import Path; print("resolved=", tomllib.loads(Path("Manifest.toml").read_text())["julia_version"], sep="")' >> "$GITHUB_OUTPUT"
