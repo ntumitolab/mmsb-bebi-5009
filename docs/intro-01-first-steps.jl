@@ -1,4 +1,6 @@
-#===
+using Markdown
+
+md"""
 # First steps
 
 ## Comments
@@ -24,7 +26,7 @@ To see the data content:
 - [`@printf`](https://docs.julialang.org/en/v1/stdlib/Printf/): C-like formatted output.
 - Inline display: content of the last expression. A semicolon `;` at the end will suppress inline output.
 
-===#
+"""
 
 # An integer (64 bit)
 x = 1
