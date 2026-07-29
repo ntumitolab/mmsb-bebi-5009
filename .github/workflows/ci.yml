@@ -13,16 +13,15 @@ concurrency:
 
 env:
   CACHE_NUM: '1'
-  LITERATE_PROC: '6'
+  LITERATE_PROC: '2'
   JULIA_CI: 'true'
-  # JULIA_CPU_TARGET: 'generic;icelake-server,clone_all;znver3,clone_all'
   JULIA_NUM_THREADS: '2'
   OPENBLAS_NUM_THREADS: '1'
   NBCACHE: '.cache'
 
 jobs:
   CI:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
       uses: actions/checkout@v7
@@ -32,14 +31,23 @@ jobs:
       with:
         python-version: 3.x
     - name: Read Julia version
+      uses: julia-actions/julia-version@v0.1.0
       id: julia-version
-      run: python -c 'import tomllib; from pathlib import Path; print("resolved=", tomllib.loads(Path("Manifest.toml").read_text())["julia_version"], sep="")' >> "$GITHUB_OUTPUT"
+      with:
+        versions: manifest
     - name: Get environment hashes
       id: hash
       run: |
         echo "jl=${{ runner.os }}-${{ runner.arch }}-julia-${{ steps.julia-version.outputs.resolved }}" >> "$GITHUB_OUTPUT"
         echo "env=${{ env.CACHE_NUM }}-${{ hashFiles('Project.toml', 'Manifest.toml', 'Startup/**') }}" >> "$GITHUB_OUTPUT"
         echo "nb=${{ hashFiles('docs/**/*.jl', 'docs/**/*.ipynb') }}" >> "$GITHUB_OUTPUT"
+    # https://github.com/jupyter/docker-stacks/blob/main/images/minimal-notebook/setup-scripts/setup-julia-packages.bash
+    - name: Set Julia CPU target (x64)
+      if: runner.arch == 'X64'
+      run: echo 'JULIA_CPU_TARGET=generic;sandybridge,-xsaveopt,clone_all;haswell,-rdrnd,base(1);x86-64-v4,-rdrnd,base(1)' >> $GITHUB_ENV
+    - name: Set Julia CPU target (ARM64)
+      if: runner.arch == 'ARM64'
+      run: echo 'JULIA_CPU_TARGET=generic;sandybridge,-xsaveopt,clone_all;haswell,-rdrnd,base(1);x86-64-v4,-rdrnd,base(1)' >> $GITHUB_ENV
     - name: Cache executed notebooks
       uses: actions/cache@v6
       id: cache-nb
@@ -98,7 +106,7 @@ jobs:
 
   # Deployment job
   deploy:
-    name: Deploy to GitHub pages and Notebook branch
+    name: Deploy to GitHub pages
     needs: CI
     if: ${{ github.ref == 'refs/heads/main' }}
     # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
