@@ -47,7 +47,7 @@ jobs:
         echo "nb=${{ hashFiles('docs/**/*.jl', 'docs/**/*.ipynb') }}" >> "$GITHUB_OUTPUT"
     - name: Set Julia CPU target (x64)
       if: ${{ runner.arch == 'X64' && runner.environment == 'github-hosted' }}
-      run: echo 'JULIA_CPU_TARGET=generic;sandybridge,-xsaveopt,clone_all;znver3,-rdrnd,base(1);saphirerapids,-rdrnd,base(1)' >> $GITHUB_ENV
+      run: echo 'JULIA_CPU_TARGET=generic;sandybridge,-xsaveopt,clone_all;znver3,-rdrnd,base(1);sapphirerapids,-rdrnd,base(1)' >> $GITHUB_ENV
     - name: Cache executed notebooks
       uses: actions/cache@v6
       id: cache-nb
