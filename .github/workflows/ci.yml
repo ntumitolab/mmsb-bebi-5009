@@ -13,9 +13,9 @@ concurrency:
 
 env:
   CACHE_NUM: '1'
-  LITERATE_PROC: '6'
+  LITERATE_PROC: '4'
   JULIA_CI: 'true'
-  JULIA_NUM_THREADS: '2'
+  JULIA_NUM_THREADS: '1'
   OPENBLAS_NUM_THREADS: '1'
   NBCACHE: '.cache'
   JULIA_CONDAPKG_OFFLINE: 'true'
@@ -23,7 +23,7 @@ env:
 
 jobs:
   CI:
-    runs-on: self-hosted
+    runs-on: ubuntu-24.04-arm
     steps:
     - name: Checkout repository
       uses: actions/checkout@v7
