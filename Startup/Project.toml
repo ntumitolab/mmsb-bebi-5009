@@ -5,6 +5,7 @@ authors = ["Wen Wei Tseng <sosiristseng@gmail.com>"]
 
 [deps]
 PrecompileTools = "aea7be01-6a6a-4083-8856-8a6e6704d82a"
+SymbolicIndexingInterface = "2efcf032-c050-4f8e-a9bb-153293bab1f5"
 
 [compat]
 PrecompileTools = "1"

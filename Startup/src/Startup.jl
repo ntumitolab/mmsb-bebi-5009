@@ -1,6 +1,9 @@
 module Startup
 
-# See the documentation at https://julialang.github.io/PrecompileTools.jl/stable/
 using PrecompileTools
+using SymbolicIndexingInterface
+
+include("utils.jl")
+include("precompile.jl")
 
 end # module Startup
