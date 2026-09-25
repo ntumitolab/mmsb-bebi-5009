@@ -31,6 +31,7 @@ plot(pl1, pl2, layout=(2, 1))
 
 # ## Fig 4.7 B
 # Vector field with nullclines
+@unpack A, B = prob407.f.sys
 xrange = range(0, 5, 201)
 yrange = range(0, 5, 201)
 xx, yy = meshgrid(xrange, yrange)
