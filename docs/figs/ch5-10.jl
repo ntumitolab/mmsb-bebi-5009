@@ -3,7 +3,6 @@
 using Startup: meshgrid, get_gradient, normalize_gradient
 using OrdinaryDiffEq
 using ModelingToolkit
-using SymbolicIndexingInterface
 using Plots
 Plots.gr(linewidth=1.5)
 
