@@ -13,16 +13,15 @@ concurrency:
 
 env:
   CACHE_NUM: '1'
-  LITERATE_PROC: '6'
+  LITERATE_PROC: '4'
   JULIA_CI: 'true'
-  JULIA_NUM_THREADS: '2'
-  JULIA_CPU_TARGET: 'sysimage'
+  JULIA_NUM_THREADS: '1'
   OPENBLAS_NUM_THREADS: '1'
   NBCACHE: '.cache'
 
 jobs:
   CI:
-    runs-on: self-hosted
+    runs-on: ubuntu-26.04-arm
     steps:
     - name: Checkout repository
       uses: actions/checkout@v7
@@ -35,6 +34,9 @@ jobs:
         echo "jl=${{ runner.os }}-${{ runner.arch }}-julia-${{ steps.julia-version.outputs.resolved }}" >> "$GITHUB_OUTPUT"
         echo "env=${{ env.CACHE_NUM }}-${{ hashFiles('Project.toml', 'Manifest.toml', 'Startup/**') }}" >> "$GITHUB_OUTPUT"
         echo "nb=${{ hashFiles('docs/**/*.jl', 'docs/**/*.ipynb') }}" >> "$GITHUB_OUTPUT"
+    - name: Set Julia CPU target (x64)
+      if: ${{ runner.arch == 'X64' }}
+      run: echo 'JULIA_CPU_TARGET=sysimage' >> $GITHUB_ENV
     - name: Cache executed notebooks
       uses: actions/cache@v6
       id: cache-nb
