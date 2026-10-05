@@ -13,15 +13,16 @@ concurrency:
 
 env:
   CACHE_NUM: '1'
-  LITERATE_PROC: '4'
+  LITERATE_PROC: '8'
   JULIA_CI: 'true'
   JULIA_NUM_THREADS: '1'
+  JULIA_MAX_NUM_PRECOMPILE_FILES: '50'
   OPENBLAS_NUM_THREADS: '1'
   NBCACHE: '.cache'
 
 jobs:
   CI:
-    runs-on: ubuntu-26.04-arm
+    runs-on: self-hosted
     steps:
     - name: Checkout repository
       uses: actions/checkout@v7
@@ -64,7 +65,11 @@ jobs:
     - name: Install Julia packages
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' && (runner.environment == 'self-hosted' || steps.cache-julia.outputs.cache-hit != 'true') }}
       shell: julia --color=yes --project=@. {0}
-      run: using Pkg; Pkg.instantiate(); Pkg.precompile()
+      run: |
+        using Pkg
+        Pkg.instantiate()
+        Pkg.precompile()
+        get(ENV, "RUNNER_ENVIRONMENT", "") == "github-hosted" && Pkg.gc()
     - name: Save Julia package cache
       uses: actions/cache/save@v6
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' && runner.environment == 'github-hosted' && steps.cache-julia.outputs.cache-hit != 'true' }}
