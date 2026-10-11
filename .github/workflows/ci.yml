@@ -13,16 +13,19 @@ concurrency:
 
 env:
   CACHE_NUM: '1'
-  LITERATE_PROC: '8'
+  LITERATE_PROC: '4'
   JULIA_CI: 'true'
   JULIA_NUM_THREADS: '1'
   JULIA_MAX_NUM_PRECOMPILE_FILES: '50'
   OPENBLAS_NUM_THREADS: '1'
   NBCACHE: '.cache'
+  PY_VER: '3.14'
+  JULIA_CONDAPKG_BACKEND: 'Null'
+  JULIA_CONDAPKG_OFFLINE: 'true'
 
 jobs:
   CI:
-    runs-on: self-hosted
+    runs-on: ubuntu-26.04-arm
     steps:
     - name: Checkout repository
       uses: actions/checkout@v7
@@ -36,7 +39,7 @@ jobs:
         echo "env=${{ env.CACHE_NUM }}-${{ hashFiles('Project.toml', 'Manifest.toml', 'Startup/**') }}" >> "$GITHUB_OUTPUT"
         echo "nb=${{ hashFiles('docs/**/*.jl', 'docs/**/*.ipynb') }}" >> "$GITHUB_OUTPUT"
     - name: Set Julia CPU target (x64)
-      if: ${{ runner.arch == 'X64' }}
+      if: ${{ runner.arch == 'X64' && runner.environment == 'github-hosted' }}
       run: echo 'JULIA_CPU_TARGET=sysimage' >> $GITHUB_ENV
     - name: Cache executed notebooks
       uses: actions/cache@v6
@@ -48,6 +51,17 @@ jobs:
         key: notebook-${{ steps.hash.outputs.env }}-${{ steps.hash.outputs.nb }}
         restore-keys: |
           notebook-${{ steps.hash.outputs.env }}-
+    - name: Setup Python
+      uses: actions/setup-python@v7
+      if: ${{ steps.cache-nb.outputs.cache-hit != 'true' }}
+      with:
+        python-version: ${{ env.PY_VER }}
+    - name: Install the latest version of uv
+      if: ${{ steps.cache-nb.outputs.cache-hit != 'true' }}
+      uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+    - name: Install Python deps
+      if: ${{ steps.cache-nb.outputs.cache-hit != 'true' }}
+      run: uv pip install --system -r requirements.txt
     - name: Setup Julia
       uses: julia-actions/setup-julia@v3
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' }}
@@ -64,9 +78,12 @@ jobs:
           ${{ steps.hash.outputs.jl }}-
     - name: Install Julia packages
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' && (runner.environment == 'self-hosted' || steps.cache-julia.outputs.cache-hit != 'true') }}
-      shell: julia --color=yes --project=@. {0}
+      shell: julia --color=yes {0}
       run: |
         using Pkg
+        Pkg.add(["JSON", "Literate", "MarkdownTables", "SHA", "Tables"])
+        Pkg.activate(".")
+        Pkg.resolve()
         Pkg.instantiate()
         Pkg.precompile()
         get(ENV, "RUNNER_ENVIRONMENT", "") == "github-hosted" && Pkg.gc()
