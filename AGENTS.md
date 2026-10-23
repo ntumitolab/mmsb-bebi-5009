@@ -32,15 +32,16 @@ CI (`.github/workflows/ci.yml`) runs the same pipeline on `ubuntu-26.04-arm` wit
 
 - `.github/ci.jl` caches by SHA256 per source file under `.cache/docs/**/<name>.sha`; unchanged files are not re-executed. Delete the matching `.sha` or `.cache/` to force a rerun.
 - The cache copy step is required: notebooks are written to `.cache/docs/...`, and the site build only sees them after copying back into `docs/`.
+- After copying notebooks back, delete the generated `docs/**/*.ipynb` before running `ci.jl` again. Its source walk treats those notebooks as inputs; a cache miss rewrites the same-named `.jl` from the generated notebook.
 - `docs/myst.yml` is the table of contents. `intro-*.ipynb` and `figs/*.ipynb` are included by glob; new pages outside those patterns must be added explicitly (as `hw-01.ipynb` is).
 
 ## Source conventions
 
-- Most files under `docs/` are Literate.jl sources, not runnable Python/Jupyter content:
+- Content under `docs/` is authored as Markdown or Literate.jl sources, not Jupyter files:
   - `docs/*.jl`: markdown in `#=== ... ===#` blocks, code in between.
-  - `docs/figs/*.jl`: markdown as `#` comments, code blocks separated by `#---`.
-- Both forms are valid Julia and can be executed directly.
-- Textbook figures mostly build Catalyst.jl/ModelingToolkit.jl ODE models and use the GR backend (`Plots.gr(linewidth=1.5)`); keep the GR backend and explicit `Plots.gr(...)` resets when adding figures.
-- `docs/figs/ch1.ipynb`, `ch2.ipynb`, and `ch3.ipynb` are checked-in notebooks with no `.jl` source. On a cache miss, `ci.jl` deletes each `.ipynb`, generates and runs a `.jl` sibling, then copies a regenerated notebook back, so avoid running the full CI script if you only need to edit those notebooks.
+  - `docs/figs/*.jl`: markdown as `#` comment lines; `#---` starts a new chunk and preserves the current chunk type.
+- Inside code, comments must start with `##`; Literate treats a single leading `#` as markdown. Both forms are valid Julia and can be executed directly.
+- Textbook figures (`docs/figs/`, including ch1–ch3) mostly build Catalyst.jl/ModelingToolkit.jl ODE models and use the GR backend (`Plots.gr(linewidth=1.5)`); keep the GR backend and explicit backend resets when adding figures.
+- There are no longer checked-in notebooks under `docs/figs/`; all figures are `.jl` sources matched by the `figs/*.ipynb` glob after generation. Do not reintroduce committed `.ipynb` files.
 - Generated `.ipynb` files under `docs/` are not gitignored (the `*.ipynb` rule is commented out); do not commit build outputs. `*.png` and `*.csv` are ignored.
 - `Manifest.toml` is intentionally committed and updated weekly by `.github/workflows/update-manifest.yml`; do not hand-edit it.
