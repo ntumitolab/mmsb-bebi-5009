@@ -1,18 +1,36 @@
-name: Clear all cache
+name: Clear caches
+
 on:
+  pull_request:
+    types:
+      - closed
   workflow_dispatch:
 
 jobs:
   cleanup:
-    runs-on: ubuntu-slim
+    name: Clear GitHub runner caches
+    runs-on: ubuntu-latest
     permissions:
       actions: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
     steps:
-      - name: Cleanup
+      # On a closed (merged) PR, only delete the caches created by that PR so the
+      # shared main-branch caches survive.
+      - name: Delete caches of the closed pull request
+        if: github.event_name == 'pull_request'
+        env:
+          PR_REF: refs/pull/${{ github.event.pull_request.number }}/merge
         run: |
-          echo "Deleting caches..."
+          echo "Deleting caches for $PR_REF..."
+          for id in $(gh cache list --ref "$PR_REF" --limit 100 --json id --jq '.[].id'); do
+            gh cache delete "$id" || true
+          done
+          echo "Done"
+      - name: Delete all caches
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          echo "Deleting all caches..."
           gh cache delete --succeed-on-no-caches --all
           echo "Done"
-        env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}

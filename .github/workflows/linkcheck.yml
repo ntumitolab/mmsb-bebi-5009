@@ -24,17 +24,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
-      - name: Setup Python
-        uses: actions/setup-python@v7
-        id: setup-python
-        with:
-          python-version: 3.x
-      - name: Install nbconvert
-        run: pip install nbconvert
-      - name: Convert ipynb files to markdown
-        run: >
-          find docs/ -type f -name '*.ipynb' |
-          parallel jupyter nbconvert --to markdown {}
       - name: Restore lychee cache
         id: restore-cache
         uses: actions/cache/restore@v6

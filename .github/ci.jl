@@ -58,6 +58,7 @@ function clean_cache(cachedir)
 end
 
 # Convert a Jupyter notebook into a Literate notebook. Adapted from https://github.com/JuliaInterop/NBInclude.jl.
+# Currently unused (list_notebooks only accepts .jl sources); kept for manual conversions.
 function to_literate(nbpath; shell_or_help=r"^\s*[;?]")
     nb = open(JSON.parse, nbpath, "r")
     jlpath = splitext(nbpath)[1] * ".jl"
@@ -80,13 +81,14 @@ function to_literate(nbpath; shell_or_help=r"^\s*[;?]")
     return jlpath
 end
 
-# List notebooks without caches in a file tree
+# List notebooks without caches in a file tree.
+# Only .jl (Literate) notebooks are accepted; .ipynb files in the docs tree are ignored.
 function list_notebooks(basedir, cachedir)
     list = String[]
     for (root, _, files) in walkdir(basedir)
         for file in files
             name, ext = splitext(file)
-            if ext == ".ipynb" || ext == ".jl"
+            if ext == ".jl"
                 nb = joinpath(root, file)
                 shaval = read(nb, String) |> sha256 |> bytes2hex
                 @info "$(nb) SHA256 = $(shaval)"
@@ -97,13 +99,7 @@ function list_notebooks(basedir, cachedir)
                     @info "$(nb) cache misses. Writing hash to $(shafilename)."
                     mkpath(dirname(shafilename))
                     write(shafilename, shaval)
-                    if ext == ".ipynb"
-                        litnb = to_literate(nb)
-                        rm(nb; force=true)
-                        push!(list, litnb)
-                    elseif ext == ".jl"
-                        push!(list, nb)
-                    end
+                    push!(list, nb)
                 end
             end
         end

@@ -19,9 +19,7 @@ env:
   JULIA_MAX_NUM_PRECOMPILE_FILES: '50'
   OPENBLAS_NUM_THREADS: '1'
   NBCACHE: '.cache'
-  PY_VER: '3.14'
-  JULIA_CONDAPKG_BACKEND: 'Null'
-  JULIA_CONDAPKG_OFFLINE: 'true'
+  JULIA_CONDAPKG_ENV: '@mpl'
 
 jobs:
   CI:
@@ -37,7 +35,7 @@ jobs:
       run: |
         echo "jl=${{ runner.os }}-${{ runner.arch }}-julia-${{ steps.julia-version.outputs.resolved }}" >> "$GITHUB_OUTPUT"
         echo "env=${{ env.CACHE_NUM }}-${{ hashFiles('Project.toml', 'Manifest.toml', 'Startup/**') }}" >> "$GITHUB_OUTPUT"
-        echo "nb=${{ hashFiles('docs/**/*.jl', 'docs/**/*.ipynb') }}" >> "$GITHUB_OUTPUT"
+        echo "nb=${{ hashFiles('docs/**/*.jl') }}" >> "$GITHUB_OUTPUT"
     - name: Set Julia CPU target (x64)
       if: ${{ runner.arch == 'X64' && runner.environment == 'github-hosted' }}
       run: echo 'JULIA_CPU_TARGET=sysimage' >> $GITHUB_ENV
@@ -51,17 +49,6 @@ jobs:
         key: notebook-${{ steps.hash.outputs.env }}-${{ steps.hash.outputs.nb }}
         restore-keys: |
           notebook-${{ steps.hash.outputs.env }}-
-    - name: Setup Python
-      uses: actions/setup-python@v7
-      if: ${{ steps.cache-nb.outputs.cache-hit != 'true' }}
-      with:
-        python-version: ${{ env.PY_VER }}
-    - name: Install the latest version of uv
-      if: ${{ steps.cache-nb.outputs.cache-hit != 'true' }}
-      uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
-    - name: Install Python deps
-      if: ${{ steps.cache-nb.outputs.cache-hit != 'true' }}
-      run: uv pip install --system -r requirements.txt
     - name: Setup Julia
       uses: julia-actions/setup-julia@v3
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' }}
