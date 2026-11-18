@@ -19,4 +19,8 @@ julia --project=@. -e 'using Pkg; Pkg.instantiate(); Pkg.precompile()'
   - `docs/*.jl`: markdown in `#=== ... ===#` blocks, code in between.
   - `docs/figs/*.jl`: markdown as `#` comment lines; `#---` starts a new chunk and preserves the current chunk type.
 - Inside code, comments must start with `##`; Literate treats a single leading `#` as markdown. Both forms are valid Julia and can be executed directly.
-- Do not hand-edit `Manifest.toml`.
+- Do not hand-edit `Manifest.toml`. It should be updated by the following command
+
+```sh
+julia --project=@. -e 'using Pkg; Pkg.update()'
+```
