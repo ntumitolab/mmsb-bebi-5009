@@ -3,7 +3,7 @@
 using ComponentArrays
 using OrdinaryDiffEq
 using Plots
-using Startup: meshgrid, normalize_gradient
+using Startup: get_gradient, meshgrid, normalize_gradient
 Plots.gr(linewidth=1.5)
 
 #---
@@ -20,20 +20,6 @@ function lambda_ode!(du, u, p, t)
     return nothing
 end
 
-function get_gradient(f!, p, xname, yname, xx, yy; t = 0.0)
-    du = ComponentArray(r = 0.0, c = 0.0)
-    u = ComponentArray(r = 0.0, c = 0.0)
-    v = map(xx, yy) do x, y
-        u[xname] = x
-        u[yname] = y
-        f!(du, u, p, t)
-        (du[xname], du[yname])
-    end
-    dx = map(first, v)
-    dy = map(last, v)
-    return (dx, dy)
-end
-
 #---
 p = ComponentArray(K1=1.0, K2=0.1, K3=5.0, K4=0.5, delta_r=0.02, delta_c=0.02, a=5.0, b=50.0)
 u0 = ComponentArray(r=0.0, c=0.0)
@@ -45,7 +31,7 @@ xrange = range(0, 250, 101)
 yrange = range(0, 250, 101)
 
 xx, yy = meshgrid(xrange, yrange)
-dx, dy = get_gradient(lambda_ode!, prob711.p, :r, :c, xx, yy)
+dx, dy = get_gradient(lambda_ode!, prob711.u0, prob711.p, :r, :c, xx, yy)
 xx_sp = xx[1:5:end, 1:5:end]
 yy_sp = yy[1:5:end, 1:5:end]
 dxnorm, dynorm = normalize_gradient(dx[1:5:end, 1:5:end], dy[1:5:end, 1:5:end], 5*step(xrange), 5*step(yrange))
@@ -60,7 +46,7 @@ plot!(xlabel="[cI] (nM)", ylabel="[cro] (nM)", title="Fig. 7.11 (A)", legend=:to
 # ## Fig 7.11 (B)
 # Faster degradation of the cI repressor removes the lysogenic branch.
 prob711b = remake(prob711; p=[:delta_r => 0.2])
-dx, dy = get_gradient(lambda_ode!, prob711b.p, :r, :c, xx, yy)
+dx, dy = get_gradient(lambda_ode!, prob711b.u0, prob711b.p, :r, :c, xx, yy)
 dxnorm, dynorm = normalize_gradient(dx[1:5:end, 1:5:end], dy[1:5:end, 1:5:end], 5*step(xrange), 5*step(yrange))
 quiver(xx_sp, yy_sp, quiver=(dxnorm, dynorm); aspect_ratio=1, size=(600, 600), xlims=(0, 250), ylims=(0, 250), color=:gray)
 contour!(xrange, yrange, dx, levels=[0], line=(:black, :solid), colorbar=false)

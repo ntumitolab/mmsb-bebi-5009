@@ -5,6 +5,7 @@ using ComponentArrays
 using OrdinaryDiffEq
 using SteadyStateDiffEq
 using Plots
+using Startup: with_param
 Plots.gr(linewidth=1.5)
 
 #---
@@ -33,7 +34,8 @@ u0 = ComponentArray(A=0.0, B=0.0)
 @time "Build problem" prob = SteadyStateProblem(switch_ode!, u0, p)
 
 #---
-with_k1(p, k1) = ComponentArray(merge(NamedTuple(p), (k1 = k1,)))
+## Sweeping `k1` means rebuilding the whole parameter array: pair-based
+## `remake(prob; p=[:k1 => k1])` silently no-ops for a `SteadyStateProblem`.
 k1s = 0.0:10.0:1000.0
-@time sols = [solve(remake(prob; p=with_k1(p, k1)), DynamicSS(FBDF())).u[:A] for k1 in k1s]
+@time sols = [solve(remake(prob; p=with_param(p, :k1, k1)), DynamicSS(FBDF())).u[:A] for k1 in k1s]
 plot(k1s, sols, xlabel="Parameter k1", ylabel="Steady state [A]", title="Fig. 4.18", label=false)

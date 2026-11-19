@@ -9,13 +9,10 @@
 using ComponentArrays
 using OrdinaryDiffEq
 using Plots
-using Startup: meshgrid, normalize_gradient
+using Startup: get_gradient, mass_action, meshgrid, normalize_gradient
 Plots.gr(linewidth=1.5)
 
 #---
-mass_action(k) = k            ## zero-order flux, e.g. constant production
-mass_action(k, x) = k * x     ## first-order flux
-
 function oscillatory_ode!(du, u, p, t)
     ## Flux through each reaction:
     v1 = mass_action(p.k0)                        ## 0 --> A
@@ -29,20 +26,6 @@ function oscillatory_ode!(du, u, p, t)
 end
 
 #---
-function get_gradient(f!, p, xname, yname, xx, yy; t = 0.0)
-    du = ComponentArray(A = 0.0, B = 0.0)
-    u = ComponentArray(A = 0.0, B = 0.0)
-    v = map(xx, yy) do x, y
-        u[xname] = x
-        u[yname] = y
-        f!(du, u, p, t)
-        (du[xname], du[yname])
-    end
-    dx = map(first, v)
-    dy = map(last, v)
-    return (dx, dy)
-end
-
 # ## Fig 4.15 A
 alg = FBDF()
 p = ComponentArray(k0=8.0, k1=1.0, k2=5.0, n=2.0)
@@ -70,7 +53,7 @@ plot(sols[1], xlabel="Time", ylabel="Concentration", title="Fig. 4.15 A")
 xrange = range(0, 4, 101)
 yrange = range(0, 4, 101)
 xx, yy = meshgrid(xrange, yrange)
-dx, dy = get_gradient(oscillatory_ode!, p, :A, :B, xx, yy)
+dx, dy = get_gradient(oscillatory_ode!, u0, p, :A, :B, xx, yy)
 xx_sp = xx[1:5:end, 1:5:end]
 yy_sp = yy[1:5:end, 1:5:end]
 dx_sp = dx[1:5:end, 1:5:end]
@@ -101,7 +84,7 @@ plot(sols[1], xlabel="Time", ylabel="Concentration", title="Fig. 4.16 A", tspan=
 xrange = range(0, 4, 201)
 yrange = range(0, 4, 201)
 xx, yy = meshgrid(xrange, yrange)
-dx, dy = get_gradient(oscillatory_ode!, prob416.p, :A, :B, xx, yy)
+dx, dy = get_gradient(oscillatory_ode!, prob416.u0, prob416.p, :A, :B, xx, yy)
 xx_sp = xx[1:10:end, 1:10:end]
 yy_sp = yy[1:10:end, 1:10:end]
 dx_sp = dx[1:10:end, 1:10:end]
@@ -128,7 +111,7 @@ plot(sol, idxs=(:A, :B), arrow=(:head))
 xrange = range(1, 3, 201)
 yrange = range(1, 3, 201)
 xx, yy = meshgrid(xrange, yrange)
-dx, dy = get_gradient(oscillatory_ode!, prob417.p, :A, :B, xx, yy)
+dx, dy = get_gradient(oscillatory_ode!, prob417.u0, prob417.p, :A, :B, xx, yy)
 xx_sp = xx[1:10:end, 1:10:end]
 yy_sp = yy[1:10:end, 1:10:end]
 dx_sp = dx[1:10:end, 1:10:end]

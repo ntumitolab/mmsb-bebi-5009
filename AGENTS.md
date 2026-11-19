@@ -10,7 +10,7 @@ Course website for *Mathematical Modeling in Systems Biology* (BEBI-5009). Conte
 julia --project=@. -e 'using Pkg; Pkg.instantiate(); Pkg.precompile()'
 ```
 - Prefer `repld` skill to test and run Julia scripts.
-- `Startup` is a local package (in `Startup/`). It exports helper functions.
+- `Startup` is a local package (in `Startup/`).
 - Headless plotting: set `GKSwstype=100`.
 
 ## Source conventions

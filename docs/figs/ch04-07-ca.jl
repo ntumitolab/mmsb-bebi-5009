@@ -3,7 +3,7 @@
 using ComponentArrays
 using OrdinaryDiffEq
 using Plots
-using Startup: meshgrid, normalize_gradient
+using Startup: get_gradient, meshgrid, normalize_gradient
 Plots.gr(linewidth=1.5)
 
 #---
@@ -18,22 +18,6 @@ function toggle_ode!(du, u, p, t)
     du.A = p.k1 / (1 + u.B^p.n1) - p.k3 * u.A
     du.B = p.k2 / (1 + u.A^p.n2) - p.k4 * u.B
     return nothing
-end
-
-function get_gradient(f!, p, xx, yy)
-    dx = map(xx, yy) do x, y
-        u = ComponentArray(A = x, B = y)
-        du = similar(u)
-        f!(du, u, p, 0.0)
-        du.A
-    end
-    dy = map(xx, yy) do x, y
-        u = ComponentArray(A = x, B = y)
-        du = similar(u)
-        f!(du, u, p, 0.0)
-        du.B
-    end
-    return dx, dy
 end
 
 # ## Fig 4.7 A
@@ -53,7 +37,7 @@ plot(pl1, pl2, layout=(2, 1))
 xrange = range(0, 5, 201)
 yrange = range(0, 5, 201)
 xx, yy = meshgrid(xrange, yrange)
-dx, dy = get_gradient(toggle_ode!, prob407.p, xx, yy)
+dx, dy = get_gradient(toggle_ode!, prob407.u0, prob407.p, :A, :B, xx, yy)
 xx_sp = xx[1:10:end, 1:10:end]
 yy_sp = yy[1:10:end, 1:10:end]
 dx_sp = dx[1:10:end, 1:10:end]
@@ -80,7 +64,7 @@ plot(pl1, pl2, layout=(2, 1))
 xrange = range(0, 5, 201)
 yrange = range(0, 5, 201)
 xx, yy = meshgrid(xrange, yrange)
-dx, dy = get_gradient(toggle_ode!, prob408.p, xx, yy)
+dx, dy = get_gradient(toggle_ode!, prob408.u0, prob408.p, :A, :B, xx, yy)
 xx_sp = xx[1:10:end, 1:10:end]
 yy_sp = yy[1:10:end, 1:10:end]
 dx_sp = dx[1:10:end, 1:10:end]
@@ -98,7 +82,7 @@ plot!(title="Fig. 4.8 B", aspect_ratio=1, size=(600, 600), xlims=(0, 5), ylims=(
 xrange = 1.0:0.01:1.5
 yrange = 1.0:0.01:1.5
 xx, yy = meshgrid(xrange, yrange)
-dx, dy = get_gradient(toggle_ode!, prob408.p, xx, yy)
+dx, dy = get_gradient(toggle_ode!, prob408.u0, prob408.p, :A, :B, xx, yy)
 xx_sp = xx[1:5:end, 1:5:end]
 yy_sp = yy[1:5:end, 1:5:end]
 dx_sp = dx[1:5:end, 1:5:end]

@@ -4,12 +4,10 @@ using ComponentArrays
 using DiffEqCallbacks
 using OrdinaryDiffEq
 using Plots
+using Startup: hil
 Plots.gr(linewidth=1.5)
 
 #---
-hil(x, k) = x / (x + k)
-hil(x, k, n) = hil(x^n, k^n)
-
 ## External input signals, replacing the algebraic equations
 ## `i1 ~ 10 * (t > 30) * (t < 40)` and `i2 ~ 10 * (t > 10) * (t < 20)`.
 ## A signal is ON on the half-open interval [t_on, t_off).

@@ -9,7 +9,7 @@
 using ComponentArrays
 using OrdinaryDiffEq
 using Plots
-using Startup: meshgrid
+using Startup: get_gradient, mass_action, meshgrid
 Plots.gr(linewidth=1.5)
 
 #---
@@ -19,9 +19,7 @@ v0_723(x, y, alpha, sigma) = (1 + x^2 + alpha * sigma * x^4) / ((1 + x^2 + sigma
 
 ## Each reaction contributes a *flux* to the balances: the rate that is
 ## written in front of the reaction, times the mass-action monomial of its
-## reactants.
-mass_action(k) = k            ## zero-order flux, e.g. production from `0 --> x`
-mass_action(k, x) = k * x     ## first-order flux
+## reactants (`mass_action` is one of the reaction-network helpers in `Startup`).
 
 ## Single oscillator: `0 --> x`, `0 --> y`, `x --> 0`, `y --> 0`.
 function hasty_ode!(du, u, p, t)
@@ -36,20 +34,6 @@ function hasty_ode!(du, u, p, t)
     du.x = v1 - v3
     du.y = v2 - v4
     return nothing
-end
-
-function get_gradient(f!, p, xname, yname, xx, yy; t = 0.0)
-    du = ComponentArray(x = 0.0, y = 0.0)
-    u = ComponentArray(x = 0.0, y = 0.0)
-    v = map(xx, yy) do x, y
-        u[xname] = x
-        u[yname] = y
-        f!(du, u, p, t)
-        (du[xname], du[yname])
-    end
-    dx = map(first, v)
-    dy = map(last, v)
-    return (dx, dy)
 end
 
 # ## Fig. 7.23 (A)
@@ -68,7 +52,7 @@ xrange = range(0, 1.5, 51)
 yrange = range(0, 3, 51)
 
 xx, yy = meshgrid(xrange, yrange)
-dx, dy = get_gradient(hasty_ode!, p723, :x, :y, xx, yy)
+dx, dy = get_gradient(hasty_ode!, u0723, p723, :x, :y, xx, yy)
 contour(xrange, yrange, dx, levels=[0], line=(:black, :solid), colorbar=false)
 plot!([], [], line=(:black, :solid), label="x nullcline")
 contour!(xrange, yrange, dy, levels=[0], line=(:black, :dash), colorbar=false)

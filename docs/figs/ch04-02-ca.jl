@@ -2,7 +2,7 @@
 using ComponentArrays
 using OrdinaryDiffEq
 using Plots
-using Startup: meshgrid, normalize_gradient
+using Startup: get_gradient, mass_action, meshgrid, normalize_gradient
 Plots.gr(linewidth=1.5)
 
 # Bistable autoregulatory network for Figures 4.2 - 4.5, without Catalyst.
@@ -21,9 +21,6 @@ Plots.gr(linewidth=1.5)
 # of by numeric index.
 
 #---
-mass_action(k) = k            ## zero-order flux, e.g. constant production
-mass_action(k, x) = k * x     ## first-order flux
-
 function bistable_ode!(du, u, p, t)
     ## Flux through each reaction:
     v1 = mass_action(p.k1 / (1 + u.B^p.n))  ## 0 --> A, inhibited by B
@@ -84,25 +81,11 @@ plot!(title="Fig. 4.3 B", aspect_ratio=1, size=(600, 600), xlims=(0, 2), ylims=(
 
 # ## Fig 4.4 A
 # Let's sketch vector fields in phase plots.
-function get_gradient(f!, p, xname, yname, xx, yy; t = 0.0)
-    du = ComponentArray(A = 0.0, B = 0.0)
-    u = ComponentArray(A = 0.0, B = 0.0)
-    v = map(xx, yy) do x, y
-        u[xname] = x
-        u[yname] = y
-        f!(du, u, p, t)
-        (du[xname], du[yname])
-    end
-    dx = map(first, v)
-    dy = map(last, v)
-    return (dx, dy)
-end
-
 xrange = 0:0.1:2
 yrange = 0:0.1:2
 
 xx, yy = meshgrid(xrange, yrange)
-dx, dy = get_gradient(bistable_ode!, p, :A, :B, xx, yy)
+dx, dy = get_gradient(bistable_ode!, u0, p, :A, :B, xx, yy)
 dx_norm, dy_norm = normalize_gradient(dx, dy, step(xrange), step(yrange))
 quiver(xx, yy, quiver=(dx_norm, dy_norm), color=:gray)
 
@@ -117,7 +100,7 @@ plot!(title="Fig. 4.4 A", aspect_ratio=1, size=(600, 600), xlims=(0, 2), ylims=(
 xrange = 0:0.01:2
 yrange = 0:0.01:2
 xx, yy = meshgrid(xrange, yrange)
-dx, dy = get_gradient(bistable_ode!, p, :A, :B, xx, yy)
+dx, dy = get_gradient(bistable_ode!, u0, p, :A, :B, xx, yy)
 
 contour(xrange, yrange, dx, levels=[0], line=(:black, :solid), colorbar=false)
 plot!([], [],  line=(:black, :solid), label="A nullcline")
@@ -134,7 +117,7 @@ plot!(title="Fig. 4.5 A", aspect_ratio=1, size=(600, 600), xlims=(0, 2), ylims=(
 xrange = 0:0.01:2
 yrange = 0:0.01:2
 xx, yy = meshgrid(xrange, yrange)
-dx, dy = get_gradient(bistable_ode!, p, :A, :B, xx, yy)
+dx, dy = get_gradient(bistable_ode!, u0, p, :A, :B, xx, yy)
 
 xx_sp = xx[1:10:end, 1:10:end]
 yy_sp = yy[1:10:end, 1:10:end]

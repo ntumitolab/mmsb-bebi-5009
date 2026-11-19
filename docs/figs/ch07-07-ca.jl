@@ -5,20 +5,19 @@ using DiffEqCallbacks
 using DifferentialEquations
 using SteadyStateDiffEq
 using Plots
+using Startup: hil, with_param
 Plots.gr(linewidth=1.5)
 
 #---
-mm(x, v, K) = v * x / (x + K)
-
 function lac_ode!(du, u, p, t)
     ## Flux through each reaction:
     v1p = p.a1 / (1 + p.RToverK1 * (p.K2 / (p.K2 + u.L))^4)   ## 0 --> M
     v1m = p.δM * u.M                                          ## M --> 0
     v2p = p.c1 * u.M                                          ## 0 --> Y
     v2m = p.δY * u.Y                                          ## Y --> 0
-    v3 = mm(p.Le, p.kL * u.Y, p.KML)                          ## 0 --> L
+    v3 = (p.kL * u.Y) * hil(p.Le, p.KML)                      ## 0 --> L, saturating in the external lactose Le
     v4 = p.δL * u.L                                           ## L --> 0
-    v5 = (u.Y / 4) * mm(u.L, 2 * p.kg, p.KMg)                 ## L => 0
+    v5 = (u.Y / 4) * (2 * p.kg) * hil(u.L, p.KMg)             ## L => 0
 
     ## Species balances: each flux enters with its stoichiometric coefficient.
     du.M = v1p - v1m
@@ -72,9 +71,9 @@ function lac_ode_modified!(du, u, p, t)
     v1m = p.δM * u.M                                          ## M --> 0
     v2p = p.c1 * u.M                                          ## 0 --> Y
     v2m = p.δY * u.Y                                          ## Y --> 0
-    v3 = p.Enz * mm(p.Le, 4 * p.kL, p.KML)                    ## 0 --> L
+    v3 = p.Enz * (4 * p.kL) * hil(p.Le, p.KML)                ## 0 --> L
     v4 = p.δL * u.L                                           ## L --> 0
-    v5 = p.Enz * mm(u.L, 2 * p.kg, p.KMg)                     ## L => 0
+    v5 = p.Enz * (2 * p.kg) * hil(u.L, p.KMg)                 ## L => 0
 
     ## Species balances: each flux enters with its stoichiometric coefficient.
     du.M = v1p - v1m
@@ -84,14 +83,16 @@ function lac_ode_modified!(du, u, p, t)
 end
 
 #---
+## This variant adds a new parameter, so the whole array is rebuilt;
+## `with_param` only replaces a parameter that `p` already has.
 p_mod = ComponentArray(merge(NamedTuple(p), (Enz = 40.0,)))
 
-with_Le(p, le) = ComponentArray(merge(NamedTuple(p), (Le = le,)))
-
+## Sweeping `Le` means rebuilding the whole parameter array: pair-based
+## `remake(prob; p=[:Le => le])` silently no-ops for a `SteadyStateProblem`.
 prob707a = SteadyStateProblem(lac_ode!, u0, p)
 prob707b = SteadyStateProblem(lac_ode_modified!, u0, p_mod)
 lerange = 0:100
-prob_func = (prob, ctx) -> remake(prob; p = with_Le(prob.p, lerange[ctx.sim_id]))
+prob_func = (prob, ctx) -> remake(prob; p = with_param(prob.p, :Le, lerange[ctx.sim_id]))
 output_func = (sol, ctx) -> (sol.u[:Y] / 4, false)
 ssalg = DynamicSS(FBDF())
 

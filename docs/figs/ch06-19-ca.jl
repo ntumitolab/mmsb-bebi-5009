@@ -4,13 +4,10 @@ using ComponentArrays
 using OrdinaryDiffEq
 using Plots
 using LaTeXStrings
+using Startup: mass_action
 Plots.gr(linewidth=1.5)
 
 #---
-mass_action(k) = k                ## zero-order flux
-mass_action(k, x) = k * x         ## first-order flux
-mass_action(k, x, y) = k * x * y  ## second-order flux
-
 L_signal(t, p) = p.lt + (p.lt / p.l_AMP) * cospi(2t / p.l_per)
 
 #---

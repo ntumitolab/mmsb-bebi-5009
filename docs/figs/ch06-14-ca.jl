@@ -4,6 +4,7 @@ using ComponentArrays
 using DiffEqCallbacks
 using OrdinaryDiffEq
 using Plots
+using Startup: hil
 Plots.gr(linewidth=1.5)
 
 #---
@@ -17,20 +18,21 @@ Plots.gr(linewidth=1.5)
 ## (k4 * L, km4),         A   <--> AL
 ## (k5 * Am, km5),        B   <--> BP
 ## ```
-mm(x, v, k) = v * x / (x + k)  ## Michaelis–Menten factor, as in Catalyst
+## The `mm(x, v, k)` of Catalyst is `v * hil(x, k)` with the Hill function
+## `hil` from `Startup`.
 
 function chemotaxis_ode!(du, u, p, t)
     ## Flux through each reaction:
-    v1 = mm(u.Am, p.k1 * u.BP, p.KM1)  ## Am  => A,   v1 = k1 * BP * Am / (KM1 + Am)
-    v2 = mm(u.AmL, p.k2 * u.BP, p.KM2) ## AmL => AL,  v2 = k2 * BP * AmL / (KM2 + AmL)
-    v3 = p.km1 * p.R                   ## A   => Am,  zeroth order in A
-    v4 = p.km2 * p.R                   ## AL  => AmL, zeroth order in AL
-    v5 = p.k3 * p.L * u.Am             ## Am  --> AmL
-    v6 = p.km3 * u.AmL                 ## AmL --> Am
-    v7 = p.k4 * p.L * u.A              ## A   --> AL
-    v8 = p.km4 * u.AL                  ## AL  --> A
-    v9 = p.k5 * u.Am * u.B             ## B   --> BP
-    v10 = p.km5 * u.BP                 ## BP  --> B
+    v1 = (p.k1 * u.BP) * hil(u.Am, p.KM1)   ## Am  => A,   v1 = k1 * BP * Am / (KM1 + Am)
+    v2 = (p.k2 * u.BP) * hil(u.AmL, p.KM2)  ## AmL => AL,  v2 = k2 * BP * AmL / (KM2 + AmL)
+    v3 = p.km1 * p.R                        ## A   => Am,  zeroth order in A
+    v4 = p.km2 * p.R                        ## AL  => AmL, zeroth order in AL
+    v5 = p.k3 * p.L * u.Am                  ## Am  --> AmL
+    v6 = p.km3 * u.AmL                      ## AmL --> Am
+    v7 = p.k4 * p.L * u.A                   ## A   --> AL
+    v8 = p.km4 * u.AL                       ## AL  --> A
+    v9 = p.k5 * u.Am * u.B                  ## B   --> BP
+    v10 = p.km5 * u.BP                      ## BP  --> B
 
     ## Species balances: each flux enters with its stoichiometric coefficient.
     du.Am = -v1 + v3 - v5 + v6

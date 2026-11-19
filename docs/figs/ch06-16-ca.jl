@@ -5,6 +5,7 @@ using ComponentArrays
 using DiffEqCallbacks
 using OrdinaryDiffEq
 using Plots
+using Startup: mass_action
 Plots.gr(linewidth=1.5)
 
 #---
@@ -23,10 +24,6 @@ Plots.gr(linewidth=1.5)
 ## k18,                     C8sBAR --> 0
 ## k19,                     C3sIAP --> 0
 ## ```
-mass_action(k) = k               ## zero-order flux, e.g. constant production
-mass_action(k, x) = k * x        ## first-order flux
-mass_action(k, x, y) = k * x * y ## second-order flux
-
 function apoptosis_ode!(du, u, p, t)
     ## Flux through each reaction:
     v1p = mass_action(p.k1)                          ## 0 --> C8

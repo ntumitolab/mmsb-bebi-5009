@@ -3,6 +3,7 @@
 using ComponentArrays
 using OrdinaryDiffEq
 using Plots
+using Startup: hil
 Plots.gr(linewidth=1.5)
 
 #---
@@ -14,8 +15,8 @@ function vg728(R, C, KR, KC, aG)
     return aG * (fR / (1 + fR + fC^2 + fR * fC^2))
 end
 
-## Michaelis-Menten function, as Catalyst defines it: `mm(x, v, K) = v*x/(x + K)`.
-mm(x, v, K) = v * x / (x + K)
+## Michaelis-Menten kinetics come from `Startup`: Catalyst's `mm(x, v, K)` is
+## `v * hil(x, K)`.
 
 #---
 ## The reactions
@@ -29,9 +30,9 @@ mm(x, v, K) = v * x / (x + K)
 ## ```
 function pulse_ode!(du, u, p, t)
     ## Flux through each reaction:
-    w1 = vg728(u.R, u.C, p.KR, p.KC, p.aG)       ## 0 --> G
+    w1 = vg728(u.R, u.C, p.KR, p.KC, p.aG)        ## 0 --> G
     w2 = p.bG * u.G                               ## G --> 0
-    w3 = mm(u.R, p.aC, p.KR)                      ## 0 --> C
+    w3 = p.aC * hil(u.R, p.KR)                    ## 0 --> C
     w4 = p.bC * u.C                               ## C --> 0
     w5 = p.k1 * (p.RT - 2 * u.R)^2 * p.A^2        ## 0 --> R
     w6 = p.k2 * u.R                               ## R --> 0

@@ -4,11 +4,10 @@ using ComponentArrays
 using DiffEqCallbacks
 using OrdinaryDiffEq
 using Plots
+using Startup: hil
 Plots.gr(linewidth=1.5)
 
 #---
-hill(x, v, K, n) = v * x^n / (x^n + K^n)
-
 ## We write each flux once as a function of the state and parameters, and
 ## `cicr_ode!` just balances every species: production minus consumption (the
 ## same `du = S * v` split Catalyst uses internally).
@@ -20,8 +19,8 @@ function cicr_ode!(du, u, p, t)
     v2m = p.km2 * u.RIC                             ## RIC --> RI
     v3p = p.k3 * u.C * u.RIC                        ## RIC --> RICC
     v3m = p.km3 * u.RICC                            ## RICC --> RIC
-    v4 = p.vr * (p.γ0 + p.γ1 * u.RIC) * (p.Cer - u.C) ## 0 --> C
-    v5 = hill(u.C, p.p1, p.p2, 4)                   ## C => 0
+    v4 = p.vr * (p.γ0 + p.γ1 * u.RIC) * (p.Cer - u.C)  ## 0 --> C
+    v5 = p.p1 * hil(u.C, p.p2, 4)                     ## C => 0
 
     ## Species balances: each flux enters with its stoichiometric coefficient.
     du.R = -v1p + v1m

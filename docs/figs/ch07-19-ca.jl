@@ -2,12 +2,10 @@
 using ComponentArrays
 using OrdinaryDiffEq
 using Plots
+using Startup: hil, hilr
 Plots.gr(linewidth=1.5)
 
 #---
-mm(x, v, k) = v * x / (x + k)              ## Michaelis-Menten saturation
-hillr(x, v, k, n) = v * k^n / (x^n + k^n)  ## Hill repression
-
 ## The reactions
 ## ```
 ## hillr(PN, vs, ki, n), 0 --> M
@@ -23,16 +21,16 @@ hillr(x, v, k, n) = v * k^n / (x^n + k^n)  ## Hill repression
 ## ```
 function circadian_ode!(du, u, p, t)
     ## Flux through each reaction:
-    w1 = hillr(u.PN, p.vs, p.ki, p.n)  ## 0 --> M
-    w2 = mm(u.M, p.vm, p.km1)          ## M => 0
+    w1 = p.vs * hilr(u.PN, p.ki, p.n)  ## 0 --> M
+    w2 = p.vm * hil(u.M, p.km1)        ## M => 0
     w3 = p.ks * u.M                    ## 0 --> P0
-    w4 = mm(u.P0, p.v1, p.k1)          ## P0 => P1
-    w5 = mm(u.P1, p.v2, p.k2)          ## P1 => P0
-    w6 = mm(u.P1, p.v3, p.k3)          ## P1 => P2
-    w7 = mm(u.P2, p.v4, p.k4)          ## P2 => P1
+    w4 = p.v1 * hil(u.P0, p.k1)        ## P0 => P1
+    w5 = p.v2 * hil(u.P1, p.k2)        ## P1 => P0
+    w6 = p.v3 * hil(u.P1, p.k3)        ## P1 => P2
+    w7 = p.v4 * hil(u.P2, p.k4)        ## P2 => P1
     w8 = p.k1 * u.P2                   ## P2 --> PN
     w9 = p.k2 * u.PN                   ## PN --> P2
-    w10 = mm(u.P2, p.vd, p.kd)         ## P2 => 0
+    w10 = p.vd * hil(u.P2, p.kd)       ## P2 => 0
 
     ## Species balances: each flux enters with its stoichiometric coefficient.
     ## `w8` leaves `P2` and enters `PN` (nuclear import), and `w9` comes back

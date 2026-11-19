@@ -4,6 +4,7 @@ using ComponentArrays
 using DiffEqCallbacks
 using OrdinaryDiffEq
 using Plots
+using Startup: mass_action
 Plots.gr(linewidth=1.5)
 
 #---
@@ -13,10 +14,6 @@ Plots.gr(linewidth=1.5)
 ## k2, RL + P --> RL + Ps
 ## k3, Ps --> P
 ## ```
-mass_action(k) = k                ## zero-order flux
-mass_action(k, x) = k * x         ## first-order flux
-mass_action(k, x, y) = k * x * y  ## second-order flux
-
 #---
 function pathway_ode!(du, u, p, t)
     v1 = mass_action(p.k1, p.L, u.R)   ## R + L --> RL

@@ -3,13 +3,13 @@
 using ComponentArrays
 using OrdinaryDiffEq
 using Plots
+using Startup: mass_action
 Plots.gr(linewidth=1.5)
 
 #---
 ## Each reaction has a mass-action flux: its rate constant times the
-## product of the concentrations of its reactants.
-mass_action(k) = k          ## zero-order flux (constant production)
-mass_action(k, x) = k * x   ## first-order flux
+## product of the concentrations of its reactants (`mass_action` is one of
+## the reaction-network helpers in `Startup`).
 
 # ## Fig 2.11
 ## The full model

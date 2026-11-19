@@ -4,13 +4,12 @@ using ComponentArrays
 using DifferentialEquations
 using SteadyStateDiffEq
 using Plots
+using Startup: hil, with_param
 Plots.gr(linewidth=1.5)
 
 #---
 ## Hill functions: `hil(x, k)` is the saturating `x / (k + x)` and the
-## three-argument form adds a Hill coefficient `n`.
-hil(x, k) = x / (k + x)
-hil(x, k, n) = hil(x^n, k^n)
+## three-argument form adds a Hill coefficient `n`. Both come from `Startup`.
 
 # Model with/without feedback
 function make_ode(feedback::Bool)
@@ -41,12 +40,12 @@ u0 = ComponentArray(A = 0.0, I = 0.0, Rstar = 0.0, Aout = 0.0)
 @time "Build problem" prob725_no_feedback = SteadyStateProblem(make_ode(false), u0, p)
 
 #---
-with_popsize(p, n) = ComponentArray(merge(NamedTuple(p), (popsize = Float64(n),)))
-
+## Sweeping `popsize` means rebuilding the whole parameter array: pair-based
+## `remake(prob; p=[:popsize => n])` silently no-ops for a `SteadyStateProblem`.
 npops = 1:50:5001
 trajectories = length(npops)
 alg = DynamicSS(FBDF())
-prob_func = (prob, ctx) -> remake(prob; p = with_popsize(prob.p, npops[ctx.sim_id]))
+prob_func = (prob, ctx) -> remake(prob; p = with_param(prob.p, :popsize, npops[ctx.sim_id]))
 eprob = EnsembleProblem(prob725; prob_func)
 eprob_nofeed = EnsembleProblem(prob725_no_feedback; prob_func)
 @time sim = solve(eprob, alg; trajectories);

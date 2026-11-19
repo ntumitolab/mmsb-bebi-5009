@@ -4,11 +4,10 @@
 using ComponentArrays
 using OrdinaryDiffEq
 using Plots
+using Startup: hilr, mass_action
 Plots.gr(linewidth=1.5)
 
 #---
-mass_action(k, x) = k * x  ## first-order flux, e.g. first-order removal
-
 ## Hill repression `hillr(x, α, 1, n)` of Catalyst: the production rate falls
 ## from `α` to `0` as the repressor `x` grows past the threshold `K = 1`, and
 ## `n` sets how sharply, i.e. how switch-like the repression is. The general
@@ -16,12 +15,12 @@ mass_action(k, x) = k * x  ## first-order flux, e.g. first-order removal
 ## ```
 ## α * K^n / (x^n + K^n)
 ## ```
-## which with `K = 1` reduces to `α / (1 + x^n)`.
-hill_repression(x, p) = p.α * 1.0^p.n / (x^p.n + 1.0^p.n)
+## which with `K = 1` reduces to `α / (1 + x^n)`. `hilr(x, k, n)` from
+## `Startup` is the `K^n / (x^n + K^n)` factor.
 
 ## Production of an mRNA: a small basal rate `α0` plus the repressed maximal
 ## rate, so the gene is never completely off.
-mrna_production(x, p) = p.α0 + hill_repression(x, p)
+mrna_production(x, p) = p.α0 + p.α * hilr(x, 1.0, p.n)
 
 function repressilator_ode!(du, u, p, t)
     ## Flux through each reaction:

@@ -3,13 +3,10 @@
 using ComponentArrays
 using OrdinaryDiffEq
 using Plots
-using Startup: meshgrid, normalize_gradient
+using Startup: get_gradient, hil, meshgrid, normalize_gradient
 Plots.gr(linewidth=1.5)
 
 #---
-hil(x, k=one(x)) = x / (x + k)
-hil(x, k, n) = hil(x^n, k^n)
-
 function met_ode!(du, u, p, t)
     Hcy = u.AdoHcy * p.K_AHC / p.Adenosine                                ## Hcy ~ AdoHcy * K_AHC / Adenosine
     v_MATI = p.v_MATI_max * hil(p.Met * hil(p.K_MATI_i, u.AdoMet), p.K_MATI_m)
@@ -24,23 +21,6 @@ function met_ode!(du, u, p, t)
     du.AdoMet = (v_MATI + v_MATIII) - (v_GNMT + v_MET)
     du.AdoHcy = (v_GNMT + v_MET - v_D) * hil(p.Adenosine, p.K_AHC)
     return nothing
-end
-
-#---
-function get_gradient(f!, p, xx, yy; t = 0.0)
-    dx = map(xx, yy) do x, y
-        u = ComponentArray(AdoMet = x, AdoHcy = y)
-        du = similar(u)
-        f!(du, u, p, t)
-        du.AdoMet
-    end
-    dy = map(xx, yy) do x, y
-        u = ComponentArray(AdoMet = x, AdoHcy = y)
-        du = similar(u)
-        f!(du, u, p, t)
-        du.AdoHcy
-    end
-    return dx, dy
 end
 
 # ## Figure 5.10
@@ -74,7 +54,7 @@ plot(sol510, idxs=[:AdoMet, :AdoHcy], labels=["AdoMet" "AdoHcy"], title="Fig. 5.
 xrange = range(0, 1200, 101)
 yrange = range(0, 6, 101)
 xx, yy = meshgrid(xrange, yrange)
-dx, dy = get_gradient(met_ode!, prob510.p, xx, yy)
+dx, dy = get_gradient(met_ode!, prob510.u0, prob510.p, :AdoMet, :AdoHcy, xx, yy)
 
 xx_sp = xx[1:5:end, 1:5:end]
 yy_sp = yy[1:5:end, 1:5:end]
@@ -95,7 +75,7 @@ prob511b = remake(prob510, p=[:Met => 51.0])
 xrange = range(0, 1200, 101)
 yrange = range(0, 6, 101)
 xx, yy = meshgrid(xrange, yrange)
-dx, dy = get_gradient(met_ode!, prob511b.p, xx, yy)
+dx, dy = get_gradient(met_ode!, prob511b.u0, prob511b.p, :AdoMet, :AdoHcy, xx, yy)
 
 xx_sp = xx[1:5:end, 1:5:end]
 yy_sp = yy[1:5:end, 1:5:end]

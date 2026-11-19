@@ -3,6 +3,7 @@
 using ComponentArrays
 using OrdinaryDiffEq
 using Plots
+using Startup: hilr, mass_action
 Plots.gr(linewidth=1.5)
 
 #---
@@ -12,21 +13,22 @@ Plots.gr(linewidth=1.5)
 ## (α * X, β),           0 <--> Y
 ## (γ * Y, δ),           0 <--> Z
 ## ```
-mass_action(k, x) = k * x  ## first-order flux, e.g. first-order removal
 
 ## Hill repression of the production of `X` by the end product `Z`: the flux
-## falls from `a` to `0` as `Z` grows past the threshold `k`, and `n` sets how
-## sharply, i.e. how switch-like the feedback is.
-hill_repression(z, p) = p.a / (p.k^p.n + z^p.n)
+## falls from `a / k^n` (at `Z = 0`) to `0` as `Z` grows past the threshold `k`,
+## and `n` sets how sharply, i.e. how switch-like the feedback is. Catalyst's
+## `hillr(Z, a, k, n)` is `a * k^n / (Z^n + k^n)`, so the rate written above is
+## that divided by `k^n`: with `hilr(x, k, n) = k^n / (x^n + k^n)` from `Startup`
+## it becomes `(a / k^n) * hilr(Z, k, n)`.
 
 function goodwin_ode!(du, u, p, t)
     ## Flux through each reaction:
-    v1p = hill_repression(u.Z, p)       ## 0 --> X, repressed by Z
-    v1m = mass_action(p.b, u.X)         ## X --> 0
-    v2p = mass_action(p.α, u.X)         ## 0 --> Y, at a rate proportional to X
-    v2m = mass_action(p.β, u.Y)         ## Y --> 0
-    v3p = mass_action(p.γ, u.Y)         ## 0 --> Z, at a rate proportional to Y
-    v3m = mass_action(p.δ, u.Z)         ## Z --> 0
+    v1p = (p.a / p.k^p.n) * hilr(u.Z, p.k, p.n)  ## 0 --> X, repressed by Z
+    v1m = mass_action(p.b, u.X)                  ## X --> 0
+    v2p = mass_action(p.α, u.X)                  ## 0 --> Y, at a rate proportional to X
+    v2m = mass_action(p.β, u.Y)                  ## Y --> 0
+    v3p = mass_action(p.γ, u.Y)                  ## 0 --> Z, at a rate proportional to Y
+    v3m = mass_action(p.δ, u.Z)                  ## Z --> 0
 
     ## Species balances: each flux enters with its stoichiometric coefficient.
     du.X = v1p - v1m

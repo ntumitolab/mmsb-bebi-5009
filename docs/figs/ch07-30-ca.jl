@@ -4,12 +4,10 @@ using ComponentArrays
 using OrdinaryDiffEq
 using SteadyStateDiffEq
 using Plots
+using Startup: hil, hilr, with_param
 Plots.gr(linewidth=1.5)
 
 #---
-mm(x, v, K) = v * x / (x + K)               ## Michaelis-Menten saturation
-hillr(x, v, K, n) = v * K^n / (x^n + K^n)   ## Hill repression
-
 ## The reactions
 ## ```
 ## hillr(L, aG, KL, 2),            0 --> G
@@ -24,12 +22,12 @@ hillr(x, v, K, n) = v * K^n / (x^n + K^n)   ## Hill repression
 ## ```
 function band_detector_ode!(du, u, p, t)
     ## Flux through each reaction:
-    w1 = hillr(u.L, p.aG, p.KL, 2)            ## 0 --> G, repressed by L
+    w1 = p.aG * hilr(u.L, p.KL, 2)             ## 0 --> G, repressed by L
     w2 = p.bG * u.G                            ## G --> 0
-    w3 = hillr(u.C, p.aL1, p.KC, 2)            ## 0 --> L, repressed by C
-    w4 = mm(u.R, p.aL2, p.KR)                  ## 0 --> L, activated by R
+    w3 = p.aL1 * hilr(u.C, p.KC, 2)            ## 0 --> L, repressed by C
+    w4 = p.aL2 * hil(u.R, p.KR)                ## 0 --> L, activated by R
     w5 = p.bL * u.L                            ## L --> 0
-    w6 = mm(u.R, p.aC, p.KR)                   ## 0 --> C, activated by R
+    w6 = p.aC * hil(u.R, p.KR)                 ## 0 --> C, activated by R
     w7 = p.bC * u.C                            ## C --> 0
     w8 = p.k1 * (p.RT - 2u.R)^2 * p.A^2        ## 0 --> R, driven by A
     w9 = p.k2 * u.R                            ## R --> 0
@@ -62,12 +60,12 @@ p = ComponentArray(
 u0 = ComponentArray(G=0.0, L=0.0, C=0.0, R=0.0)
 
 #---
-with_A(p, a) = ComponentArray(merge(NamedTuple(p), (A = a,)))
-
 (sols, as) = let N = 1:100
     as = [exp10(-4 + 4 * (i - 1) / length(N)) for i in N]
     @time "Build problem" prob = SteadyStateProblem(band_detector_ode!, u0, p)
-    prob_func = (prob, ctx) -> remake(prob; p = with_A(prob.p, as[ctx.sim_id]))
+    ## Sweeping `A` means rebuilding the whole parameter array: pair-based
+    ## `remake(prob; p=[:A => a])` silently no-ops for a `SteadyStateProblem`.
+    prob_func = (prob, ctx) -> remake(prob; p = with_param(prob.p, :A, as[ctx.sim_id]))
     eprob = EnsembleProblem(prob; prob_func)
     @time "Solve problem" sols = solve(eprob, DynamicSS(FBDF()); trajectories=length(N))
     (sols, as)

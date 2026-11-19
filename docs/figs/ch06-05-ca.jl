@@ -5,6 +5,7 @@ using DiffEqCallbacks
 using OrdinaryDiffEq
 using SteadyStateDiffEq
 using Plots
+using Startup: mass_action, with_param
 Plots.gr(linewidth=1.5)
 
 #---
@@ -16,10 +17,6 @@ Plots.gr(linewidth=1.5)
 ## kGd0, Ga --> Gd
 ## kG1, Gd + Gbg --> G
 ## ```
-mass_action(k) = k                ## zero-order flux
-mass_action(k, x) = k * x         ## first-order flux
-mass_action(k, x, y) = k * x * y  ## second-order flux
-
 #---
 function gprotein_ode!(du, u, p, t)
     v1 = mass_action(p.kRL, p.L, u.R)     ## R + L --> RL
@@ -59,9 +56,10 @@ plot(sol605, idxs=[:RL, :Ga], labels=["RL" "Ga"], title="Fig. 6.05 (A)", xlabel=
 lrange = range(0, 20 * 1e-9, length=101)
 
 @time "Build problem" prob605b = SteadyStateProblem(gprotein_ode!, u0, p)
-with_L(p, L) = ComponentArray(merge(NamedTuple(p), (L = L,)))
+## Sweeping `L` means rebuilding the whole parameter array: pair-based
+## `remake(prob; p=[:L => lval])` silently no-ops for a `SteadyStateProblem`.
 @time "Ensemble simulations" sols605 = map(lrange) do lval
-    _p = remake(prob605b; p=with_L(p, lval))
+    _p = remake(prob605b; p=with_param(p, :L, lval))
     sssol = solve(_p, DynamicSS(FBDF()))
 end
 

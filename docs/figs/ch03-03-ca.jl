@@ -3,6 +3,7 @@
 using ComponentArrays
 using OrdinaryDiffEq
 using Plots
+using Startup: hil
 Plots.gr(linewidth=1.5)
 
 #---
@@ -65,13 +66,11 @@ plot(ts, [s_full es_full p_full e_full],
 # ```
 # in Catalyst notation, where `=>` means the rate expression is used as-is and
 # `mm(X, v, K) = v * X / (X + K)`.
-mm(x, v, k) = v * x / (x + k)            ## Michaelis-Menten rate
-
 Km(p) = (p.km1 + p.k2) / p.k1            ## Michaelis constant
 
 function qssa_ode!(du, u, p, t)
     ## Flux through the single reaction, used as-is (a `=>` reaction):
-    v = mm(u.S, p.k2 * p.ET, Km(p))      ## mm(S, k2 * ET, (km1 + k2) / k1), S => P
+    v = (p.k2 * p.ET) * hil(u.S, Km(p))  ## mm(S, k2 * ET, (km1 + k2) / k1), S => P
 
     du.S = -v                            ## S --> P
     du.P = v                             ## P is made at the same rate
